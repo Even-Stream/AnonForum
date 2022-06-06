@@ -9,7 +9,8 @@
 	<script src="htmx.js" defer></script>
 
 <style nonce="Gnm9CO00dC">
-{{range .Posts}}{{if .File}}.p{{.Id}} {--mini: url('Files/{{.Imgprev}}'); --maxi: url('Files/{{.File}}');}{{end}}{{end}}
+{{range .Posts}}{{if .File}}
+.p{{.Id}} {--mini: url('Files/{{.Imgprev}}'); --maxi: url('Files/{{.File}}');}{{end}}{{end}}
 </style>
 </head>
 
