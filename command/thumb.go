@@ -35,7 +35,7 @@ func Make_thumb(file_path, file_pre, file_name, mime_type string) {
 
 	if file_dim.Height >= file_dim.Width && file_dim.Height > 200 {
 		selected = options[0]
-	} else if file_dim.Width > file_dim.Width && file_dim.Width > 200 {
+	} else if file_dim.Width > file_dim.Height && file_dim.Width > 200 {
 		selected = options[1]
 	} else {
 		selected = options[2]
