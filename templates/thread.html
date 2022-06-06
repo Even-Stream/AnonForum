@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>test</title>
+ 	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="style.css">
+	<script src="htmx.js" defer></script>
+
+<style nonce="Gnm9CO00dC">
+{{range .Posts}}{{if .File}}.p{{.Id}} {--mini: url('Files/{{.Imgprev}}'); --maxi: url('Files/{{.File}}');}{{end}}{{end}}
+</style>
+</head>
+
+<body>
+{{range slice .Posts 0 1}}
+		<table id="no{{.Id}}" class="thread">
+			<tr>
+				<td>
+					<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
+					<br>
+					<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>
+					<label><subject>「{{$.Subject}}」</subject>{{.Time}} No. {{.Id}}</label>
+					<p class="pcontent">{{.Content}}</p>
+				</td>
+			</tr>
+		</table>{{end}}
+{{range slice .Posts 1}}
+	<postwrap>
+		<table id="no{{.Id}}" class="post">
+			<tr>
+				<td>
+					<label>{{.Time}} No. {{.Id}}</label>
+					<br>
+					{{if .File}}<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
+					<br>
+					<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
+					{{if .Content}}<p class="pcontent">{{.Content}}</p>{{end}}
+				</td>
+			</tr>
+		</table>
+	</postwrap>
+{{end}}
+	<form action="/im/post/?parent=1" enctype="multipart/form-data" method="Post">
+		<textarea name="newpost" rows="8" cols="78">I'm putting the new post box at the bottom.</textarea>
+		<br>
+		<input type="file" name="file" accept="image/*,.jxl">
+		<input type="submit" value="Reply">
+	</form>
+</body>
+</html>
