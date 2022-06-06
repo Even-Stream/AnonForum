@@ -45,5 +45,4 @@ func Make_thumb(file_path, file_pre, file_name, mime_type string) {
 	Err_check(err)
 
 	bimg.Write(file_path + file_pre + "s.webp", newImage)
-
 }

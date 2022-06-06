@@ -8,7 +8,7 @@
 	<link rel="stylesheet" href="style.css">
 	<script src="htmx.js" defer></script>
 
-<style nonce="Gnm9CO00dC">
+<style>
 {{range .Posts}}{{if .File}}
 .p{{.Id}} {--mini: url('Files/{{.Imgprev}}'); --maxi: url('Files/{{.File}}');}{{end}}{{end}}
 </style>
@@ -22,7 +22,7 @@
 					<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
 					<br>
 					<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>
-					<label><subject>「{{$.Subject}}」</subject>{{.Time}} No. {{.Id}}</label>
+					<label><subject>「{{$.Subject}}」</subject>{{.Time}} <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></ref></label>
 					<p class="pcontent">{{.Content}}</p>
 				</td>
 			</tr>
@@ -32,7 +32,7 @@
 		<table id="no{{.Id}}" class="post">
 			<tr>
 				<td>
-					<label>{{.Time}} No. {{.Id}}</label>
+					<label>{{.Time}} <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></ref></label>
 					<br>
 					{{if .File}}<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
 					<br>

@@ -30,9 +30,14 @@ a {
     color: rgb(216, 68, 36);
 }
 
-ref a
+ref a, selfref a
 {
     text-decoration: none;
+}
+
+selfref a
+{
+    color: rgb(153, 17, 23);
 }
 
 p, label, postwrap, a, postwrap::before, .thread {
