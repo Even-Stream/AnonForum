@@ -2,14 +2,13 @@ package main
 
 import (
 	"database/sql"
-	"log"
 	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func create_table(db *sql.DB) {
-	//SQL command
+
 	createPostsTableSQL := `CREATE TABLE posts (
 		"Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 		"Content" TEXT,
@@ -23,24 +22,30 @@ func create_table(db *sql.DB) {
 		"Imgprev" TEXT
 	);`
 
-	log.Println("Creating posts table...")
-	statement, err := db.Prepare(createPostsTableSQL) //"prepares sql statement"
-	Err_check(err)
+	createRepliesTableSQL := `CREATE TABLE replies (
+		"Source" INTEGER NOT NULL,
+		"Replier" INTEGER NOT NULL
+	);`
 
-	statement.Exec() //executes the statements
-	log.Println("posts table created")
+	statement, err := db.Prepare(createPostsTableSQL)
+	Err_check(err)
+	statement.Exec()
+
+	statement, err = db.Prepare(createRepliesTableSQL)
+        Err_check(err)
+	statement.Exec()
 }
 
 func New_db() {
 
-	file, err := os.Create(BP + "command/post-coll.db") 
-	Err_check(err)	
+	file, err := os.Create(BP + "command/post-coll.db")
+	Err_check(err)
 
 	file.Close()
 
-	conn, err := sql.Open("sqlite3", BP + "command/post-coll.db") 
+	conn, err := sql.Open("sqlite3", BP + "command/post-coll.db")
 	Err_check(err)
-	defer conn.Close() 
-	
-	create_table(conn) 
+	defer conn.Close()
+
+	create_table(conn)
 }
