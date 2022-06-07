@@ -3,8 +3,7 @@
     font-style: normal;
     font-weight: 400;
     src: local(''),
-       url('noto-sans-jp-v42-latin_japanese-regular.woff2') format('woff2'), 
-       url('noto-sans-jp-v42-latin_japanese-regular.woff') format('woff'); 
+       url('noto-sans-jp-v42-latin_japanese-regular.woff2') format('woff2'); 
     font-display: block;
 }
 

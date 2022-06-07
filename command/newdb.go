@@ -9,7 +9,7 @@ import (
 )
 
 func create_table(db *sql.DB) {
-	//SQL command 
+	//SQL command
 	createPostsTableSQL := `CREATE TABLE posts (
 		"Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 		"Content" TEXT,
@@ -21,7 +21,7 @@ func create_table(db *sql.DB) {
 		"Filename" TEXT,
 		"Fileinfo" TEXT,
 		"Imgprev" TEXT
-	);` 
+	);`
 
 	log.Println("Creating posts table...")
 	statement, err := db.Prepare(createPostsTableSQL) //"prepares sql statement"

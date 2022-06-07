@@ -2,7 +2,7 @@ package main
 
 import (
 	"database/sql"
-    	"flag"
+	"flag"
 	"log"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -18,24 +18,24 @@ func Err_check(err error) {
 
 func Query_err_check(err error) {
 	if err != nil {
-	
+
 		if err == sql.ErrNoRows {
 			// there were no rows, but otherwise no error occurred
 		} else {
 				log.Fatal(err)
-			} 
-			
+			}
+
 	}
 }
 
 
 func main() {
 
-    	flag.StringVar(&BP, "BP", "../", "the base path")
-    	flag.Parse()
+	flag.StringVar(&BP, "BP", "../", "the base path")
+	flag.Parse()
 
 	Make_Conns()
 	Listen()
 	//New_db() 
 	//Build_thread()
-} 
+}

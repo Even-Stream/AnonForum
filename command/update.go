@@ -1,4 +1,4 @@
-package main 
+package main
 
 import (
 	"database/sql"
@@ -17,6 +17,7 @@ type Post struct {
     Filename string
     Fileinfo string
     Imgprev string
+    Replies []string
 }
 
 type Thread struct {
@@ -27,26 +28,29 @@ type Thread struct {
 
 
 func get_posts(parent int) []*Post {
- 	conn, err := sql.Open("sqlite3", BP + "command/post-coll.db")
-  	Err_check(err)
+	conn, err := sql.Open("sqlite3", BP + "command/post-coll.db")
+	Err_check(err)
 
 	stmt, err := conn.Prepare(`SELECT Id, Content, Time, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
 		COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev FROM posts WHERE parent = ?`)
 	Err_check(err)
 
+	//make another statment that searches the replies table(every board will have one) 
+	//where the source equals the given id, add the replier to the post's replies array 
+
 	rows, err := stmt.Query(parent)
 	Err_check(err)
 	defer rows.Close()
-	
+
 	var thread_body []*Post
 
 	for rows.Next() {
-        	var pst Post
-        	err = rows.Scan(&pst.Id, &pst.Content, &pst.Time, &pst.File,
-            		&pst.Filename, &pst.Fileinfo, &pst.Imgprev)
+		var pst Post
+		err = rows.Scan(&pst.Id, &pst.Content, &pst.Time, &pst.File,
+			&pst.Filename, &pst.Fileinfo, &pst.Imgprev)
 		Err_check(err)
-        	thread_body = append(thread_body, &pst)
-    	}
+		thread_body = append(thread_body, &pst)
+	}
 
 	return thread_body
 }
