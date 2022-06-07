@@ -15,7 +15,7 @@ import (
 
 var nip, _ = time.LoadLocation("Asia/Tokyo")
 
-var ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", "image/jxl": ".jxl", "image/gif": ".gif"}
+var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif"}
 
 func gen_info(size int64) string {
 	file_info := units.HumanSize(float64(size))
@@ -43,23 +43,27 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 		defer file.Close()
 
 		mime_type := handler.Header["Content-Type"][0]
-		file_pre := strconv.FormatInt(time.Now().UnixNano(), 10)
-		file_name := file_pre + ext[mime_type]
-		file_path := BP + "/Files/"
+		ext, supp := mime_ext[mime_type]
 
-		f, err := os.OpenFile(file_path + file_name, os.O_WRONLY|os.O_CREATE, 0666)
-		Err_check(err)
-		defer f.Close()
+		if supp == true {
+			file_pre := strconv.FormatInt(time.Now().UnixNano(), 10)
+			file_name := file_pre + ext
+			file_path := BP + "/Files/"
 
-		io.Copy(f, file)
+			f, err := os.OpenFile(file_path + file_name, os.O_WRONLY|os.O_CREATE, 0666)
+			Err_check(err)
+			defer f.Close()
 
-		//think about if a pdf is given 
-		Make_thumb(file_path, file_pre, file_name, mime_type)
-		file_info := gen_info(handler.Size)
+			io.Copy(f, file)
 
-		stmt, err := conn.Prepare(`INSERT INTO posts(Content, Time, Parent, File, Filename, Fileinfo, Imgprev) VALUES (?, ?, ?, ?, ?, ?, ?)`)
-		Err_check(err)
-		_, err = stmt.Exec(input, post_time, parent, file_name, handler.Filename, file_info, file_pre + "s.webp")
+			//think about if a pdf is given 
+			Make_thumb(file_path, file_pre, file_name, mime_type)
+			file_info := gen_info(handler.Size)
+
+			stmt, err := conn.Prepare(`INSERT INTO posts(Content, Time, Parent, File, Filename, Fileinfo, Imgprev) VALUES (?, ?, ?, ?, ?, ?, ?)`)
+			Err_check(err)
+			_, err = stmt.Exec(input, post_time, parent, file_name, handler.Filename, file_info, file_pre + "s.webp")
+		}
 
 	} else {
 		stmt, err := conn.Prepare(`INSERT INTO posts(Content, Time, Parent) VALUES (?, ?, ?)`)
