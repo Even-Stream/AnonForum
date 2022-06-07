@@ -15,14 +15,14 @@
 </head>
 
 <body>
-{{range slice .Posts 0 1}}
+{{if .Posts}}{{range slice .Posts 0 1}}
 		<table id="no{{.Id}}" class="thread">
 			<tr>
 				<td>
 					<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
 					<br>
 					<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>
-					<label><subject>「{{$.Subject}}」</subject>{{.Time}} <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></ref></label>
+					<label><subject>「{{$.Subject}}」</subject>{{.Time}} <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
 					<p class="pcontent">{{.Content}}</p>
 				</td>
 			</tr>
@@ -32,7 +32,7 @@
 		<table id="no{{.Id}}" class="post">
 			<tr>
 				<td>
-					<label>{{.Time}} <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></ref></label>
+					<label>{{.Time}} <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
 					<br>
 					{{if .File}}<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
 					<br>
@@ -42,7 +42,7 @@
 			</tr>
 		</table>
 	</postwrap>
-{{end}}
+{{end}}{{end}}
 	<form action="/im/post/?parent=1" enctype="multipart/form-data" method="Post">
 		<textarea name="newpost" rows="8" cols="78">I'm putting the new post box at the bottom.</textarea>
 		<br>
