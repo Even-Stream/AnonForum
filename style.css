@@ -58,7 +58,7 @@ textarea {
     margin: 2vw;
     width: 45%;
     height: 25%;
-    max-width: 98%;
+    max-width: 98% !important;
     font: 14px MPlus, Helvetica, Arial, sans-serif;
     outline: none;
     border: solid 1px rgb(240, 193, 197);
@@ -108,7 +108,7 @@ textarea:focus {
     padding-left: 20px;
     margin-bottom: 10px;
     line-height: 1.5em;
-    overflow-wrap: anywhere;
+    overflow-wrap: normal;
 }
 
 .prev {
