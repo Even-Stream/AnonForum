@@ -15,7 +15,7 @@ import (
 
 var nip, _ = time.LoadLocation("Asia/Tokyo")
 
-var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif"}
+var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif", "image/webp": ".webp"}
 
 func gen_info(size int64) string {
 	file_info := units.HumanSize(float64(size))
@@ -44,8 +44,16 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 
 		mime_type := handler.Header["Content-Type"][0]
 		ext, supp := mime_ext[mime_type]
+		
+		buffer := make([]byte, 512)
+		_, err := file.Read(buffer)
+		Err_check(err)
 
-		if supp == true {
+		_, supp2 := mime_ext[http.DetectContentType(buffer)]
+		_, err = file.Seek(0, io.SeekStart)
+		Err_check(err)
+
+		if supp && supp2 {
 			file_pre := strconv.FormatInt(time.Now().UnixNano(), 10)
 			file_name := file_pre + ext
 			file_path := BP + "/Files/"
