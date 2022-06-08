@@ -87,11 +87,11 @@ textarea:focus {
     min-width: 19.09vw;
     max-width: 98%;
     margin-bottom: .5%;
-    margin-left: 2%;
+    margin-left: 2.5%;
     padding-right: 10px;
 }
 
-.post label, .post pcontent {
+.post label {
     padding-left: 10px;
 }
 
@@ -105,7 +105,7 @@ textarea:focus {
 
 .pcontent {
     padding-right: 10px;
-    padding-left: 20px;
+    padding-left: 30px;
     margin-bottom: 10px;
     line-height: 1.5em;
     overflow-wrap: normal;
