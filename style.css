@@ -89,7 +89,14 @@ textarea:focus {
     margin-bottom: .5%;
     margin-left: 2%;
     padding-right: 10px;
+}
+
+.post label, .post pcontent {
     padding-left: 10px;
+}
+
+.post .imspec {
+    padding-left: 7px;
 }
 
 .post:target {
@@ -98,7 +105,7 @@ textarea:focus {
 
 .pcontent {
     padding-right: 10px;
-    padding-left: 10px;
+    padding-left: 20px;
     margin-bottom: 10px;
     line-height: 1.5em;
     overflow-wrap: anywhere;
