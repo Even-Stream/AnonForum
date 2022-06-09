@@ -27,6 +27,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 	req.ParseMultipartForm(10 << 20)
 
 	input := html.EscapeString(req.FormValue("newpost"))
+	input = Format_post(input)
 	parent := req.FormValue("parent")
 
 	now := time.Now().In(nip)

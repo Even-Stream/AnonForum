@@ -68,6 +68,20 @@ textarea:focus {
     border: solid 1px rgb(237, 169, 150);
 }
 
+quo {
+    color: rgb(140, 140, 140);
+}
+
+spoil {
+  color: black;
+  background-color: black;
+}
+
+spoil:hover {
+  color: inherit;
+  background-color: inherit;
+}
+
 .imspec {
     appearance: none;
     user-select: none;
