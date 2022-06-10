@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"net/http"
 	"time"
 	"html"
@@ -33,12 +32,12 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 	now := time.Now().In(nip)
 	post_time := now.Format("1/2/06(Mon)15:04:05")
 
-	conn, err := sql.Open("sqlite3", BP + "command/post-coll.db")
-	Err_check(err)
-	defer conn.Close()
+	stmts := Checkout()
+  defer Checkin(stmts)
 
 	//file uploading
 	file, handler, file_err := req.FormFile("file")
+	//never := false
 
 	if file_err == nil {
 		defer file.Close()
@@ -69,19 +68,18 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 			Make_thumb(file_path, file_pre, file_name, mime_type)
 			file_info := gen_info(handler.Size)
 
-			stmt, err := conn.Prepare(`INSERT INTO posts(Content, Time, Parent, File, Filename, Fileinfo, Imgprev) VALUES (?, ?, ?, ?, ?, ?, ?)`)
-			Err_check(err)
+			stmt := stmts["newpost_wf"]
 			_, err = stmt.Exec(input, post_time, parent, file_name, handler.Filename, file_info, file_pre + "s.webp")
+			Err_check(err)
 		}
 
 	} else {
-		stmt, err := conn.Prepare(`INSERT INTO posts(Content, Time, Parent) VALUES (?, ?, ?)`)
+		stmt := stmts["newpost_nf"]
+		_, err := stmt.Exec(input, post_time, parent)
 		Err_check(err)
-		_, err = stmt.Exec(input, post_time, parent)
 	}
-
-	Err_check(err)
+	
 	Build_thread()
-
+	
 	http.Redirect(w, req, req.Header.Get("Referer"), 302)
 }

@@ -24,8 +24,9 @@ type Prev struct {
 func Get_prev(w http.ResponseWriter, req *http.Request) {
 	//retrieves post request 
 
-	stmt := Checkout()
-  	defer Checkin(stmt)
+	stmts := Checkout()
+  	defer Checkin(stmts)
+	stmt := stmts["prev"]
 	
 	id := req.FormValue("p")
 	

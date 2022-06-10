@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"os"
 	"text/template"
 
@@ -28,21 +27,12 @@ type Thread struct {
 
 
 func get_posts(parent int) []*Post {
-	conn, err := sql.Open("sqlite3", BP + "command/post-coll.db")
-	Err_check(err)
 
-	stmt, err := conn.Prepare(`SELECT Id, Content, Time, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
-		COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev FROM posts WHERE Parent = ?`)
-	Err_check(err)
+	stmts := Checkout()
+  defer Checkin(stmts)
 
-	//make another statment that searches the replies table(every board will have one) 
-	//where the source equals the given id, add the replier to the post's replies array 
-	
-	conn2, err := sql.Open("sqlite3", BP + "command/post-coll.db")
-	Err_check(err)
-
-	stmt2, err := conn2.Prepare(`Select Replier FROM replies WHERE Source = ?`)
-	Err_check(err)
+  stmt := stmts["update"]
+	stmt2 := stmts["update_rep"]
 
 	rows, err := stmt.Query(parent)
 	Err_check(err)
