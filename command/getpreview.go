@@ -51,5 +51,3 @@ func Get_prev(w http.ResponseWriter, req *http.Request) {
 
 	w.Write([]byte(data))
 }
-
- 

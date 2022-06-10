@@ -32,8 +32,8 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 	now := time.Now().In(nip)
 	post_time := now.Format("1/2/06(Mon)15:04:05")
 
-	stmts := Checkout()
-  defer Checkin(stmts)
+	stmts := writeCheckout()
+  	defer writeCheckin(stmts)
 
 	//file uploading
 	file, handler, file_err := req.FormFile("file")

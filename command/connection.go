@@ -7,15 +7,24 @@ import (
 )
 
 var Max_conns = 5
-var Conns = make(chan map[string]*sql.Stmt, Max_conns)
+var readConns = make(chan map[string]*sql.Stmt, Max_conns)
+var writeConns = make(chan map[string]*sql.Stmt, 1)
+
 
 func Checkout() map[string]*sql.Stmt {
-  return <-Conns
+  return <-readConns
+}
+func Checkin(c map[string]*sql.Stmt) {
+  readConns <- c
 }
 
-func Checkin(c map[string]*sql.Stmt) {
-  Conns <- c
+func writeCheckout() map[string]*sql.Stmt {
+  return <-writeConns
 }
+func writeCheckin(c map[string]*sql.Stmt) {
+  writeConns <- c
+}
+
 
 func Make_Conns() {
 	for i := 0; i < Max_conns; i++ {
@@ -26,21 +35,6 @@ func Make_Conns() {
 		prev_stmt, err := conn1.Prepare(`SELECT Content, 
 			COALESCE(Imgprev, '') Imgprev FROM posts WHERE id = ?`)
 		Err_check(err)	
-
-
-		conn2, err := sql.Open("sqlite3", BP + "command/post-coll.db")
-		Err_check(err)
-
-		newpost_wfstmt, err := conn2.Prepare(`INSERT INTO posts(Content, Time, Parent, File, Filename, Fileinfo, Imgprev) VALUES (?, ?, ?, ?, ?, ?, ?)`)
-		Err_check(err)
-
-
-		conn3, err := sql.Open("sqlite3", BP + "command/post-coll.db")
-		Err_check(err)
-
-		newpost_nfstmt, err := conn3.Prepare(`INSERT INTO posts(Content, Time, Parent) VALUES (?, ?, ?)`)
-		Err_check(err)
-
 		
 		conn4, err := sql.Open("sqlite3", BP + "command/post-coll.db")
 		Err_check(err)
@@ -57,9 +51,23 @@ func Make_Conns() {
 		Err_check(err)
 		
 
-		stmts := map[string]*sql.Stmt{"prev": prev_stmt, "newpost_wf": newpost_wfstmt, "newpost_nf": newpost_nfstmt, 
-			"update": updatestmt, "update_rep": update_repstmt}
-
-		Conns <- stmts
+		stmts := map[string]*sql.Stmt{"prev": prev_stmt, "update": updatestmt, "update_rep": update_repstmt}
+		readConns <- stmts
 	}
+
+	conn2, err := sql.Open("sqlite3", BP + "command/post-coll.db")
+	Err_check(err)
+
+	newpost_wfstmt, err := conn2.Prepare(`INSERT INTO posts(Content, Time, Parent, File, Filename, Fileinfo, Imgprev) VALUES (?, ?, ?, ?, ?, ?, ?)`)
+	Err_check(err)
+
+
+	conn3, err := sql.Open("sqlite3", BP + "command/post-coll.db")
+	Err_check(err)
+
+	newpost_nfstmt, err := conn3.Prepare(`INSERT INTO posts(Content, Time, Parent) VALUES (?, ?, ?)`)
+	Err_check(err)
+
+	stmts := map[string]*sql.Stmt{"newpost_wf": newpost_wfstmt, "newpost_nf": newpost_nfstmt}
+	writeConns <- stmts
 }

@@ -26,7 +26,7 @@ type Thread struct {
 }
 
 
-func get_posts(parent int) []*Post {
+func get_posts(parent int) ([]*Post, error) {
 
 	stmts := Checkout()
   defer Checkin(stmts)
@@ -59,7 +59,7 @@ func get_posts(parent int) []*Post {
 		thread_body = append(thread_body, &pst)
 	}
 
-	return thread_body
+	return thread_body, err
 }
 
 func Build_thread() {
@@ -71,7 +71,10 @@ func Build_thread() {
     Err_check(err)
     defer f.Close()
 
-    thread := Thread{Posts: get_posts(1), Subject: "Templates"}
-
-    threadtemp.Execute(f, thread)
+    posts, err := get_posts(1)
+    
+    if err == nil {
+        thread := Thread{Posts: posts, Subject: "Templates"}
+        threadtemp.Execute(f, thread)
+    }
 }
