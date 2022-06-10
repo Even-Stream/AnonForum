@@ -31,11 +31,11 @@ func Query_err_check(err error) {
 
 func main() {
 
-	flag.StringVar(&BP, "BP", "../", "the base path")
+	flag.StringVar(&BP, "BP", "/mnt/c/server/data/content/media/toggle/", "the base path")
 	flag.Parse()
 
+	New_db() 
 	Make_Conns()
 	Listen()
-	//New_db() 
 	//Build_thread()
 }

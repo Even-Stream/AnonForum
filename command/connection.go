@@ -2,14 +2,12 @@ package main
 
 import (
 	"database/sql"
-
 	_ "github.com/mattn/go-sqlite3"
 )
 
 var Max_conns = 5
 var readConns = make(chan map[string]*sql.Stmt, Max_conns)
 var writeConns = make(chan map[string]*sql.Stmt, 1)
-
 
 func Checkout() map[string]*sql.Stmt {
   return <-readConns
@@ -27,16 +25,19 @@ func writeCheckin(c map[string]*sql.Stmt) {
 
 
 func Make_Conns() {
+	db_path := BP + "command/post-coll.db" 
+	db_uri := "file://" + db_path //+ "?cache=shared&mode=rwc&_journal_mode=WAL"
+
 	for i := 0; i < Max_conns; i++ {
 	
-		conn1, err := sql.Open("sqlite3", BP + "command/post-coll.db")
+		conn1, err := sql.Open("sqlite3", db_uri)
 		Err_check(err)
 		
 		prev_stmt, err := conn1.Prepare(`SELECT Content, 
 			COALESCE(Imgprev, '') Imgprev FROM posts WHERE id = ?`)
 		Err_check(err)	
 		
-		conn4, err := sql.Open("sqlite3", BP + "command/post-coll.db")
+		conn4, err := sql.Open("sqlite3", db_uri)
 		Err_check(err)
 
 		updatestmt, err := conn4.Prepare(`SELECT Id, Content, Time, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
@@ -44,7 +45,7 @@ func Make_Conns() {
 		Err_check(err)
 
 
-		conn5, err := sql.Open("sqlite3", BP + "command/post-coll.db")
+		conn5, err := sql.Open("sqlite3", db_uri)
 		Err_check(err)
 
 		update_repstmt, err := conn5.Prepare(`Select Replier FROM replies WHERE Source = ?`)
@@ -55,14 +56,14 @@ func Make_Conns() {
 		readConns <- stmts
 	}
 
-	conn2, err := sql.Open("sqlite3", BP + "command/post-coll.db")
+	conn2, err := sql.Open("sqlite3", db_uri)
 	Err_check(err)
 
 	newpost_wfstmt, err := conn2.Prepare(`INSERT INTO posts(Content, Time, Parent, File, Filename, Fileinfo, Imgprev) VALUES (?, ?, ?, ?, ?, ?, ?)`)
 	Err_check(err)
 
 
-	conn3, err := sql.Open("sqlite3", BP + "command/post-coll.db")
+	conn3, err := sql.Open("sqlite3", db_uri)
 	Err_check(err)
 
 	newpost_nfstmt, err := conn3.Prepare(`INSERT INTO posts(Content, Time, Parent) VALUES (?, ?, ?)`)
