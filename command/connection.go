@@ -26,7 +26,7 @@ func writeCheckin(c map[string]*sql.Stmt) {
 
 func Make_Conns() {
 	db_path := BP + "command/post-coll.db" 
-	db_uri := "file://" + db_path + "?cache=shared&mode=rwc&_journal_mode=WAL"
+	db_uri := "file://" + db_path + "?cache=private&_synchronous=NORMAL&_journal_mode=WAL"
 
 	for i := 0; i < Max_conns; i++ {
 	
