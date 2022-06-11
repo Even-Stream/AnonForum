@@ -14,9 +14,13 @@ git clone https://gitgud.io/nvtelen/ogai
 
 cd ogai/command
 
+go mod init modules
+
+go mod tidy 
+
 go build -o ogai *.go
 
 ## Project status
-6/6/22
+6/11/22
 
 ongoing
