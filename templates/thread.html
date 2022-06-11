@@ -5,7 +5,7 @@
 	<title>test</title>
  	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="default.css">
 	<script src="htmx.js" defer></script>
 
 <style>
@@ -48,6 +48,15 @@
 		<br>
 		<input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp">
 		<input type="submit" value="Reply">
+	</form>
+
+	<form class="thememenu" action="/im/theme/" method="Post">
+		<select name="theme">
+			<option value="default">Styles</option>
+ 			<option value="default">Default</option>
+  			<option value="burichan">Burichan</option>
+		</select>
+		<input type="submit" value="Select">
 	</form>
 </body>
 </html>

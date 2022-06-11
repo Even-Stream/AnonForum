@@ -106,6 +106,7 @@ spoil:hover {
 
 .post label {
     padding-left: 10px;
+    padding-right: 10px;
 }
 
 .post .imspec {
@@ -156,15 +157,14 @@ selfref a, .reply a
     color: rgb(153, 17, 23);
 }
 
-.subject {
-	font-size: 1empx;
-	color: rgb(213, 75, 75);
-}
-
 .image {
     content: var(--mini);
 }
 
 .image:checked {
     content: var(--maxi);
+}
+
+.thememenu {
+	float: right;
 }
