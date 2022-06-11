@@ -37,8 +37,8 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 
 	//file uploading
 	file, handler, file_err := req.FormFile("file")
-	//never := false
 
+	//file present
 	if file_err == nil {
 		defer file.Close()
 
@@ -47,6 +47,11 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 		
 		buffer := make([]byte, 512)
 		_, err := file.Read(buffer)
+
+		if err == io.EOF {
+			buffer = []byte("ts")
+			err = nil
+		}
 		Err_check(err)
 
 		_, supp2 := mime_ext[http.DetectContentType(buffer)]
@@ -72,7 +77,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 			_, err = stmt.Exec(input, post_time, parent, file_name, handler.Filename, file_info, file_pre + "s.webp")
 			Err_check(err)
 		}
-
+	//file not present 
 	} else {
 		stmt := stmts["newpost_nf"]
 		_, err := stmt.Exec(input, post_time, parent)

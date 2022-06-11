@@ -34,7 +34,7 @@ func main() {
 	flag.StringVar(&BP, "BP", "/mnt/c/server/data/content/media/toggle/", "the base path")
 	flag.Parse()
 
-	New_db() 
+	//New_db() 
 	Make_Conns()
 	Listen()
 	//Build_thread()
