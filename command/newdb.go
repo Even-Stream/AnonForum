@@ -19,7 +19,8 @@ func create_table(db *sql.DB) {
 		"File" TEXT,
 		"Filename" TEXT,
 		"Fileinfo" TEXT,
-		"Imgprev" TEXT
+		"Imgprev" TEXT,
+		"Phash" TEXT
 	);`
 
 	createRepliesTableSQL := `CREATE TABLE replies (
