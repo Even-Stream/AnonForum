@@ -65,4 +65,3 @@ func (i *IPRateLimiter) GetLimiter(ip string, sel int) *rate.Limiter {
 
     return limiters[sel]
 }
-

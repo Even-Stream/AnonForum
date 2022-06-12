@@ -5,6 +5,32 @@ An image board engine written in golang.
 live instance(url subject to change):
 https://[200:c5b0:cfeb:5db:c054:d66d:eb6f:7412]/content/media/toggle/
 
+## Advantages
+
+Uses CSS instead of JS for some common features
+
+- Expanding thumbnails
+
+- Linked-to post highlighting 
+
+Takes advantage of Nginx features
+
+- Theme picker with no JS
+
+Other
+
+- Files keep their original name when downloaded 
+
+- Embeded thumbnailer
+
+- Webp thumbnails 
+
+- Concurrent 
+
+- Uses Sqlite by default 
+
+- Not PHP
+
 ## Compile Instructions
 sudo apt install build-essential cmake git
 
@@ -25,6 +51,6 @@ go build -o ogai *.go
 sudo ./configure --with-http_ssl_module --with-http_v2_module --with-http_sub_module
 
 ## Project status
-6/11/22
+6/12/22
 
 ongoing
