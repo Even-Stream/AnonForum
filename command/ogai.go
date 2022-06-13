@@ -39,8 +39,8 @@ func main() {
 	Err_check(err)
 	log.SetOutput(file)
 
-	//New_db() 
+	//New_db()
 	Make_Conns()
+	//Build_thread() 
 	Listen()
-	//Build_thread()
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"strings"
+	"time"
 
 	"golang.org/x/time/rate"
 )
@@ -13,6 +14,11 @@ var limiter = NewIPRateLimiter(rarr, barr)
 
 func Listen() {
 
+	go func() {
+		for range time.Tick(time.Hour) {
+			limiter = NewIPRateLimiter(rarr, barr)
+	}}()
+
 	//listen mux
 	mux := http.NewServeMux()
 	mux.HandleFunc("/im/ret/", Get_prev)
@@ -22,9 +28,7 @@ func Listen() {
 }
 
 func hongMeiling(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		//fmt.Println(next)
-		//fmt.Println(r.URL)	
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {	
 				
 		var sel int
 		url := r.URL.String()
