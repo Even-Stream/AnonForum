@@ -11,7 +11,10 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+
 var BP string
+var rand_charset = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_"
+
 
 func Err_check(err error) {
 	if err != nil {
@@ -31,6 +34,16 @@ func Query_err_check(err error) {
 	}
 }
 
+func Rand_gen() string {
+    result := ""
+	
+    for i := 0; i < 6; i++ {
+        c := rand_charset[rand.Intn(len(rand_charset))]
+	result += string(c)
+    }
+
+    return result
+}
 
 func main() {
 

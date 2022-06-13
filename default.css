@@ -11,6 +11,10 @@
     color: rgb(255, 255, 255);
 }
 
+:focus{
+    outline: none;
+}
+
 body {
     background-color: rgb(253, 240, 241);
     overflow-x: hidden;
@@ -162,6 +166,8 @@ selfref a, .reply a
 }
 
 .image:checked {
+    max-width: 60vw;
+    max-height: 90vh;
     content: var(--maxi);
 }
 

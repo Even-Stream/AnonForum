@@ -16,8 +16,9 @@ var nip, _ = time.LoadLocation("Asia/Tokyo")
 
 var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif", "image/webp": ".webp"}
 
-func gen_info(size int64) string {
+func gen_info(size int64, width int, height int) string {
 	file_info := units.HumanSize(float64(size))
+	file_info = file_info + ", " + strconv.Itoa(width) + "x" + strconv.Itoa(height)
 	return file_info
 }
 
@@ -70,8 +71,8 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 			io.Copy(f, file)
 
 			//think about if a pdf is given 
-			Make_thumb(file_path, file_pre, file_name, mime_type)
-			file_info := gen_info(handler.Size)
+			width, height := Make_thumb(file_path, file_pre, file_name, mime_type)
+			file_info := gen_info(handler.Size, width, height)
 
 			stmt := stmts["newpost_wf"]
 			_, err = stmt.Exec(input, post_time, parent, file_name, handler.Filename, file_info, file_pre + "s.webp")

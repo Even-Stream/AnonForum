@@ -22,7 +22,7 @@ var small = bimg.Options{
 var options = [3]bimg.Options{taller, wider, small}
 
 
-func Make_thumb(file_path, file_pre, file_name, mime_type string) {
+func Make_thumb(file_path, file_pre, file_name, mime_type string) (int, int) {
 
 	var selected bimg.Options
 	file_full := file_path + file_name
@@ -45,4 +45,6 @@ func Make_thumb(file_path, file_pre, file_name, mime_type string) {
 	Err_check(err)
 
 	bimg.Write(file_path + file_pre + "s.webp", newImage)
+
+	return file_dim.Width, file_dim.Height
 }

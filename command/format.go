@@ -4,7 +4,6 @@ import (
 	"strings"
 	"bufio"
 	"regexp"
-	"math/rand"
 )
 
 var nlreg = regexp.MustCompile("\n")
@@ -22,26 +21,13 @@ var nlpost = "\n<br>"
 var tagpost = "$1\n$2"
 
 var reppost = `<ref hx-get="/im/ret/?p=$1" hx-trigger="mouseover once" hx-target="#p$1"><a href="#no$1">&#62;&#62;$1</a></ref><box id="p$1" class="prev"></box>`
-var reprandpost string
+var reprandpost = reppost
 var quopost = `<quo>&#62;$1</quo>`
 var spoilpost = `<spoil>$1</spoil>`
 var boldpost = `<b>$1</b>`
 var italicpost = `<i>$1</i>`
 var linkpost = `<a href="$1://$2">$1://$2</a>`
 
-var charset = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_"
-
-
-func randgen() string {
-    result := ""
-	
-    for i := 0; i < 6; i++ {
-        c := charset[rand.Intn(len(charset))]
-	result += string(c)
-    }
-
-    return result
-}
 
 func process(rawline string) string {
 
@@ -60,7 +46,7 @@ func Format_post(input string) string {
 	scanner := bufio.NewScanner(strings.NewReader(input))
 	scanner.Scan()
 
-	reprandpost = randreg.ReplaceAllString(reppost, `p$$1-` + randgen())
+	reprandpost = randreg.ReplaceAllString(reppost, `p$$1-` + Rand_gen())
 
 	output := process(scanner.Text())
 	
