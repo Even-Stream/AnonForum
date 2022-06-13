@@ -5,6 +5,8 @@ import (
 	"flag"
 	"log"
 	"os"
+	"math/rand"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -38,6 +40,8 @@ func main() {
 	file, err := os.OpenFile(BP + "error.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	Err_check(err)
 	log.SetOutput(file)
+
+	rand.Seed(time.Now().UnixNano())
 
 	//New_db()
 	Make_Conns()

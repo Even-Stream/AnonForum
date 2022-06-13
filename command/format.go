@@ -5,7 +5,6 @@ import (
 	"bufio"
 	"regexp"
 	"math/rand"
-	"time"
 )
 
 var nlreg = regexp.MustCompile("\n")
@@ -61,7 +60,6 @@ func Format_post(input string) string {
 	scanner := bufio.NewScanner(strings.NewReader(input))
 	scanner.Scan()
 
-	rand.Seed(time.Now().UnixNano())
 	reprandpost = randreg.ReplaceAllString(reppost, `p$$1-` + randgen())
 
 	output := process(scanner.Text())
