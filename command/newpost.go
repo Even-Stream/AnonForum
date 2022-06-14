@@ -75,7 +75,15 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 			file_info := gen_info(handler.Size, width, height)
 
 			stmt := stmts["newpost_wf"]
-			_, err = stmt.Exec(input, post_time, parent, file_name, handler.Filename, file_info, file_pre + "s.webp")
+
+			ofname := []rune(handler.Filename)
+			rem := len(ofname) - 20
+			if rem < 0 {
+				rem = 0
+			}
+			ffname := string(ofname[rem:])
+
+			_, err = stmt.Exec(input, post_time, parent, file_name, ffname, file_info, file_pre + "s.webp")
 			Err_check(err)
 		}
 	//file not present 
