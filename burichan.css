@@ -136,7 +136,9 @@ spoil:hover {
     margin-top: 2%;
     position: absolute;
     overflow: hidden;
+    user-select: none;
 }
+
 
 ref:hover+.prev {
     visibility: visible;
