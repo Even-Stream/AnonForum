@@ -7,7 +7,7 @@ import (
 )
 
 var nlreg = regexp.MustCompile("\n")
-var tagreg = regexp.MustCompile("(>)(<)")
+var tagreg = regexp.MustCompile("(br>)(<)")
 
 var repreg = regexp.MustCompile(`&gt;&gt;(\d+)\b`)
 var randreg = regexp.MustCompile(`p\$1`)
