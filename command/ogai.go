@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"flag"
 	"log"
 	"os"
 	"math/rand"
@@ -11,10 +10,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-
-var BP string
 const rand_charset = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_"
-
 
 func Err_check(err error) {
 	if err != nil {
@@ -47,8 +43,7 @@ func Rand_gen() string {
 
 func main() {
 
-	flag.StringVar(&BP, "bp", "/mnt/c/server/data/content/media/toggle/", "the base path")
-	flag.Parse()
+	Load_conf()
 
 	file, err := os.OpenFile(BP + "error.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	Err_check(err)
