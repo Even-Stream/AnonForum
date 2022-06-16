@@ -44,7 +44,7 @@ func hongMeiling(next http.Handler) http.Handler {
 		climiter := limiter.GetLimiter(r.Header.Get("X-Real-IP"), sel)
 
         	if !climiter.Allow() {
-            		http.Error(w, http.StatusText(http.StatusTooManyRequests), http.StatusTooManyRequests)
+            		http.Error(w, "Request limit exceeded. Please wait.", http.StatusTooManyRequests)
             		return
         	}
 

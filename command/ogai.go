@@ -47,7 +47,7 @@ func Rand_gen() string {
 
 func main() {
 
-	flag.StringVar(&BP, "BP", "/mnt/c/server/data/content/media/toggle/", "the base path")
+	flag.StringVar(&BP, "bp", "/mnt/c/server/data/content/media/toggle/", "the base path")
 	flag.Parse()
 
 	file, err := os.OpenFile(BP + "error.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)

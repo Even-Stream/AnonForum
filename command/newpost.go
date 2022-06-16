@@ -16,6 +16,8 @@ var nip, _ = time.LoadLocation("Asia/Tokyo")
 
 var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif", "image/webp": ".webp"}
 
+const max_upload_size = 1024 * 1024 * 11	//11MB
+
 func gen_info(size int64, width int, height int) string {
 	file_info := units.HumanSize(float64(size))
 	file_info = file_info + ", " + strconv.Itoa(width) + "x" + strconv.Itoa(height)
@@ -24,7 +26,16 @@ func gen_info(size int64, width int, height int) string {
 
 func New_post(w http.ResponseWriter, req *http.Request) {
 
-	req.ParseMultipartForm(10 << 20)
+	if req.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+ 	req.Body = http.MaxBytesReader(w, req.Body, max_upload_size)
+	if err := req.ParseMultipartForm(max_upload_size); err != nil {
+		http.Error(w, "Request size exceeds limit.", http.StatusBadRequest)
+		return
+	}
 
 	input := html.EscapeString(req.FormValue("newpost"))
 	input = Format_post(input)
@@ -60,6 +71,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 		Err_check(err)
 
 		if supp && supp2 {
+
 			file_pre := strconv.FormatInt(time.Now().UnixNano(), 10)
 			file_name := file_pre + ext
 			file_path := BP + "/Files/"
