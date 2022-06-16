@@ -17,6 +17,7 @@ var nip, _ = time.LoadLocation("Asia/Tokyo")
 var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif", "image/webp": ".webp"}
 
 const max_upload_size = 1024 * 1024 * 11	//11MB
+const max_post_length = 10000
 
 func gen_info(size int64, width int, height int) string {
 	file_info := units.HumanSize(float64(size))
@@ -33,9 +34,16 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 
  	req.Body = http.MaxBytesReader(w, req.Body, max_upload_size)
 	if err := req.ParseMultipartForm(max_upload_size); err != nil {
-		http.Error(w, "Request size exceeds limit.", http.StatusBadRequest)
+		http.Error(w, "Request size exceeds limit(10MB).", http.StatusBadRequest)
 		return
 	}
+
+	post_length := len([]rune(req.FormValue("newpost")))
+	if post_length > max_post_length {
+		http.Error(w, "Post exceeds character limit(10000). Post length: " + strconv.Itoa(post_length), http.StatusBadRequest)
+		return 
+	}
+
 
 	input := html.EscapeString(req.FormValue("newpost"))
 	input = Format_post(input)
