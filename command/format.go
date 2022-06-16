@@ -16,21 +16,32 @@ var spoilreg = regexp.MustCompile(`~~(.+)~~`)
 var boldreg = regexp.MustCompile(`\*\*(.+)\*\*`)
 var italicreg = regexp.MustCompile(`__(.+)__`)
 var linkreg = regexp.MustCompile(`(http|ftp|https):\/\/(\S+)`)
-	
-var nlpost = "\n<br>"
-var tagpost = "$1\n$2"
 
-var reppost = `<ref hx-get="/im/ret/?p=$1" hx-trigger="mouseover once" hx-target="#p$1"><a href="#no$1">&#62;&#62;$1</a></ref><box id="p$1" class="prev"></box>`
+const (	
+	nlpost = "\n<br>"
+	tagpost = "$1\n$2"
+	reppost = `<ref hx-get="/im/ret/?p=$1" hx-trigger="mouseover once" hx-target="#p$1"><a href="#no$1">&#62;&#62;$1</a></ref><box id="p$1" class="prev"></box>`
+)
+
 var reprandpost = reppost
-var quopost = `<quo>&#62;$1</quo>`
-var spoilpost = `<spoil>$1</spoil>`
-var boldpost = `<b>$1</b>`
-var italicpost = `<i>$1</i>`
-var linkpost = `<a href="$1://$2">$1://$2</a>`
+const (
+	quopost = `<quo>&#62;$1</quo>`
+	spoilpost = `<spoil>$1</spoil>`
+	boldpost = `<b>$1</b>`
+	italicpost = `<i>$1</i>`
+	linkpost = `<a href="$1://$2">$1://$2</a>`
+)
 
+func process(rawline string) (string, []string) {
 
-func process(rawline string) string {
-
+	repmatches := make([]string, 1)
+	repmatchcon := repreg.FindAllStringSubmatch(rawline, -1) 
+	if repmatchcon != nil {
+		for _, match := range repmatchcon {
+			repmatches = append(repmatches, match[1])
+		}
+	}
+	
 	postline := repreg.ReplaceAllString(rawline, reprandpost)
 	postline = quoreg.ReplaceAllString(postline, quopost)
 	postline = spoilreg.ReplaceAllString(postline, spoilpost)
@@ -38,25 +49,27 @@ func process(rawline string) string {
 	postline = italicreg.ReplaceAllString(postline, italicpost)
 	postline = linkreg.ReplaceAllString(postline, linkpost)
 
-	return postline
+	return postline, repmatches  
 }
 
-func Format_post(input string) string {
+func Format_post(input string) (string, []string) {
 
 	scanner := bufio.NewScanner(strings.NewReader(input))
 	scanner.Scan()
 
 	reprandpost = randreg.ReplaceAllString(reppost, `p$$1-` + Rand_gen())
 
-	output := process(scanner.Text())
+	output, repmatches := process(scanner.Text())
 	
 	for scanner.Scan() {
-		output = output + "\n" 
-		output = output + process(scanner.Text())	
+		output = output + "\n"
+		coutput, crepmatches := process(scanner.Text())	 
+		output = output + coutput
+		repmatches = append(repmatches, crepmatches...)
 	}
 
 	output = nlreg.ReplaceAllString(output, nlpost)
 	output = tagreg.ReplaceAllString(output, tagpost)
 	
-	return output
+	return output, repmatches
 }

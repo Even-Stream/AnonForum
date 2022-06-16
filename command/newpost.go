@@ -16,8 +16,12 @@ var nip, _ = time.LoadLocation("Asia/Tokyo")
 
 var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif", "image/webp": ".webp"}
 
-const max_upload_size = 1024 * 1024 * 11	//11MB
-const max_post_length = 10000
+var lastid int64
+
+const (
+	max_upload_size = 1024 * 1024 * 11	//11MB
+	max_post_length = 10000
+)
 
 func gen_info(size int64, width int, height int) string {
 	file_info := units.HumanSize(float64(size))
@@ -43,10 +47,9 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "Post exceeds character limit(10000). Post length: " + strconv.Itoa(post_length), http.StatusBadRequest)
 		return 
 	}
-
-
+	
 	input := html.EscapeString(req.FormValue("newpost"))
-	input = Format_post(input)
+	input, repmatches := Format_post(input)
 	parent := req.FormValue("parent")
 
 	now := time.Now().In(nip)
@@ -103,14 +106,29 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 			}
 			ffname := string(ofname[rem:])
 
-			_, err = stmt.Exec(input, post_time, parent, file_name, ffname, file_info, file_pre + "s.webp")
+			result, err := stmt.Exec(input, post_time, parent, file_name, ffname, file_info, file_pre + "s.webp")
+			Err_check(err)
+			lastid, err = result.LastInsertId()
 			Err_check(err)
 		}
 	//file not present 
 	} else {
 		stmt := stmts["newpost_nf"]
-		_, err := stmt.Exec(input, post_time, parent)
+		result, err := stmt.Exec(input, post_time, parent)
 		Err_check(err)
+		lastid, err = result.LastInsertId()
+		Err_check(err)
+	}
+
+	//reply insert
+	if len(repmatches) > 0 {
+		stmt := stmts["repadd"]
+		source := lastid 
+		for _, match := range repmatches {
+			match_id, err := strconv.ParseUint(match, 10, 64)
+			_, err = stmt.Exec(match_id, source)
+			Err_check(err)
+		}	
 	}
 	
 	Build_thread()

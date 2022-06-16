@@ -69,6 +69,12 @@ func Make_Conns() {
 	newpost_nfstmt, err := conn3.Prepare(`INSERT INTO posts(Content, Time, Parent) VALUES (?, ?, ?)`)
 	Err_check(err)
 
-	stmts := map[string]*sql.Stmt{"newpost_wf": newpost_wfstmt, "newpost_nf": newpost_nfstmt}
+	conn6, err := sql.Open("sqlite3", db_uri)
+	Err_check(err)
+
+	repadd_stmt, err := conn6.Prepare(`INSERT INTO replies(Source, Replier) VALUES (?, ?)`)
+	Err_check(err)
+
+	stmts := map[string]*sql.Stmt{"newpost_wf": newpost_wfstmt, "newpost_nf": newpost_nfstmt, "repadd": repadd_stmt}
 	writeConns <- stmts
 }
