@@ -32,6 +32,19 @@ const (
 	linkpost = `<a href="$1://$2">$1://$2</a>`
 )
 
+
+func removeDuplicates(strSlice []string) []string {
+    allKeys := make(map[string]bool)
+    list := []string{}
+    for _, item := range strSlice {
+        if _, value := allKeys[item]; !value {
+            allKeys[item] = true
+            list = append(list, item)
+        }
+    }
+    return list
+}
+
 func process(rawline string) (string, []string) {
 
 	repmatches := make([]string, 1)
@@ -68,6 +81,8 @@ func Format_post(input string) (string, []string) {
 		repmatches = append(repmatches, crepmatches...)
 	}
 
+	repmatches = removeDuplicates(repmatches)
+	
 	output = nlreg.ReplaceAllString(output, nlpost)
 	output = tagreg.ReplaceAllString(output, tagpost)
 	

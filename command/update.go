@@ -21,12 +21,13 @@ type Post struct {
 
 type Thread struct {
     Board string
+    Parent string
     Subject string
     Posts []*Post
 }
 
 
-func get_posts(parent int) ([]*Post, error) {
+func get_posts(parent string) ([]*Post, error) {
 
 	stmts := Checkout()
   defer Checkin(stmts)
@@ -62,19 +63,19 @@ func get_posts(parent int) ([]*Post, error) {
 	return thread_body, err
 }
 
-func Build_thread() { //will accept argument for board and thread number
+func Build_thread(parent string) { //will accept argument for board and thread number
     threadtemp := template.New("thread.html")
     threadtemp, err := threadtemp.ParseFiles(BP + "/templates/thread.html")
     Err_check(err)
 
-    f, err := os.Create(BP + "head/ot/index.html")
+    f, err := os.Create(BP + "head/ot/" + parent + ".html")
     Err_check(err)
     defer f.Close()
 
-    posts, err := get_posts(1)
+    posts, err := get_posts(parent)
     
     if err == nil {
-        thread := Thread{Posts: posts, Subject: "Templates"}
+        thread := Thread{Posts: posts, Subject: "Templates", Parent: parent}
         threadtemp.Execute(f, thread)
     }
 }

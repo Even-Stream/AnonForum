@@ -47,7 +47,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "Post exceeds character limit(10000). Post length: " + strconv.Itoa(post_length), http.StatusBadRequest)
 		return 
 	}
-	
+
 	input := html.EscapeString(req.FormValue("newpost"))
 	input, repmatches := Format_post(input)
 	parent := req.FormValue("parent")
@@ -131,7 +131,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 		}	
 	}
 	
-	Build_thread()
+	Build_thread(parent)
 	
 	http.Redirect(w, req, req.Header.Get("Referer"), 302)
 }
