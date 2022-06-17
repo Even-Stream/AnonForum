@@ -8,7 +8,7 @@ import (
 	"golang.org/x/time/rate"
 )
 
-var rarr = []rate.Limit{10, .02, .5}
+var rarr = []rate.Limit{10, .04, .5}
 var barr = []int{30, 1, 1}
 var limiter = NewIPRateLimiter(rarr, barr)
 

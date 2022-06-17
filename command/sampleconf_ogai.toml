@@ -1,3 +1,16 @@
 # Ogai image board configuration
 
 Base_path = #insert git cloned directory 
+
+#below has not been implemented yet 
+Boards = ["ot"]
+
+Max_request_size = 11     #in MB
+
+Max_characters = 10000
+
+Themes = ["Burichan"]     #Default included by default 
+
+Max_thumbnail_dim = 200
+
+Read_connections = 5          

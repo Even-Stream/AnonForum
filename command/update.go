@@ -62,12 +62,12 @@ func get_posts(parent int) ([]*Post, error) {
 	return thread_body, err
 }
 
-func Build_thread() {
+func Build_thread() { //will accept argument for board and thread number
     threadtemp := template.New("thread.html")
     threadtemp, err := threadtemp.ParseFiles(BP + "/templates/thread.html")
     Err_check(err)
 
-    f, err := os.Create(BP + "index.html")
+    f, err := os.Create(BP + "head/ot/index.html")
     Err_check(err)
     defer f.Close()
 

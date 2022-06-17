@@ -5,12 +5,12 @@
 	<title>test</title>
  	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<link rel="stylesheet" href="default.css">
-	<script src="htmx.js" defer></script>
+	<link rel="stylesheet" href="/resources/default.css">
+	<script src="/resources/htmx.js" defer></script>
 
 <style>
 {{range .Posts}}{{if .File}}
-.p{{.Id}} {--mini: url('Files/{{.Imgprev}}'); --maxi: url('Files/{{.File}}');}{{end}}{{end}}
+.p{{.Id}} {--mini: url('/ot/Files/{{.Imgprev}}'); --maxi: url('/ot/Files/{{.File}}');}{{end}}{{end}}
 </style>
 </head>
 
