@@ -1,0 +1,174 @@
+@font-face {
+    font-family: 'MPlus';
+    font-style: normal;
+    font-weight: 400;
+    src: url('m-plus-2-v5-latin_japanese-regular.woff2') format('woff2'); 
+    font-display: block;
+}
+
+:focus{
+    outline: none;
+}
+
+body {
+    background-color: #EEF2FF;
+    overflow-x: hidden;
+}
+
+postwrap::before {
+    content: ">>";
+}
+
+postwrap::before, .prev {
+    position: absolute;
+}
+
+a {
+    color: #34345C;
+}
+
+ref a, selfref a
+{
+    text-decoration: none;
+}
+
+p, label, postwrap, a, postwrap::before, .thread {
+    font: 16px MPlus, Helvetica, Arial, sans-serif;
+}
+
+p, label, postwrap, .thread postwrap::before {
+    color: rgb(30, 30, 30);
+}
+
+subject {
+	color: #0F0C5D;
+	font-size: 1.1em;
+}
+
+img {
+    aspect-ratio:attr(width)/attr(height);
+}
+
+input {
+    padding-top: 5px;
+}
+
+textarea {
+    margin: 2vw;
+    width: 45%;
+    height: 25%;
+    max-width: 98% !important;
+    font: 14px MPlus, Helvetica, Arial, sans-serif;
+    outline: none;
+    border: solid 1px #D6DAF0;
+}
+
+textarea:focus {
+    border: solid 1px #D6BAD0;
+}
+
+quo {
+    color: #789922;
+}
+
+spoil {
+  color: black;
+  background-color: black;
+}
+
+spoil:hover {
+  color: inherit;
+  background-color: inherit;
+}
+
+.imspec {
+    appearance: none;
+    user-select: none;
+    cursor: pointer;
+    float: left;
+    padding-right: 15px;
+}
+
+.thread {
+    height: 40.44vh;
+    margin-left: 1%;
+    padding-bottom: 10px;
+}
+
+.post {
+    height: 12.81vh;
+    min-width: 19.09vw;
+    max-width: 98%;
+    margin-bottom: .5%;
+    margin-left: 2.5%;
+}
+
+.post label {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.post .imspec {
+    padding-left: 7px;
+}
+
+.post:target {
+    background-color: #D6BAD0;
+}
+
+.pcontent {
+    padding-right: 30px;
+    padding-left: 30px;
+    margin-bottom: 10px;
+    line-height: 1.5em;
+    overflow-wrap: normal;
+}
+
+.prev {
+    visibility: hidden;
+    border: .1rem solid;
+    border-color: rgb(183, 197, 217);
+    padding: 7px;
+    content: var(--post);
+    max-width: 65%;
+    max-height: 70%;
+    margin-left: 1%;
+    margin-top: 2%;
+    position: absolute;
+    overflow: hidden;
+    user-select: none;
+}
+
+
+ref:hover+.prev {
+    visibility: visible;
+}
+
+.post, .prev {
+    background-color: #D6DAF0;
+}
+
+.reply a {
+    font-size: 12px;
+    padding-left: 5px;
+}
+
+selfref a, .reply a
+{
+    color: rgb(60, 60, 90);
+}
+
+.image {
+    content: var(--mini);
+}
+
+.image:checked {
+    max-width: 80vw;
+    max-height: 80vh;
+    content: var(--maxi);
+}
+
+
+.thememenu {
+	float: right;
+}
