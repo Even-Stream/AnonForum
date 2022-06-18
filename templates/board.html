@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>test</title>
+ 	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="/resources/default.css">
+	<script src="/resources/htmx.js" defer></script>
+</head>
+
+<body>
+{{range .Threads}}<a href ="{{.Parent}}.html">{{.Parent}}</a><br>
+{{end}}
+</body>
+</html>

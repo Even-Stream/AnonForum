@@ -48,11 +48,18 @@ func Make_Conns() {
 		conn5, err := sql.Open("sqlite3", db_uri)
 		Err_check(err)
 
-		update_repstmt, err := conn5.Prepare(`Select Replier FROM replies WHERE Source = ?`)
+		update_repstmt, err := conn5.Prepare(`SELECT Replier FROM replies WHERE Source = ?`)
+		Err_check(err)
+
+		conn7, err := sql.Open("sqlite3", db_uri)
+		Err_check(err)
+
+		update_boardstmt, err := conn7.Prepare(`SELECT DISTINCT Parent FROM posts ORDER BY Id DESC LIMIT 10`)
 		Err_check(err)
 		
 
-		stmts := map[string]*sql.Stmt{"prev": prev_stmt, "update": updatestmt, "update_rep": update_repstmt}
+		stmts := map[string]*sql.Stmt{"prev": prev_stmt, "update": updatestmt, "update_rep": update_repstmt, 
+			"update_board": update_boardstmt}
 		readConns <- stmts
 	}
 

@@ -132,6 +132,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 	}
 	
 	Build_thread(parent)
+	Build_board("ot")
 	
 	http.Redirect(w, req, req.Header.Get("Referer"), 302)
 }

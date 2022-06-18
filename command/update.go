@@ -20,12 +20,39 @@ type Post struct {
 }
 
 type Thread struct {
-    Board string
     Parent string
     Subject string
     Posts []*Post
 }
 
+type Board struct {
+		Name string 
+		Threads []*Thread
+}
+
+
+func get_threads(board string) ([]*Thread, error) {
+	stmts := Checkout()
+	defer Checkin(stmts)
+	stmt := stmts["update_board"]
+
+//tables will be called a board 	
+	rows, err := stmt.Query()
+	Err_check(err)
+	defer rows.Close()
+
+	var board_body []*Thread
+
+	for rows.Next() {
+		var thr Thread
+		err = rows.Scan(&thr.Parent)
+		Err_check(err)
+
+		board_body = append(board_body, &thr)
+	}	
+
+	return board_body, err
+}
 
 func get_posts(parent string) ([]*Post, error) {
 
@@ -61,6 +88,23 @@ func get_posts(parent string) ([]*Post, error) {
 	}
 
 	return thread_body, err
+}
+
+func Build_board(name string) {
+	boardtemp := template.New("board.html")
+	boardtemp, err := boardtemp.ParseFiles(BP + "/templates/board.html")
+	Err_check(err)
+
+	f, err := os.Create(BP + "head/" + name + "/index.html")
+	Err_check(err)
+	defer f.Close()
+
+	threads, err := get_threads(name)
+
+	if err == nil {
+		board := Board{Name: name, Threads: threads}
+		boardtemp.Execute(f, board)
+	}
 }
 
 func Build_thread(parent string) { //will accept argument for board and thread number
