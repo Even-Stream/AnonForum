@@ -29,7 +29,8 @@ func Make_Conns() {
 	db_uri := "file://" + db_path + "?cache=private&_synchronous=NORMAL&_journal_mode=WAL"
 
 	for i := 0; i < Max_conns; i++ {
-	
+		
+		//preview statement
 		conn1, err := sql.Open("sqlite3", db_uri)
 		Err_check(err)
 		
@@ -37,6 +38,8 @@ func Make_Conns() {
 			COALESCE(Imgprev, '') Imgprev FROM posts WHERE id = ?`)
 		Err_check(err)	
 		
+
+		//thread update statements
 		conn4, err := sql.Open("sqlite3", db_uri)
 		Err_check(err)
 
@@ -51,15 +54,51 @@ func Make_Conns() {
 		update_repstmt, err := conn5.Prepare(`SELECT Replier FROM replies WHERE Source = ?`)
 		Err_check(err)
 
+		
+		//board upate statements
 		conn7, err := sql.Open("sqlite3", db_uri)
 		Err_check(err)
 
-		update_boardstmt, err := conn7.Prepare(`SELECT DISTINCT Parent FROM posts ORDER BY Id DESC LIMIT 10`)
+		parent_collstmt, err := conn7.Prepare(`SELECT DISTINCT Parent FROM posts ORDER BY Id DESC LIMIT 10`)
+		Err_check(err)
+
+		conn8, err := sql.Open("sqlite3", db_uri)
+		Err_check(err)
+
+		thread_headstmt, err := conn8.Prepare(`SELECT Content, Time, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
+				COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev
+				FROM posts
+				WHERE Id = ?`)
+		Err_check(err)
+
+		conn9, err := sql.Open("sqlite3", db_uri)
+		Err_check(err)
+
+		thread_bodystmt, err := conn9.Prepare(`SELECT * FROM (
+				SELECT Id, Content, Time, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
+				COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev FROM posts 
+				WHERE Parent = ? AND Id != Parent ORDER BY Id DESC LIMIT 5)
+				ORDER BY Id ASC`)
+		Err_check(err)
+
+		conn10, err := sql.Open("sqlite3", db_uri)
+		Err_check(err)
+
+		lastid_stmt, err := conn10.Prepare(`SELECT IFNULL ((SELECT MAX(Id) FROM posts), 0)`)
+		Err_check(err)
+
+		conn11, err := sql.Open("sqlite3", db_uri)
+		Err_check(err)
+
+		parent_checkstmt, err := conn11.Prepare(`SELECT COUNT(*)
+				FROM posts
+				WHERE Parent = ?`)
 		Err_check(err)
 		
 
 		stmts := map[string]*sql.Stmt{"prev": prev_stmt, "update": updatestmt, "update_rep": update_repstmt, 
-			"update_board": update_boardstmt}
+			"parent_coll": parent_collstmt, "thread_head": thread_headstmt, "thread_body": thread_bodystmt, 
+			"lastid": lastid_stmt, "parent_check": parent_checkstmt}
 		readConns <- stmts
 	}
 

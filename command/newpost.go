@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
 	units "github.com/docker/go-units"
@@ -32,7 +33,7 @@ func gen_info(size int64, width int, height int) string {
 func New_post(w http.ResponseWriter, req *http.Request) {
 
 	if req.Method != "POST" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		http.Error(w, "Method not allowed.", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -52,11 +53,43 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 	input, repmatches := Format_post(input)
 	parent := req.FormValue("parent")
 
+	if parent == "" {
+		http.Error(w, "Parent thread not specified.", http.StatusBadRequest)
+		return
+	}
+
 	now := time.Now().In(nip)
 	post_time := now.Format("1/2/06(Mon)15:04:05")
 
-	stmts := writeCheckout()
-  	defer writeCheckin(stmts)
+	wstmts := writeCheckout()
+  	defer writeCheckin(wstmts)
+
+	rstmts := Checkout()
+	defer Checkin(rstmts)
+
+	//new thread testing 
+	stmt0 := rstmts["parent_check"]
+	var parent_result int
+
+	err := stmt0.QueryRow(parent).Scan(&parent_result)
+	Query_err_check(err)
+
+	if parent_result == 0 {
+		stmt01 := rstmts["lastid"]
+		var latestid int
+
+		err = stmt01.QueryRow().Scan(&latestid)
+		Err_check(err)
+
+		latestid++
+		fmt.Println("test")
+		fmt.Println(strconv.Itoa(latestid))
+		if parent != strconv.Itoa(latestid) {
+			http.Error(w, "Parent thread is invalid.", http.StatusBadRequest)
+			return
+		}
+	}
+	
 
 	//file uploading
 	file, handler, file_err := req.FormFile("file")
@@ -97,7 +130,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 			width, height := Make_thumb(file_path, file_pre, file_name, mime_type)
 			file_info := gen_info(handler.Size, width, height)
 
-			stmt := stmts["newpost_wf"]
+			stmt := wstmts["newpost_wf"]
 
 			ofname := []rune(handler.Filename)
 			rem := len(ofname) - 20
@@ -113,26 +146,31 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 		}
 	//file not present 
 	} else {
-		stmt := stmts["newpost_nf"]
+		stmt := wstmts["newpost_nf"]
 		result, err := stmt.Exec(input, post_time, parent)
 		Err_check(err)
 		lastid, err = result.LastInsertId()
 		Err_check(err)
 	}
 
+
 	//reply insert
+	fmt.Println(repmatches)
+/*
 	if len(repmatches) > 0 {
-		stmt := stmts["repadd"]
+		stmt := wstmts["repadd"]
 		source := lastid 
 		for _, match := range repmatches {
 			match_id, err := strconv.ParseUint(match, 10, 64)
+			Err_check(err)
 			_, err = stmt.Exec(match_id, source)
 			Err_check(err)
 		}	
 	}
+*/
 	
 	Build_thread(parent)
-	Build_board("ot")
-	
 	http.Redirect(w, req, req.Header.Get("Referer"), 302)
+	
+	Build_board("ot")
 }

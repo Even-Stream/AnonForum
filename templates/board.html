@@ -7,10 +7,48 @@
 
 	<link rel="stylesheet" href="/resources/default.css">
 	<script src="/resources/htmx.js" defer></script>
+
+<style>
+{{if .Threads}}{{range .Threads}}{{range .Posts}}{{if.File}}
+.p{{.Id}} {--mini: url('/ot/Files/{{.Imgprev}}'); --maxi: url('/ot/Files/{{.File}}');}{{end}}{{end}}{{end}}{{end}}
+</style>
 </head>
 
 <body>
-{{range .Threads}}<a href ="{{.Parent}}.html">{{.Parent}}</a><br>
-{{end}}
+{{if .Threads}}{{range .Threads}}{{$sub:= .Subject}}{{if .Posts}}{{range slice .Posts 0 1}}
+		<table id="no{{.Id}}" class="thread">
+			<tr>
+				<td>
+					<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
+					<br>
+					<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>
+					<label><subject>「{{$sub}}」</subject>{{.Time}} <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
+					<p class="pcontent">{{.Content}}</p>
+				</td>
+			</tr>
+		</table>{{end}}
+{{range slice .Posts 1}}
+	<postwrap>
+		<table id="no{{.Id}}" class="post">
+			<tr>
+				<td>
+					<label>{{.Time}} <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
+					<br>
+					{{if .File}}<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
+					<br>
+					<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
+					{{if .Content}}<p class="pcontent">{{.Content}}</p>{{end}}
+				</td>
+			</tr>
+		</table>
+	</postwrap>
+{{end}}{{end}}
+{{end}}{{end}}
+	<form action="/im/post/?parent={{.Latest}}" enctype="multipart/form-data" method="Post">
+		<textarea name="newpost" rows="8" cols="78">I'm putting the new post box at the bottom.</textarea>
+		<br>
+		<input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp">
+		<input type="submit" value="Reply">
+	</form>
 </body>
 </html>

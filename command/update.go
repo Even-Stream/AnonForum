@@ -3,20 +3,21 @@ package main
 import (
 	"os"
 	"text/template"
+	"strconv"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 
 type Post struct {
-    Id int
-    Content string
-    Time string
-    File string
-    Filename string
-    Fileinfo string
-    Imgprev string
-    Replies []int
+	Id int
+	Content string
+    	Time string
+    	File string
+	Filename string
+	Fileinfo string
+	Imgprev string
+	Replies []int
 }
 
 type Thread struct {
@@ -26,32 +27,78 @@ type Thread struct {
 }
 
 type Board struct {
-		Name string 
-		Threads []*Thread
+	Name string 
+	Threads []*Thread
+	Latest int
 }
 
 
-func get_threads(board string) ([]*Thread, error) {
+func get_threads(board string) ([]*Thread, int) {
 	stmts := Checkout()
 	defer Checkin(stmts)
-	stmt := stmts["update_board"]
-
-//tables will be called a board 	
-	rows, err := stmt.Query()
-	Err_check(err)
-	defer rows.Close()
+	
+	stmt0 := stmts["parent_coll"]
+	stmt := stmts["thread_head"]
+	stmt2 := stmts["thread_body"]
+	stmt3 := stmts["update_rep"]
+	stmt4 := stmts["lastid"]
 
 	var board_body []*Thread
 
-	for rows.Next() {
-		var thr Thread
-		err = rows.Scan(&thr.Parent)
+	//tables will be called a board 
+	parent_rows, err := stmt0.Query()
+	Err_check(err)
+	defer parent_rows.Close()
+	
+	for parent_rows.Next() {
+		var fstpst Post
+		var pst_coll []*Post
+		
+		err = parent_rows.Scan(&fstpst.Id)
+		Err_check(err)
+		err = stmt.QueryRow(fstpst.Id).Scan(&fstpst.Content, &fstpst.Time, &fstpst.File,
+			&fstpst.Filename, &fstpst.Fileinfo, &fstpst.Imgprev)
 		Err_check(err)
 
-		board_body = append(board_body, &thr)
-	}	
+		pst_coll = append(pst_coll, &fstpst)
 
-	return board_body, err
+		thread_rows, err := stmt2.Query(fstpst.Id)
+		Err_check(err)
+		defer thread_rows.Close()
+
+		for thread_rows.Next() {
+			var cpst Post
+
+			err = thread_rows.Scan(&cpst.Id, &cpst.Content, &cpst.Time, &cpst.File,
+			&cpst.Filename, &cpst.Fileinfo, &cpst.Imgprev)
+			Err_check(err)
+			
+			pst_coll = append(pst_coll, &cpst)
+		}
+
+		for _, pst := range pst_coll {
+			rep_rows, err := stmt3.Query(pst.Id)
+			Err_check(err)
+			
+			for rep_rows.Next() {
+				var replier int
+				rep_rows.Scan(&replier)
+				pst.Replies = append(pst.Replies, replier)
+			}
+			rep_rows.Close()
+		}
+
+		thr := Thread{Posts: pst_coll, Subject: "Templates", Parent: strconv.Itoa(fstpst.Id)}
+		board_body = append(board_body, &thr)
+	}
+	
+	var latestid int
+	err = stmt4.QueryRow().Scan(&latestid)
+	Query_err_check(err)
+	//latestid will equal 0 when there are no posts yet
+	latestid++
+
+	return board_body, latestid
 }
 
 func get_posts(parent string) ([]*Post, error) {
@@ -99,12 +146,11 @@ func Build_board(name string) {
 	Err_check(err)
 	defer f.Close()
 
-	threads, err := get_threads(name)
+	threads, latestid := get_threads(name)
 
-	if err == nil {
-		board := Board{Name: name, Threads: threads}
-		boardtemp.Execute(f, board)
-	}
+	board := Board{Name: name, Threads: threads, Latest: latestid}
+	boardtemp.Execute(f, board)
+	
 }
 
 func Build_thread(parent string) { //will accept argument for board and thread number
