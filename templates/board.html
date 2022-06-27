@@ -15,14 +15,14 @@
 </head>
 
 <body>
-{{if .Threads}}{{range .Threads}}{{$sub:= .Subject}}{{if .Posts}}{{range slice .Posts 0 1}}
+{{if .Threads}}{{range .Threads}}{{$Parent:= .Parent}}{{$sub:= .Subject}}{{if .Posts}}{{range slice .Posts 0 1}}
 		<table id="no{{.Id}}" class="thread">
 			<tr>
 				<td>
 					<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
 					<br>
 					<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>
-					<label><subject>「{{$sub}}」</subject>{{.Time}} <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
+					<label><a href="{{$Parent}}.html"><subject>「{{$sub}}」</subject></a>{{.Time}} <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}</label>
 					<p class="pcontent">{{.Content}}</p>
 				</td>
 			</tr>
@@ -48,7 +48,7 @@
 		<textarea name="newpost" rows="8" cols="78">I'm putting the new post box at the bottom.</textarea>
 		<br>
 		<input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp">
-		<input type="submit" value="Reply">
+		<input type="submit" value="Submit">
 	</form>
 </body>
 </html>
