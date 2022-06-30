@@ -22,7 +22,7 @@
 					<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
 					<br>
 					<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>
-					<label><subject>「{{$.Subject}}」</subject>{{.Time}} <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
+					<label><subject>{{$.Subject}}</subject> {{.Time}} <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
 					<p class="pcontent">{{.Content}}</p>
 				</td>
 			</tr>
