@@ -18,8 +18,8 @@
 {{if eq 0 $index}}<tr>
 {{else if startrow 5 $index}}</tr><tr>{{end}}
 <td><catcon>
-<label><a href="{{.Id}}.html"><subject>{{index $subs $index}}</subject></a></label><br>
-<img class="catimg" src="/ot/Files/{{.Imgprev}}"><br>
+<label><subject>{{index $subs $index}}</subject></label><br>
+<a href="{{.Id}}.html"><img class="catimg" src="/ot/Files/{{.Imgprev}}"></a><br>
 <p>{{.Content}}</p></catcon></td>{{end}}</tr>
 {{end}}</table>
 </body>
