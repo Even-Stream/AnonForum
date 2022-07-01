@@ -193,14 +193,14 @@ selfref a, .reply a
 
 .catalog catcon {
     width: 210px;
-    height: 300px;
+    height: 328px;
     overflow: hidden;
     display: block;
 }
 
 .catalog .catimg {
     padding-top: 5px;
-    max-height: 60%;
+    max-height: 50%;
 }
 
 .catalog p {

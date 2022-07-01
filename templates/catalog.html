@@ -14,6 +14,7 @@
 </head>
 
 <body>
+<a href="/{{.Name}}/">Return</a>
 <table class="catalog">{{if .Posts}}{{$subs := .Subjects}}{{range $index, $value := .Posts}}
 {{if eq 0 $index}}<tr>
 {{else if startrow 5 $index}}</tr><tr>{{end}}

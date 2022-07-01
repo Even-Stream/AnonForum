@@ -15,6 +15,8 @@
 </head>
 
 <body>
+<a href="/{{.BoardN}}/">Return</a> 
+<a href="/{{.BoardN}}/catalog.html">Catalog</a>
 {{if .Posts}}{{range slice .Posts 0 1}}
 		<table id="no{{.Id}}" class="thread">
 			<tr>
@@ -43,7 +45,7 @@
 		</table>
 	</postwrap>
 {{end}}{{end}}
-	<form action="/im/post/?parent={{.Parent}}" enctype="multipart/form-data" method="Post">
+	<form action="/im/post/?parent={{.Parent}}&board={{.BoardN}}" enctype="multipart/form-data" method="Post">
 		<textarea name="newpost" rows="8" cols="78">I'm putting the new post box at the bottom.</textarea>
 		<br>
 		<input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp">

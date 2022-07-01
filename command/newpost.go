@@ -52,9 +52,10 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 	input := html.EscapeString(req.FormValue("newpost"))
 	input, repmatches := Format_post(input)
 	parent := req.FormValue("parent")
+	board := req.FormValue("board")
 
-	if parent == "" {
-		http.Error(w, "Parent thread not specified.", http.StatusBadRequest)
+	if parent == "" | board == "" {
+		http.Error(w, "Board or parent thread not specified.", http.StatusBadRequest)
 		return
 	}
 
@@ -169,9 +170,9 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 	}
 */
 	
-	Build_thread(parent)
+	Build_thread(parent, board)
 	http.Redirect(w, req, req.Header.Get("Referer"), 302)
 	
-	Build_board("ot")
-	Build_catalog("ot")
+	Build_board(board)
+	Build_catalog(board)
 }

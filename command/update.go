@@ -21,6 +21,7 @@ type Post struct {
 }
 
 type Thread struct {
+	BoardN string
 	Parent string
 	Subject string
 	Posts []*Post
@@ -133,7 +134,7 @@ func get_threads(board string) ([]*Thread, int) {
 			rep_rows.Close()
 		}
 
-		thr := Thread{Posts: pst_coll, Subject: "Templates", Parent: strconv.Itoa(fstpst.Id)}
+		thr := Thread{BoardN: board, Posts: pst_coll, Subject: "Templates", Parent: strconv.Itoa(fstpst.Id)}
 		board_body = append(board_body, &thr)
 	}
 	
@@ -213,7 +214,7 @@ func Build_board(name string) {
 	
 }
 
-func Build_thread(parent string) { //will accept argument for board and thread number
+func Build_thread(parent string, boardn string) { //will accept argument for board and thread number
 	threadtemp := template.New("thread.html")
 	threadtemp, err := threadtemp.ParseFiles(BP + "/templates/thread.html")
 	Err_check(err)
@@ -225,7 +226,7 @@ func Build_thread(parent string) { //will accept argument for board and thread n
 	posts, err := get_posts(parent)
     
 	if err == nil {
-		thread := Thread{Posts: posts, Subject: "Templates", Parent: parent}
+		thread := Thread{BoardN: boardn, Posts: posts, Subject: "Templates", Parent: parent}
 		threadtemp.Execute(f, thread)
 	}
 }
