@@ -164,11 +164,45 @@ selfref a, .reply a
 
 .image:checked {
     max-width: 80vw;
-    max-height: 80vh;
+    max-height: 85vh;
     content: var(--maxi);
 }
 
 
 .thememenu {
 	float: right;
+}
+
+.catalog {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    word-wrap: break-word;
+    border-collapse: collapse;
+}
+
+.catalog td {
+    vertical-align: top;
+    border: 2px dotted gray;
+    padding: 4px 2px 4px 2px;
+}
+
+.catalog catcon {
+    width: 210px;
+    height: 300px;
+    overflow: hidden;
+    display: block;
+}
+
+.catalog .catimg {
+    padding-top: 5px;
+    max-height: 60%;
+}
+
+.catalog p {
+    font-size: 10pt;
+}
+
+.catalog subject {
+    font-size: 12pt;
 }

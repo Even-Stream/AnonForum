@@ -94,11 +94,17 @@ func Make_Conns() {
 				FROM posts
 				WHERE Parent = ?`)
 		Err_check(err)
+
+		conn12, err:= sql.Open("sqlite3", db_uri)
+		Err_check(err)		
+
+		thread_collstmt, err := conn12.Prepare(`SELECT DISTINCT Parent FROM posts ORDER BY Id DESC`)
+		Err_check(err)
 		
 
 		stmts := map[string]*sql.Stmt{"prev": prev_stmt, "update": updatestmt, "update_rep": update_repstmt, 
 			"parent_coll": parent_collstmt, "thread_head": thread_headstmt, "thread_body": thread_bodystmt, 
-			"lastid": lastid_stmt, "parent_check": parent_checkstmt}
+			"lastid": lastid_stmt, "parent_check": parent_checkstmt, "thread_coll": thread_collstmt}
 		readConns <- stmts
 	}
 

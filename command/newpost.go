@@ -173,4 +173,5 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 	http.Redirect(w, req, req.Header.Get("Referer"), 302)
 	
 	Build_board("ot")
+	Build_catalog("ot")
 }

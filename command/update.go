@@ -21,9 +21,9 @@ type Post struct {
 }
 
 type Thread struct {
-    Parent string
-    Subject string
-    Posts []*Post
+	Parent string
+	Subject string
+	Posts []*Post
 }
 
 type Board struct {
@@ -32,6 +32,51 @@ type Board struct {
 	Latest int
 }
 
+type Catalog struct {
+	Name string
+	Posts []*Post
+	Subjects []string
+}
+
+
+var catfuncmap = template.FuncMap{
+	"startrow": func(rowsize, index int) bool {
+		if index % rowsize == 0 {
+			return true
+		}
+		return false 
+	},
+}
+
+func get_cat_posts(board string) ([]*Post, []string) {
+	stmts := Checkout()
+	defer Checkin(stmts)
+
+	stmt0 := stmts["thread_coll"]
+	stmt := stmts["thread_head"]
+
+	var cat_body []*Post
+	var subjects []string
+
+	parent_rows, err := stmt0.Query()
+	Err_check(err)
+	defer parent_rows.Close()
+
+	for parent_rows.Next() {
+		var cparent Post
+		
+		err = parent_rows.Scan(&cparent.Id)
+		Err_check(err)
+		err = stmt.QueryRow(cparent.Id).Scan(&cparent.Content, &cparent.Time, &cparent.File,
+			&cparent.Filename, &cparent.Fileinfo, &cparent.Imgprev)
+		Query_err_check(err)
+
+		cat_body = append(cat_body, &cparent)
+		subjects = append(subjects, "Template")
+	}
+
+	return cat_body, subjects
+}
 
 func get_threads(board string) ([]*Thread, int) {
 	stmts := Checkout()
@@ -58,7 +103,7 @@ func get_threads(board string) ([]*Thread, int) {
 		Err_check(err)
 		err = stmt.QueryRow(fstpst.Id).Scan(&fstpst.Content, &fstpst.Time, &fstpst.File,
 			&fstpst.Filename, &fstpst.Fileinfo, &fstpst.Imgprev)
-		Err_check(err)
+		Query_err_check(err)
 
 		pst_coll = append(pst_coll, &fstpst)
 
@@ -137,6 +182,21 @@ func get_posts(parent string) ([]*Post, error) {
 	return thread_body, err
 }
 
+func Build_catalog(name string) {
+	cattemp := template.New("catalog.html").Funcs(catfuncmap)
+	cattemp, err := cattemp.ParseFiles(BP + "/templates/catalog.html")
+	Err_check(err)
+
+	f, err := os.Create(BP + "head/" + name + "/catalog.html")
+	Err_check(err)
+	defer f.Close()
+
+	posts, subjects := get_cat_posts(name)
+    
+	catalog := Catalog{Name: name, Posts: posts, Subjects: subjects}
+	cattemp.Execute(f, catalog)
+}
+
 func Build_board(name string) {
 	boardtemp := template.New("board.html")
 	boardtemp, err := boardtemp.ParseFiles(BP + "/templates/board.html")
@@ -154,18 +214,18 @@ func Build_board(name string) {
 }
 
 func Build_thread(parent string) { //will accept argument for board and thread number
-    threadtemp := template.New("thread.html")
-    threadtemp, err := threadtemp.ParseFiles(BP + "/templates/thread.html")
-    Err_check(err)
+	threadtemp := template.New("thread.html")
+	threadtemp, err := threadtemp.ParseFiles(BP + "/templates/thread.html")
+	Err_check(err)
 
-    f, err := os.Create(BP + "head/ot/" + parent + ".html")
-    Err_check(err)
-    defer f.Close()
+	f, err := os.Create(BP + "head/ot/" + parent + ".html")
+	Err_check(err)
+	defer f.Close()
 
-    posts, err := get_posts(parent)
+	posts, err := get_posts(parent)
     
-    if err == nil {
-        thread := Thread{Posts: posts, Subject: "Templates", Parent: parent}
-        threadtemp.Execute(f, thread)
-    }
+	if err == nil {
+		thread := Thread{Posts: posts, Subject: "Templates", Parent: parent}
+		threadtemp.Execute(f, thread)
+	}
 }

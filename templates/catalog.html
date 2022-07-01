@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>test</title>
+ 	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="/resources/default.css">
+
+<style>
+{{if .Posts}}{{range .Posts}}{{if .File}}
+.p{{.Id}} {--mini: url('/ot/Files/{{.Imgprev}}'); --maxi: url('/ot/Files/{{.File}}');}{{end}}{{end}}{{end}}
+</style>
+</head>
+
+<body>
+<table class="catalog">{{if .Posts}}{{$subs := .Subjects}}{{range $index, $value := .Posts}}
+{{if eq 0 $index}}<tr>
+{{else if startrow 5 $index}}</tr><tr>{{end}}
+<td><catcon>
+<label><a href="{{.Id}}.html"><subject>{{index $subs $index}}</subject></a></label><br>
+<img class="catimg" src="/ot/Files/{{.Imgprev}}"><br>
+<p>{{.Content}}</p></catcon></td>{{end}}</tr>
+{{end}}</table>
+</body>
+</html>
