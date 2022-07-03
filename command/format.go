@@ -47,7 +47,7 @@ func removeDuplicates(strSlice []string) []string {
 
 func process(rawline string) (string, []string) {
 
-	repmatches := make([]string, 1)
+	repmatches := make([]string, 0)
 	repmatchcon := repreg.FindAllStringSubmatch(rawline, -1) 
 	if repmatchcon != nil {
 		for _, match := range repmatchcon {

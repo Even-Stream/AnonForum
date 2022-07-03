@@ -7,7 +7,6 @@ import (
 	"io"
 	"os"
 	"strconv"
-	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
 	units "github.com/docker/go-units"
@@ -54,7 +53,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 	parent := req.FormValue("parent")
 	board := req.FormValue("board")
 
-	if parent == "" | board == "" {
+	if parent == "" || board == "" {
 		http.Error(w, "Board or parent thread not specified.", http.StatusBadRequest)
 		return
 	}
@@ -83,8 +82,6 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 		Err_check(err)
 
 		latestid++
-		fmt.Println("test")
-		fmt.Println(strconv.Itoa(latestid))
 		if parent != strconv.Itoa(latestid) {
 			http.Error(w, "Parent thread is invalid.", http.StatusBadRequest)
 			return
@@ -156,8 +153,6 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 
 
 	//reply insert
-	fmt.Println(repmatches)
-/*
 	if len(repmatches) > 0 {
 		stmt := wstmts["repadd"]
 		source := lastid 
@@ -168,7 +163,6 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 			Err_check(err)
 		}	
 	}
-*/
 	
 	Build_thread(parent, board)
 	http.Redirect(w, req, req.Header.Get("Referer"), 302)
