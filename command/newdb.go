@@ -28,11 +28,21 @@ func create_table(db *sql.DB) {
 		"Replier" INTEGER NOT NULL
 	);`
 
+
+	createSubjectsTableSQL := `CREATE TABLE subjects (
+		"Parent" INTEGER NOT NULL,
+		"Subject" TEXT NOT NULL
+	);`
+
 	statement, err := db.Prepare(createPostsTableSQL)
 	Err_check(err)
 	statement.Exec()
 
 	statement, err = db.Prepare(createRepliesTableSQL)
+        Err_check(err)
+	statement.Exec()
+
+	statement, err = db.Prepare(createSubjectsTableSQL)
         Err_check(err)
 	statement.Exec()
 }

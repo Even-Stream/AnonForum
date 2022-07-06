@@ -49,6 +49,19 @@ var catfuncmap = template.FuncMap{
 	},
 }
 
+func get_subject(parent string) string {
+	stmts := Checkout()
+	defer Checkin(stmts)
+
+	var subject string
+
+	stmt := stmts["subject_look"]
+	err := stmt.QueryRow(parent).Scan(&subject)
+	Query_err_check(err)
+
+	return subject
+}
+
 func get_cat_posts(board string) ([]*Post, []string) {
 	stmts := Checkout()
 	defer Checkin(stmts)
@@ -73,7 +86,7 @@ func get_cat_posts(board string) ([]*Post, []string) {
 		Query_err_check(err)
 
 		cat_body = append(cat_body, &cparent)
-		subjects = append(subjects, "Template")
+		subjects = append(subjects, get_subject(strconv.Itoa(cparent.Id)))
 	}
 
 	return cat_body, subjects
@@ -133,8 +146,15 @@ func get_threads(board string) ([]*Thread, int) {
 			}
 			rep_rows.Close()
 		}
+		
+		sub := get_subject(strconv.Itoa(fstpst.Id))
+		var thr Thread
+		if sub != "" {
+			thr = Thread{BoardN: board, Posts: pst_coll, Subject: sub, Parent: strconv.Itoa(fstpst.Id)}
+		} else {
+			thr = Thread{BoardN: board, Posts: pst_coll, Parent: strconv.Itoa(fstpst.Id)}
+		}
 
-		thr := Thread{BoardN: board, Posts: pst_coll, Subject: "Templates", Parent: strconv.Itoa(fstpst.Id)}
 		board_body = append(board_body, &thr)
 	}
 	
@@ -224,9 +244,17 @@ func Build_thread(parent string, boardn string) { //will accept argument for boa
 	defer f.Close()
 
 	posts, err := get_posts(parent)
+
+	sub := get_subject(parent)
     
 	if err == nil {
-		thread := Thread{BoardN: boardn, Posts: posts, Subject: "Templates", Parent: parent}
-		threadtemp.Execute(f, thread)
+		var thr Thread 
+
+		if sub != "" {
+			thr = Thread{BoardN: boardn, Posts: posts, Subject: sub, Parent: parent}
+		} else {
+			thr = Thread{BoardN: boardn, Posts: posts, Parent: parent}
+		}
+		threadtemp.Execute(f, thr)
 	}
 }

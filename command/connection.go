@@ -100,18 +100,23 @@ func Make_Conns() {
 				WHERE Parent = ?`)
 		Err_check(err)
 
-		conn12, err:= sql.Open("sqlite3", db_uri)
-		Err_check(err)		
-
-
 		//catalog update statement
+		conn12, err:= sql.Open("sqlite3", db_uri)
+		Err_check(err)	
+
 		thread_collstmt, err := conn12.Prepare(`SELECT DISTINCT Parent FROM posts ORDER BY Id DESC`)
 		Err_check(err)
 
+		//subject lookup
+		conn14, err:= sql.Open("sqlite3", db_uri)
+		Err_check(err)	
+
+		subject_lookstmt, err := conn14.Prepare(`SELECT Subject FROM subjects WHERE Parent = ?`)
+		Err_check(err)
 
 		stmts := map[string]*sql.Stmt{"prev": prev_stmt, "prev_parent": prev_parentstmt, "update": updatestmt, "update_rep": update_repstmt, 
 			"parent_coll": parent_collstmt, "thread_head": thread_headstmt, "thread_body": thread_bodystmt, 
-			"lastid": lastid_stmt, "parent_check": parent_checkstmt, "thread_coll": thread_collstmt}
+			"lastid": lastid_stmt, "parent_check": parent_checkstmt, "thread_coll": thread_collstmt, "subject_look": subject_lookstmt}
 		readConns <- stmts
 	}
 
@@ -134,6 +139,12 @@ func Make_Conns() {
 	repadd_stmt, err := conn6.Prepare(`INSERT INTO replies(Source, Replier) VALUES (?, ?)`)
 	Err_check(err)
 
-	stmts := map[string]*sql.Stmt{"newpost_wf": newpost_wfstmt, "newpost_nf": newpost_nfstmt, "repadd": repadd_stmt}
+	conn14, err := sql.Open("sqlite3", db_uri)
+	Err_check(err)
+
+	subadd_stmt, err := conn14.Prepare(`INSERT INTO subjects(Parent, Subject) VALUES (?, ?)`)
+	Err_check(err)
+
+	stmts := map[string]*sql.Stmt{"newpost_wf": newpost_wfstmt, "newpost_nf": newpost_nfstmt, "repadd": repadd_stmt, "subadd": subadd_stmt}
 	writeConns <- stmts
 }

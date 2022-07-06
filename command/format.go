@@ -22,7 +22,7 @@ var linkreg = regexp.MustCompile(`(http|ftp|https):\/\/(\S+)`)
 const (	
 	nlpost = "\n<br>"
 	tagpost = "$1\n$2"
-	reppost = `<ref hx-get="/im/ret/?p=$1" hx-trigger="mouseover once" hx-target="#p$1"><a href="#/2/3.html#no$1">&#62;&#62;$1</a></ref><box id="p$1"class="prev"></box>`
+	reppost = `<ref hx-get="/im/ret/?p=$1" hx-trigger="mouseover once" hx-target="#p$1"><a href="#/2/3.html#no$1">&#62;&#62;$1</a></ref><box id="p$1" class="prev"></box>`
 )
 
 var reprandpost = reppost

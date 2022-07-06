@@ -51,6 +51,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 
 	parent := req.FormValue("parent")
 	board := req.FormValue("board")
+	subject := req.FormValue("subject")
 
 	if parent == "" || board == "" {
 		http.Error(w, "Board or parent thread not specified.", http.StatusBadRequest)
@@ -87,6 +88,13 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 		if parent != strconv.Itoa(latestid) {
 			http.Error(w, "Parent thread is invalid.", http.StatusBadRequest)
 			return
+		} else {
+			//subject insert
+			if subject != "" {
+				stmt0A := wstmts["subadd"]
+				_, err = stmt0A.Exec(parent, subject)
+				Err_check(err)
+			}
 		}
 	}
 	

@@ -17,14 +17,14 @@
 <body>
 <a href="/{{.BoardN}}/">Return</a> 
 <a href="/{{.BoardN}}/catalog.html">Catalog</a>
-{{if .Posts}}{{range slice .Posts 0 1}}
+{{if .Posts}}{{$sub:= .Subject}}{{range slice .Posts 0 1}}
 		<table id="no{{.Id}}" class="thread">
 			<tr>
 				<td>
 					<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
 					<br>
 					<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>
-					<label><subject>{{$.Subject}}</subject> {{.Time}} <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
+					<label>{{if $sub}}<subject>{{$sub}}</subject>{{end}} {{.Time}} <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
 					<p class="pcontent">{{.Content}}</p>
 				</td>
 			</tr>
