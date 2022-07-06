@@ -30,6 +30,7 @@ func gen_info(size int64, width int, height int) string {
 }
 
 func New_post(w http.ResponseWriter, req *http.Request) {
+	//bad request filtering 
 
 	if req.Method != "POST" {
 		http.Error(w, "Method not allowed.", http.StatusMethodNotAllowed)
@@ -48,8 +49,6 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 		return 
 	}
 
-	input := html.EscapeString(req.FormValue("newpost"))
-	input, repmatches := Format_post(input)
 	parent := req.FormValue("parent")
 	board := req.FormValue("board")
 
@@ -57,6 +56,9 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "Board or parent thread not specified.", http.StatusBadRequest)
 		return
 	}
+
+	input := html.EscapeString(req.FormValue("newpost"))
+	input, repmatches := Format_post(input, board)
 
 	now := time.Now().In(nip)
 	post_time := now.Format("1/2/06(Mon)15:04:05")

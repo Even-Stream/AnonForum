@@ -30,14 +30,20 @@ func Make_Conns() {
 
 	for i := 0; i < Max_conns; i++ {
 		
-		//preview statement
+		//preview statements
 		conn1, err := sql.Open("sqlite3", db_uri)
 		Err_check(err)
 		
 		prev_stmt, err := conn1.Prepare(`SELECT Content, 
 			COALESCE(Imgprev, '') Imgprev FROM posts WHERE id = ?`)
-		Err_check(err)	
-		
+		Err_check(err)
+
+		conn13, err := sql.Open("sqlite3", db_uri)
+		Err_check(err)
+
+		prev_parentstmt, err := conn13.Prepare(`SELECT Parent FROM posts WHERE id = ?`)
+		Err_check(err)
+
 
 		//thread update statements
 		conn4, err := sql.Open("sqlite3", db_uri)
@@ -46,7 +52,6 @@ func Make_Conns() {
 		updatestmt, err := conn4.Prepare(`SELECT Id, Content, Time, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
 				COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev FROM posts WHERE Parent = ?`)
 		Err_check(err)
-
 
 		conn5, err := sql.Open("sqlite3", db_uri)
 		Err_check(err)
@@ -98,11 +103,13 @@ func Make_Conns() {
 		conn12, err:= sql.Open("sqlite3", db_uri)
 		Err_check(err)		
 
+
+		//catalog update statement
 		thread_collstmt, err := conn12.Prepare(`SELECT DISTINCT Parent FROM posts ORDER BY Id DESC`)
 		Err_check(err)
-		
 
-		stmts := map[string]*sql.Stmt{"prev": prev_stmt, "update": updatestmt, "update_rep": update_repstmt, 
+
+		stmts := map[string]*sql.Stmt{"prev": prev_stmt, "prev_parent": prev_parentstmt, "update": updatestmt, "update_rep": update_repstmt, 
 			"parent_coll": parent_collstmt, "thread_head": thread_headstmt, "thread_body": thread_bodystmt, 
 			"lastid": lastid_stmt, "parent_check": parent_checkstmt, "thread_coll": thread_collstmt}
 		readConns <- stmts
