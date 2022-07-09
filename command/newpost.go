@@ -179,8 +179,8 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 	}
 	
 	Build_thread(parent, board)
+	Build_board(board)
 	http.Redirect(w, req, req.Header.Get("Referer"), 302)
 	
-	Build_board(board)
 	Build_catalog(board)
 }

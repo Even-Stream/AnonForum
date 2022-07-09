@@ -8,9 +8,9 @@
 	<link rel="stylesheet" href="/resources/default.css">
 	<script src="/resources/htmx.js" defer></script>
 
-<style>
+<style>{{$name := .BoardN}}
 {{range .Posts}}{{if .File}}
-.p{{.Id}} {--mini: url('/ot/Files/{{.Imgprev}}'); --maxi: url('/ot/Files/{{.File}}');}{{end}}{{end}}
+.p{{.Id}} {--mini: url('/{{$name}}/Files/{{.Imgprev}}'); --maxi: url('/{{$name}}/Files/{{.File}}');}{{end}}{{end}}
 </style>
 </head>
 
