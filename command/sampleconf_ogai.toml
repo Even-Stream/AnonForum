@@ -2,9 +2,9 @@
 
 Base_path = #insert git cloned directory 
 
-#below has not been implemented yet 
-
 Boards = ["ot"]
+
+#below has not been implemented yet 
 
 Max_request_size = 11     #in MB
 

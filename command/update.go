@@ -4,6 +4,7 @@ import (
 	"os"
 	"text/template"
 	"strconv"
+	"errors"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -47,6 +48,16 @@ var catfuncmap = template.FuncMap{
 		}
 		return false 
 	},
+}
+
+func dir_check(path string) {
+
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		err := os.Mkdir(path, os.ModePerm)
+		Err_check(err)
+		err = os.Mkdir(path + "Files/", os.ModePerm)
+		Err_check(err)
+	}
 }
 
 func get_subject(parent string) string {
@@ -208,7 +219,10 @@ func Build_catalog(name string) {
 	cattemp, err := cattemp.ParseFiles(BP + "/templates/catalog.html")
 	Err_check(err)
 
-	f, err := os.Create(BP + "head/" + name + "/catalog.html")
+	path := BP + "head/" + name + "/"
+	dir_check(path)
+
+	f, err := os.Create(path + "/catalog.html")
 	Err_check(err)
 	defer f.Close()
 
@@ -223,7 +237,10 @@ func Build_board(name string) {
 	boardtemp, err := boardtemp.ParseFiles(BP + "/templates/board.html")
 	Err_check(err)
 
-	f, err := os.Create(BP + "head/" + name + "/index.html")
+	path := BP + "head/" + name + "/"
+	dir_check(path)
+
+	f, err := os.Create(path + "index.html")
 	Err_check(err)
 	defer f.Close()
 
@@ -239,7 +256,10 @@ func Build_thread(parent string, boardn string) { //will accept argument for boa
 	threadtemp, err := threadtemp.ParseFiles(BP + "/templates/thread.html")
 	Err_check(err)
 
-	f, err := os.Create(BP + "head/ot/" + parent + ".html")
+	path := BP + "head/" + boardn + "/" 
+	dir_check(path)
+
+	f, err := os.Create(path + parent + ".html")
 	Err_check(err)
 	defer f.Close()
 

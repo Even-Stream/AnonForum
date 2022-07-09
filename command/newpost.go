@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	slices "golang.org/x/exp/slices"
 	"strconv"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -63,6 +64,11 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 
 	if parent == "" || board == "" {
 		http.Error(w, "Board or parent thread not specified.", http.StatusBadRequest)
+		return
+	}
+
+	if !(slices.Contains(Boards, board)) {
+		http.Error(w, "Board is invalid.", http.StatusBadRequest)
 		return
 	}
 
@@ -130,7 +136,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 
 			file_pre := strconv.FormatInt(time.Now().UnixNano(), 10)
 			file_name := file_pre + ext
-			file_path := BP + "head/ot/Files/"
+			file_path := BP + "head/" + board + "/Files/"
 
 			f, err := os.OpenFile(file_path + file_name, os.O_WRONLY|os.O_CREATE, 0666)
 			Err_check(err)

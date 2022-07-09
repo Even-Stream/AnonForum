@@ -8,9 +8,11 @@ import (
 )
 
 var BP string
+var Boards []string
 
 type Config struct {
 	Base_path	string
+	Boards		[]string
 }
 
 func Load_conf() {
@@ -22,4 +24,5 @@ func Load_conf() {
 	_, err = toml.Decode(string(tomlData), &conf)
 	Err_check(err)
 	BP = conf.Base_path
+	Boards = conf.Boards
 }
