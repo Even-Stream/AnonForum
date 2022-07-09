@@ -6,6 +6,7 @@ import (
 	"html"
 	"io"
 	"os"
+	"strings"
 	"strconv"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -34,6 +35,13 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 
 	if req.Method != "POST" {
 		http.Error(w, "Method not allowed.", http.StatusMethodNotAllowed)
+		return
+	}
+
+	file, handler, file_err := req.FormFile("file")
+	
+	if file_err != nil && strings.TrimSpace(req.FormValue("newpost")) == "" {
+		http.Error(w, "Empty post.", http.StatusBadRequest)
 		return
 	}
 
@@ -97,10 +105,6 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 			}
 		}
 	}
-	
-
-	//file uploading
-	file, handler, file_err := req.FormFile("file")
 
 	//file present
 	if file_err == nil {

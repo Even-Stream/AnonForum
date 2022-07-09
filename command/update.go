@@ -170,9 +170,9 @@ func get_threads(board string) ([]*Thread, int) {
 func get_posts(parent string) ([]*Post, error) {
 
 	stmts := Checkout()
-  defer Checkin(stmts)
+  	defer Checkin(stmts)
 
-  stmt := stmts["update"]
+  	stmt := stmts["update"]
 	stmt2 := stmts["update_rep"]
 
 	rows, err := stmt.Query(parent)
