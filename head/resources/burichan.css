@@ -27,9 +27,13 @@ a {
     color: #34345C;
 }
 
-ref a, selfref a
+ref a, selfref a, .header
 {
     text-decoration: none;
+}
+
+.header+.header::before {
+    content: " | ";
 }
 
 p, label, postwrap, a, postwrap::before, .thread {

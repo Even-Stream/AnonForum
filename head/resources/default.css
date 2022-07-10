@@ -33,9 +33,13 @@ a {
     color: rgb(216, 68, 36);
 }
 
-ref a, selfref a
+ref a, selfref a, .header
 {
     text-decoration: none;
+}
+
+.header+.header::before {
+    content: " | ";
 }
 
 p, label, postwrap, a, postwrap::before, .thread {

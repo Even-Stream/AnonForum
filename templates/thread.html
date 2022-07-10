@@ -15,6 +15,7 @@
 </head>
 
 <body>
+<center>{{range .Header}}<a class="header" href="/{{.}}">/{{.}}/</a> {{end}}</center><br><br>
 <a href="/{{.BoardN}}/">Return</a> 
 <a href="/{{.BoardN}}/catalog.html">Catalog</a>
 {{if .Posts}}{{$sub:= .Subject}}{{range slice .Posts 0 1}}

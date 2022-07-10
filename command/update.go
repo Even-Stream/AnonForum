@@ -26,18 +26,21 @@ type Thread struct {
 	Parent string
 	Subject string
 	Posts []*Post
+	Header []string
 }
 
 type Board struct {
 	Name string 
 	Threads []*Thread
 	Latest int
+	Header []string
 }
 
 type Catalog struct {
 	Name string
 	Posts []*Post
 	Subjects []string
+	Header []string
 }
 
 
@@ -232,7 +235,7 @@ func Build_catalog(board string) {
 
 	posts, subjects := get_cat_posts(board)
     
-	catalog := Catalog{Name: board, Posts: posts, Subjects: subjects}
+	catalog := Catalog{Name: board, Posts: posts, Subjects: subjects, Header: Boards}
 	cattemp.Execute(f, catalog)
 }
 
@@ -250,7 +253,7 @@ func Build_board(board string) {
 
 	threads, latestid := get_threads(board)
 
-	cboard := Board{Name: board, Threads: threads, Latest: latestid}
+	cboard := Board{Name: board, Threads: threads, Latest: latestid, Header: Boards}
 	boardtemp.Execute(f, cboard)
 	
 }
@@ -275,9 +278,9 @@ func Build_thread(parent string, board string) { //will accept argument for boar
 		var thr Thread 
 
 		if sub != "" {
-			thr = Thread{BoardN: board, Posts: posts, Subject: sub, Parent: parent}
+			thr = Thread{BoardN: board, Posts: posts, Subject: sub, Parent: parent, Header: Boards}
 		} else {
-			thr = Thread{BoardN: board, Posts: posts, Parent: parent}
+			thr = Thread{BoardN: board, Posts: posts, Parent: parent, Header: Boards}
 		}
 		threadtemp.Execute(f, thr)
 	}
