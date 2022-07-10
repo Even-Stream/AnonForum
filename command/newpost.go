@@ -61,6 +61,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 	parent := req.FormValue("parent")
 	board := req.FormValue("board")
 	subject := req.FormValue("subject")
+	option := req.FormValue("option")
 
 	if parent == "" || board == "" {
 		http.Error(w, "Board or parent thread not specified.", http.StatusBadRequest)
@@ -159,7 +160,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 			}
 			ffname := string(ofname[rem:])
 
-			result, err := stmt.Exec(input, post_time, parent, file_name, ffname, file_info, file_pre + "s.webp")
+			result, err := stmt.Exec(input, post_time, parent, file_name, ffname, file_info, file_pre + "s.webp", option)
 			Err_check(err)
 			lastid, err = result.LastInsertId()
 			Err_check(err)
@@ -167,7 +168,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 	//file not present 
 	} else {
 		stmt := wstmts["newpost_nf"]
-		result, err := stmt.Exec(input, post_time, parent)
+		result, err := stmt.Exec(input, post_time, parent, option)
 		Err_check(err)
 		lastid, err = result.LastInsertId()
 		Err_check(err)

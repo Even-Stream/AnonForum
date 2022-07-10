@@ -16,27 +16,27 @@ const (
 			COALESCE(Imgprev, '') Imgprev FROM board_posts WHERE id = ?`
 	prev_parentstring = `SELECT Parent FROM board_posts WHERE id = ?`
 	updatestring = `SELECT Id, Content, Time, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
-				COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev FROM board_posts WHERE Parent = ?`
+				COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev, Option FROM board_posts WHERE Parent = ?`
 	update_repstring = `SELECT Replier FROM board_replies WHERE Source = ?`
-	parent_collstring = `SELECT DISTINCT Parent FROM board_posts ORDER BY Id DESC LIMIT 10`
+	parent_collstring = `SELECT DISTINCT Parent FROM board_posts WHERE Option <> "sage" OR Id = Parent ORDER BY Id DESC LIMIT 15`
 	thread_headstring = `SELECT Content, Time, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
 				COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev
 				FROM board_posts
 				WHERE Id = ?`
 	thread_bodystring = `SELECT * FROM (
 				SELECT Id, Content, Time, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
-				COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev FROM board_posts 
+				COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev, Option FROM board_posts 
 				WHERE Parent = ? AND Id != Parent ORDER BY Id DESC LIMIT 5)
 				ORDER BY Id ASC`
 	lastid_string = `SELECT IFNULL ((SELECT MAX(Id) FROM board_posts), 0)`
 	parent_checkstring = `SELECT COUNT(*)
 				FROM board_posts
 				WHERE Parent = ?`
-	thread_collstring = `SELECT DISTINCT Parent FROM board_posts ORDER BY Id DESC`
+	thread_collstring = `SELECT DISTINCT Parent FROM board_posts WHERE Option <> "sage" OR Id = Parent ORDER BY Id DESC`
 	subject_lookstring = `SELECT Subject FROM board_subjects WHERE Parent = ?`
 
-	newpost_wfstring = `INSERT INTO board_posts(Content, Time, Parent, File, Filename, Fileinfo, Imgprev) VALUES (?, ?, ?, ?, ?, ?, ?)`
-	newpost_nfstring = `INSERT INTO board_posts(Content, Time, Parent) VALUES (?, ?, ?)`
+	newpost_wfstring = `INSERT INTO board_posts(Content, Time, Parent, File, Filename, Fileinfo, Imgprev, Option) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+	newpost_nfstring = `INSERT INTO board_posts(Content, Time, Parent, Option) VALUES (?, ?, ?, ?)`
 	repadd_string = `INSERT INTO board_replies(Source, Replier) VALUES (?, ?)`
 	subadd_string = `INSERT INTO board_subjects(Parent, Subject) VALUES (?, ?)`
 )

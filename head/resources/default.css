@@ -223,3 +223,7 @@ selfref a, .reply a
 .catalog subject {
     font-size: 12pt;
 }
+
+.sage {
+    color: rgb(216, 68, 36);
+}

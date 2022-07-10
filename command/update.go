@@ -18,6 +18,7 @@ type Post struct {
 	Filename string
 	Fileinfo string
 	Imgprev string
+	Option string
 	Replies []int
 }
 
@@ -146,7 +147,7 @@ func get_threads(board string) ([]*Thread, int) {
 			var cpst Post
 
 			err = thread_rows.Scan(&cpst.Id, &cpst.Content, &cpst.Time, &cpst.File,
-			&cpst.Filename, &cpst.Fileinfo, &cpst.Imgprev)
+			&cpst.Filename, &cpst.Fileinfo, &cpst.Imgprev, &cpst.Option)
 			Err_check(err)
 			
 			pst_coll = append(pst_coll, &cpst)
@@ -202,7 +203,7 @@ func get_posts(parent string, board string) ([]*Post, error) {
 	for rows.Next() {
 		var pst Post
 		err = rows.Scan(&pst.Id, &pst.Content, &pst.Time, &pst.File,
-			&pst.Filename, &pst.Fileinfo, &pst.Imgprev)
+			&pst.Filename, &pst.Fileinfo, &pst.Imgprev, &pst.Option)
 		Err_check(err)
 
 		rep_rows, err := stmt2.Query(pst.Id)

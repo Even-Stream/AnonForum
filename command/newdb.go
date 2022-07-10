@@ -21,7 +21,8 @@ func create_table(db *sql.DB) {
 		"Filename" TEXT,
 		"Fileinfo" TEXT,
 		"Imgprev" TEXT,
-		"Phash" TEXT
+		"Phash" TEXT,
+		"Option" TEXT
 	);`
 
 	createRepliesTableSQL := `CREATE TABLE board_replies (
