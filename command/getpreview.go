@@ -24,11 +24,17 @@ type Prev struct {
 func Get_prev(w http.ResponseWriter, req *http.Request) {
 	//retrieves post request 
 
+	id := req.FormValue("p")
+	board := req.FormValue("board")
+
+	if id == "" || board == "" {
+		http.Error(w, "Invalid preview request.", http.StatusBadRequest)
+		return
+	}
+
 	stmts := Checkout()
   	defer Checkin(stmts)
-	stmt := stmts["prev"]
-	
-	id := req.FormValue("p")
+	stmt := stmts[board]["prev"]
 	
 	var data string
 	var temp bytes.Buffer

@@ -78,11 +78,13 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 	now := time.Now().In(nip)
 	post_time := now.Format("1/2/06(Mon)15:04:05")
 
-	wstmts := writeCheckout()
-  	defer writeCheckin(wstmts)
+	writestmts := writeCheckout()
+	wstmts := writestmts[board]
+  	defer writeCheckin(writestmts)
 
-	rstmts := Checkout()
-	defer Checkin(rstmts)
+	readstmts := Checkout()
+	rstmts := readstmts[board]
+	defer Checkin(readstmts)
 
 	//new thread testing 
 	stmt0 := rstmts["parent_check"]

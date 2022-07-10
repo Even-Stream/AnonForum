@@ -12,7 +12,7 @@ var tagreg = regexp.MustCompile("(br>)(<)")
 var repreg = regexp.MustCompile(`&gt;&gt;(\d+)\b`)
 var randreg = regexp.MustCompile(`p\$1`)
 var hashreg = regexp.MustCompile(`#/2/3.html`)
-var rephashreg = regexp.MustCompile(`#no\$1`)
+var prevreg = regexp.MustCompile(`#board`)
 var quoreg = regexp.MustCompile(`&gt;(.+)`)
 var spoilreg = regexp.MustCompile(`~~(.+)~~`)
 var boldreg = regexp.MustCompile(`\*\*(.+)\*\*`)
@@ -22,7 +22,7 @@ var linkreg = regexp.MustCompile(`(http|ftp|https):\/\/(\S+)`)
 const (	
 	nlpost = "\n<br>"
 	tagpost = "$1\n$2"
-	reppost = `<ref hx-get="/im/ret/?p=$1" hx-trigger="mouseover once" hx-target="#p$1"><a href="#/2/3.html#no$1">&#62;&#62;$1</a></ref><box id="p$1" class="prev"></box>`
+	reppost = `<ref hx-get="/im/ret/?p=$1&board=#board" hx-trigger="mouseover once" hx-target="#p$1"><a href="#/2/3.html#no$1">&#62;&#62;$1</a></ref><box id="p$1" class="prev"></box>`
 )
 
 var reprandpost = reppost
@@ -52,7 +52,7 @@ func process(rawline, board string) (string, []string) {
 
 	stmts := Checkout()
   	defer Checkin(stmts)
-	stmt := stmts["prev_parent"]
+	stmt := stmts[board]["prev_parent"]
 
 	repmatches := make([]string, 0)
 	repparents := make([]string, 0)
@@ -79,6 +79,7 @@ func process(rawline, board string) (string, []string) {
 		i++
 		return response  
 	})
+	postline = prevreg.ReplaceAllString(postline, board)
 
 	postline = quoreg.ReplaceAllString(postline, quopost)
 	postline = spoilreg.ReplaceAllString(postline, spoilpost)

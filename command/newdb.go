@@ -3,13 +3,14 @@ package main
 import (
 	"database/sql"
 	"os"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func create_table(db *sql.DB) {
 
-	createPostsTableSQL := `CREATE TABLE posts (
+	createPostsTableSQL := `CREATE TABLE board_posts (
 		"Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 		"Content" TEXT,
 		"Time" TEXT,
@@ -23,28 +24,31 @@ func create_table(db *sql.DB) {
 		"Phash" TEXT
 	);`
 
-	createRepliesTableSQL := `CREATE TABLE replies (
+	createRepliesTableSQL := `CREATE TABLE board_replies (
 		"Source" INTEGER NOT NULL,
 		"Replier" INTEGER NOT NULL
 	);`
 
 
-	createSubjectsTableSQL := `CREATE TABLE subjects (
+	createSubjectsTableSQL := `CREATE TABLE board_subjects (
 		"Parent" INTEGER NOT NULL,
 		"Subject" TEXT NOT NULL
 	);`
 
-	statement, err := db.Prepare(createPostsTableSQL)
-	Err_check(err)
-	statement.Exec()
+	for _, board := range Boards {
+		//fmt.Println(board)
+		statement, err := db.Prepare(strings.Replace(createPostsTableSQL, "board", board, 1))
+		Err_check(err)
+		statement.Exec()
 
-	statement, err = db.Prepare(createRepliesTableSQL)
-        Err_check(err)
-	statement.Exec()
+		statement, err = db.Prepare(strings.Replace(createRepliesTableSQL, "board", board, 1))
+        	Err_check(err)
+		statement.Exec()
 
-	statement, err = db.Prepare(createSubjectsTableSQL)
-        Err_check(err)
-	statement.Exec()
+		statement, err = db.Prepare(strings.Replace(createSubjectsTableSQL, "board", board, 1))
+        	Err_check(err)
+		statement.Exec()
+	}
 }
 
 func New_db() {

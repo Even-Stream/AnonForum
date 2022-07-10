@@ -60,9 +60,10 @@ func dir_check(path string) {
 	}
 }
 
-func get_subject(parent string) string {
-	stmts := Checkout()
-	defer Checkin(stmts)
+func get_subject(parent string, board string) string {
+	readstmts := Checkout()
+	defer Checkin(readstmts)
+	stmts := readstmts[board]
 
 	var subject string
 
@@ -74,8 +75,9 @@ func get_subject(parent string) string {
 }
 
 func get_cat_posts(board string) ([]*Post, []string) {
-	stmts := Checkout()
-	defer Checkin(stmts)
+	readstmts := Checkout()
+	defer Checkin(readstmts)
+	stmts := readstmts[board]
 
 	stmt0 := stmts["thread_coll"]
 	stmt := stmts["thread_head"]
@@ -97,15 +99,16 @@ func get_cat_posts(board string) ([]*Post, []string) {
 		Query_err_check(err)
 
 		cat_body = append(cat_body, &cparent)
-		subjects = append(subjects, get_subject(strconv.Itoa(cparent.Id)))
+		subjects = append(subjects, get_subject(strconv.Itoa(cparent.Id), board))
 	}
 
 	return cat_body, subjects
 }
 
 func get_threads(board string) ([]*Thread, int) {
-	stmts := Checkout()
-	defer Checkin(stmts)
+	readstmts := Checkout()
+	defer Checkin(readstmts)
+	stmts := readstmts[board]
 	
 	stmt0 := stmts["parent_coll"]
 	stmt := stmts["thread_head"]
@@ -158,7 +161,7 @@ func get_threads(board string) ([]*Thread, int) {
 			rep_rows.Close()
 		}
 		
-		sub := get_subject(strconv.Itoa(fstpst.Id))
+		sub := get_subject(strconv.Itoa(fstpst.Id), board)
 		var thr Thread
 		if sub != "" {
 			thr = Thread{BoardN: board, Posts: pst_coll, Subject: sub, Parent: strconv.Itoa(fstpst.Id)}
@@ -178,10 +181,11 @@ func get_threads(board string) ([]*Thread, int) {
 	return board_body, latestid
 }
 
-func get_posts(parent string) ([]*Post, error) {
+func get_posts(parent string, board string) ([]*Post, error) {
 
-	stmts := Checkout()
-  	defer Checkin(stmts)
+	readstmts := Checkout()
+  	defer Checkin(readstmts)
+	stmts := readstmts[board]
 
   	stmt := stmts["update"]
 	stmt2 := stmts["update_rep"]
@@ -214,66 +218,66 @@ func get_posts(parent string) ([]*Post, error) {
 	return thread_body, err
 }
 
-func Build_catalog(name string) {
+func Build_catalog(board string) {
 	cattemp := template.New("catalog.html").Funcs(catfuncmap)
 	cattemp, err := cattemp.ParseFiles(BP + "/templates/catalog.html")
 	Err_check(err)
 
-	path := BP + "head/" + name + "/"
+	path := BP + "head/" + board + "/"
 	dir_check(path)
 
 	f, err := os.Create(path + "/catalog.html")
 	Err_check(err)
 	defer f.Close()
 
-	posts, subjects := get_cat_posts(name)
+	posts, subjects := get_cat_posts(board)
     
-	catalog := Catalog{Name: name, Posts: posts, Subjects: subjects}
+	catalog := Catalog{Name: board, Posts: posts, Subjects: subjects}
 	cattemp.Execute(f, catalog)
 }
 
-func Build_board(name string) {
+func Build_board(board string) {
 	boardtemp := template.New("board.html")
 	boardtemp, err := boardtemp.ParseFiles(BP + "/templates/board.html")
 	Err_check(err)
 
-	path := BP + "head/" + name + "/"
+	path := BP + "head/" + board + "/"
 	dir_check(path)
 
 	f, err := os.Create(path + "index.html")
 	Err_check(err)
 	defer f.Close()
 
-	threads, latestid := get_threads(name)
+	threads, latestid := get_threads(board)
 
-	board := Board{Name: name, Threads: threads, Latest: latestid}
-	boardtemp.Execute(f, board)
+	cboard := Board{Name: board, Threads: threads, Latest: latestid}
+	boardtemp.Execute(f, cboard)
 	
 }
 
-func Build_thread(parent string, boardn string) { //will accept argument for board and thread number
+func Build_thread(parent string, board string) { //will accept argument for board and thread number
 	threadtemp := template.New("thread.html")
 	threadtemp, err := threadtemp.ParseFiles(BP + "/templates/thread.html")
 	Err_check(err)
 
-	path := BP + "head/" + boardn + "/" 
+	path := BP + "head/" + board + "/" 
 	dir_check(path)
 
 	f, err := os.Create(path + parent + ".html")
 	Err_check(err)
 	defer f.Close()
 
-	posts, err := get_posts(parent)
+	posts, err := get_posts(parent, board)
 
-	sub := get_subject(parent)
+	sub := get_subject(parent, board)
     
 	if err == nil {
 		var thr Thread 
 
 		if sub != "" {
-			thr = Thread{BoardN: boardn, Posts: posts, Subject: sub, Parent: parent}
+			thr = Thread{BoardN: board, Posts: posts, Subject: sub, Parent: parent}
 		} else {
-			thr = Thread{BoardN: boardn, Posts: posts, Parent: parent}
+			thr = Thread{BoardN: board, Posts: posts, Parent: parent}
 		}
 		threadtemp.Execute(f, thr)
 	}
