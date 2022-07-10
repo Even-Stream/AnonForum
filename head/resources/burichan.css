@@ -32,6 +32,15 @@ ref a, selfref a, .header
     text-decoration: none;
 }
 
+.headerblock {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    text-align: center;"
+}
+
 .header+.header::before {
     content: " | ";
 }
