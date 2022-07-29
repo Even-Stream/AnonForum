@@ -29,7 +29,7 @@ Other
 
 - Uses Sqlite by default 
 
-- Not PHP
+- No PHP or Perl
 
 ## Compile Instructions
 sudo apt install build-essential cmake git

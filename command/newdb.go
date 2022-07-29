@@ -10,8 +10,9 @@ import (
 
 func create_table(db *sql.DB) {
 
-	createPostsTableSQL := `CREATE TABLE board_posts (
-		"Id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	createPostsTableSQL := `CREATE TABLE posts (
+		"Board" TEXT NOT NULL,
+		"Id" INTEGER NOT NULL,
 		"Content" TEXT,
 		"Time" TEXT,
 		"Parent" INTEGER,
@@ -25,31 +26,62 @@ func create_table(db *sql.DB) {
 		"Option" TEXT
 	);`
 
-	createRepliesTableSQL := `CREATE TABLE board_replies (
+	createRepliesTableSQL := `CREATE TABLE replies (
+		"Board" TEXT NOT NULL,
 		"Source" INTEGER NOT NULL,
 		"Replier" INTEGER NOT NULL
 	);`
 
 
-	createSubjectsTableSQL := `CREATE TABLE board_subjects (
+	createSubjectsTableSQL := `CREATE TABLE subjects (
+		"Board" TEXT NOT NULL,
 		"Parent" INTEGER NOT NULL,
 		"Subject" TEXT NOT NULL
 	);`
 
+	createLatestIdTableSQL := `CREATE TABLE latest (
+		"Board" TEXT NOT NULL,
+		"Id" INTEGER NOT NULL
+	);`
+
+	createLatestTriggerSQL := `CREATE TRIGGER latest_update
+		AFTER INSERT ON posts
+		BEGIN
+			UPDATE latest 
+			SET Id = Id + 1
+			WHERE Board = NEW.Board;
+		END;`
+
+	latestseedSQL := `INSERT INTO latest (Board, Id) VALUES (cb, 1);`
+
+
+	statement, err := db.Prepare(createPostsTableSQL)
+	Err_check(err)
+	statement.Exec()
+
+	statement, err = db.Prepare(createRepliesTableSQL)
+        Err_check(err)
+	statement.Exec()
+
+	statement, err = db.Prepare(createSubjectsTableSQL)
+        Err_check(err)
+	statement.Exec()
+
+	statement, err = db.Prepare(createLatestIdTableSQL)
+        Err_check(err)
+	statement.Exec()
+
+	statement, err = db.Prepare(createLatestTriggerSQL)
+        Err_check(err)
+	statement.Exec()
+
+
 	for _, board := range Boards {
-		//fmt.Println(board)
-		statement, err := db.Prepare(strings.Replace(createPostsTableSQL, "board", board, 1))
-		Err_check(err)
-		statement.Exec()
-
-		statement, err = db.Prepare(strings.Replace(createRepliesTableSQL, "board", board, 1))
-        	Err_check(err)
-		statement.Exec()
-
-		statement, err = db.Prepare(strings.Replace(createSubjectsTableSQL, "board", board, 1))
+		statement, err = db.Prepare(strings.Replace(latestseedSQL, "cb", `'` + board + `'`, 1))
         	Err_check(err)
 		statement.Exec()
 	}
+	
 }
 
 func New_db() {

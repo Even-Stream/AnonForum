@@ -52,7 +52,7 @@ func process(rawline, board string) (string, []string) {
 
 	stmts := Checkout()
   	defer Checkin(stmts)
-	stmt := stmts[board]["prev_parent"]
+	stmt := stmts["prev_parent"]
 
 	repmatches := make([]string, 0)
 	repparents := make([]string, 0)
@@ -63,7 +63,7 @@ func process(rawline, board string) (string, []string) {
 			repmatches = append(repmatches, match[1])
 
 			var parent string
-			err := stmt.QueryRow(match[1]).Scan(&parent)
+			err := stmt.QueryRow(match[1], board).Scan(&parent)
 			Query_err_check(err)
 
 			repparents = append(repparents, parent)

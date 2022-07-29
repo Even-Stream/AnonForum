@@ -34,13 +34,13 @@ func Get_prev(w http.ResponseWriter, req *http.Request) {
 
 	stmts := Checkout()
   	defer Checkin(stmts)
-	stmt := stmts[board]["prev"]
+	stmt := stmts["prev"]
 	
 	var data string
 	var temp bytes.Buffer
 	var prv Prev
 
-	row := stmt.QueryRow(id)
+	row := stmt.QueryRow(id, board)
 
 	err := row.Scan(&prv.Content, &prv.Imgprev)
 	Query_err_check(err)

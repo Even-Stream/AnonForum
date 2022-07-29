@@ -10,7 +10,7 @@
 </head>
 
 <body>
-<p class="headerblock">{{range .Header}}<a class="header" href="/{{.}}">/{{.}}/</a> {{end}}</p><br><br>
+<p class="headerblock">{{range .Header}}<a class="header" href="/{{.}}/catalog.html">/{{.}}/</a> {{end}}</p><br><br>
 <a href="/{{.Name}}/">Return</a>
 <table class="catalog">{{if .Posts}}{{$subs := .Subjects}}{{range $index, $value := .Posts}}
 {{if eq 0 $index}}<tr>

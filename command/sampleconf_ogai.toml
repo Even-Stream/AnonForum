@@ -6,6 +6,8 @@ Boards = ["ot"]
 
 #below has not been implemented yet 
 
+Descs = ["Off Topic"]
+
 Max_request_size = 11     #in MB
 
 Max_characters = 10000

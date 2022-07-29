@@ -9,7 +9,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-
+//structures used in templates
 type Post struct {
 	Id int
 	Content string
@@ -32,6 +32,7 @@ type Thread struct {
 
 type Board struct {
 	Name string 
+	Desc string
 	Threads []*Thread
 	Latest int
 	Header []string
@@ -44,7 +45,23 @@ type Catalog struct {
 	Header []string
 }
 
+type Entry struct {
+	Title string
+	Content string
+	Date string
+}
 
+type Home struct {
+	Latest []*Post
+	Images []*Post
+	BList []string		//same as Header
+	News []*Entry
+	FAQ string
+	Rules string
+	Board_info string
+}
+
+//catalog template function for making new rows
 var catfuncmap = template.FuncMap{
 	"startrow": func(rowsize, index int) bool {
 		if index % rowsize == 0 {
@@ -65,23 +82,21 @@ func dir_check(path string) {
 }
 
 func get_subject(parent string, board string) string {
-	readstmts := Checkout()
-	defer Checkin(readstmts)
-	stmts := readstmts[board]
+	stmts := Checkout()
+	defer Checkin(stmts)
 
 	var subject string
 
 	stmt := stmts["subject_look"]
-	err := stmt.QueryRow(parent).Scan(&subject)
+	err := stmt.QueryRow(parent, board).Scan(&subject)
 	Query_err_check(err)
 
 	return subject
 }
 
 func get_cat_posts(board string) ([]*Post, []string) {
-	readstmts := Checkout()
-	defer Checkin(readstmts)
-	stmts := readstmts[board]
+	stmts := Checkout()
+	defer Checkin(stmts)
 
 	stmt0 := stmts["thread_coll"]
 	stmt := stmts["thread_head"]
@@ -89,7 +104,7 @@ func get_cat_posts(board string) ([]*Post, []string) {
 	var cat_body []*Post
 	var subjects []string
 
-	parent_rows, err := stmt0.Query()
+	parent_rows, err := stmt0.Query(board)
 	Err_check(err)
 	defer parent_rows.Close()
 
@@ -98,7 +113,7 @@ func get_cat_posts(board string) ([]*Post, []string) {
 		
 		err = parent_rows.Scan(&cparent.Id)
 		Err_check(err)
-		err = stmt.QueryRow(cparent.Id).Scan(&cparent.Content, &cparent.Time, &cparent.File,
+		err = stmt.QueryRow(cparent.Id, board).Scan(&cparent.Content, &cparent.Time, &cparent.File,
 			&cparent.Filename, &cparent.Fileinfo, &cparent.Imgprev)
 		Query_err_check(err)
 
@@ -109,10 +124,10 @@ func get_cat_posts(board string) ([]*Post, []string) {
 	return cat_body, subjects
 }
 
+//for board pages
 func get_threads(board string) ([]*Thread, int) {
-	readstmts := Checkout()
-	defer Checkin(readstmts)
-	stmts := readstmts[board]
+	stmts := Checkout()
+	defer Checkin(stmts)
 	
 	stmt0 := stmts["parent_coll"]
 	stmt := stmts["thread_head"]
@@ -123,7 +138,7 @@ func get_threads(board string) ([]*Thread, int) {
 	var board_body []*Thread
 
 	//tables will be called a board 
-	parent_rows, err := stmt0.Query()
+	parent_rows, err := stmt0.Query(board)
 	Err_check(err)
 	defer parent_rows.Close()
 	
@@ -133,13 +148,13 @@ func get_threads(board string) ([]*Thread, int) {
 		
 		err = parent_rows.Scan(&fstpst.Id)
 		Err_check(err)
-		err = stmt.QueryRow(fstpst.Id).Scan(&fstpst.Content, &fstpst.Time, &fstpst.File,
+		err = stmt.QueryRow(fstpst.Id, board).Scan(&fstpst.Content, &fstpst.Time, &fstpst.File,
 			&fstpst.Filename, &fstpst.Fileinfo, &fstpst.Imgprev)
 		Query_err_check(err)
 
 		pst_coll = append(pst_coll, &fstpst)
 
-		thread_rows, err := stmt2.Query(fstpst.Id)
+		thread_rows, err := stmt2.Query(fstpst.Id, board)
 		Err_check(err)
 		defer thread_rows.Close()
 
@@ -154,7 +169,7 @@ func get_threads(board string) ([]*Thread, int) {
 		}
 
 		for _, pst := range pst_coll {
-			rep_rows, err := stmt3.Query(pst.Id)
+			rep_rows, err := stmt3.Query(pst.Id, board)
 			Err_check(err)
 			
 			for rep_rows.Next() {
@@ -177,7 +192,7 @@ func get_threads(board string) ([]*Thread, int) {
 	}
 	
 	var latestid int
-	err = stmt4.QueryRow().Scan(&latestid)
+	err = stmt4.QueryRow(board).Scan(&latestid)
 	Query_err_check(err)
 	//latestid will equal 0 when there are no posts yet
 	latestid++
@@ -185,16 +200,16 @@ func get_threads(board string) ([]*Thread, int) {
 	return board_body, latestid
 }
 
+//for individual threads
 func get_posts(parent string, board string) ([]*Post, error) {
 
-	readstmts := Checkout()
-  	defer Checkin(readstmts)
-	stmts := readstmts[board]
+	stmts := Checkout()
+	defer Checkin(stmts)
 
   	stmt := stmts["update"]
 	stmt2 := stmts["update_rep"]
 
-	rows, err := stmt.Query(parent)
+	rows, err := stmt.Query(parent, board)
 	Err_check(err)
 	defer rows.Close()
 
@@ -206,7 +221,7 @@ func get_posts(parent string, board string) ([]*Post, error) {
 			&pst.Filename, &pst.Fileinfo, &pst.Imgprev, &pst.Option)
 		Err_check(err)
 
-		rep_rows, err := stmt2.Query(pst.Id)
+		rep_rows, err := stmt2.Query(pst.Id, board)
 		Err_check(err)
 
 		for rep_rows.Next() {
@@ -220,6 +235,10 @@ func get_posts(parent string, board string) ([]*Post, error) {
 	}
 
 	return thread_body, err
+}
+
+func Build_home() {
+
 }
 
 func Build_catalog(board string) {

@@ -79,26 +79,24 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 	now := time.Now().In(nip)
 	post_time := now.Format("1/2/06(Mon)15:04:05")
 
-	writestmts := writeCheckout()
-	wstmts := writestmts[board]
-  	defer writeCheckin(writestmts)
+	wstmts := writeCheckout()
+  	defer writeCheckin(wstmts)
 
-	readstmts := Checkout()
-	rstmts := readstmts[board]
-	defer Checkin(readstmts)
+	rstmts := Checkout()
+	defer Checkin(rstmts)
 
 	//new thread testing 
 	stmt0 := rstmts["parent_check"]
 	var parent_result int
 
-	err := stmt0.QueryRow(parent).Scan(&parent_result)
+	err := stmt0.QueryRow(parent, board).Scan(&parent_result)
 	Query_err_check(err)
 
 	if parent_result == 0 {
 		stmt01 := rstmts["lastid"]
 		var latestid int
 
-		err = stmt01.QueryRow().Scan(&latestid)
+		err = stmt01.QueryRow(board).Scan(&latestid)
 		Err_check(err)
 
 		latestid++
@@ -109,7 +107,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 			//subject insert
 			if subject != "" {
 				stmt0A := wstmts["subadd"]
-				_, err = stmt0A.Exec(parent, subject)
+				_, err = stmt0A.Exec(board, parent, subject)
 				Err_check(err)
 			}
 		}
@@ -160,7 +158,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 			}
 			ffname := string(ofname[rem:])
 
-			result, err := stmt.Exec(input, post_time, parent, file_name, ffname, file_info, file_pre + "s.webp", option)
+			result, err := stmt.Exec(board, input, post_time, parent, file_name, ffname, file_info, file_pre + "s.webp", option)
 			Err_check(err)
 			lastid, err = result.LastInsertId()
 			Err_check(err)
@@ -168,7 +166,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 	//file not present 
 	} else {
 		stmt := wstmts["newpost_nf"]
-		result, err := stmt.Exec(input, post_time, parent, option)
+		result, err := stmt.Exec(board, input, post_time, parent, option)
 		Err_check(err)
 		lastid, err = result.LastInsertId()
 		Err_check(err)
@@ -182,7 +180,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 		for _, match := range repmatches {
 			match_id, err := strconv.ParseUint(match, 10, 64)
 			Err_check(err)
-			_, err = stmt.Exec(match_id, source)
+			_, err = stmt.Exec(board, match_id, source)
 			Err_check(err)
 		}	
 	}
@@ -192,4 +190,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 	http.Redirect(w, req, req.Header.Get("Referer"), 302)
 	
 	Build_catalog(board)
+	if option != "sage" {
+		Build_home()
+	}
 }
