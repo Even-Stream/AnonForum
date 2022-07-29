@@ -51,6 +51,6 @@ go build -o ogai *.go
 sudo ./configure --with-http_ssl_module --with-http_v2_module --with-http_sub_module
 
 ## Project status
-6/12/22
+7/29/22
 
 ongoing

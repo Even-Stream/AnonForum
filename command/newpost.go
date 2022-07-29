@@ -18,8 +18,6 @@ var nip, _ = time.LoadLocation("Asia/Tokyo")
 
 var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif", "image/webp": ".webp"}
 
-var lastid int64
-
 const (
 	max_upload_size = 1024 * 1024 * 11	//11MB
 	max_post_length = 10000
@@ -158,17 +156,13 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 			}
 			ffname := string(ofname[rem:])
 
-			result, err := stmt.Exec(board, input, post_time, parent, file_name, ffname, file_info, file_pre + "s.webp", option)
-			Err_check(err)
-			lastid, err = result.LastInsertId()
+			_, err = stmt.Exec(board, input, post_time, parent, file_name, ffname, file_info, file_pre + "s.webp", option)
 			Err_check(err)
 		}
 	//file not present 
 	} else {
 		stmt := wstmts["newpost_nf"]
-		result, err := stmt.Exec(board, input, post_time, parent, option)
-		Err_check(err)
-		lastid, err = result.LastInsertId()
+		_, err := stmt.Exec(board, input, post_time, parent, option)
 		Err_check(err)
 	}
 
@@ -176,11 +170,10 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 	//reply insert
 	if len(repmatches) > 0 {
 		stmt := wstmts["repadd"]
-		source := lastid 
 		for _, match := range repmatches {
 			match_id, err := strconv.ParseUint(match, 10, 64)
 			Err_check(err)
-			_, err = stmt.Exec(board, match_id, source)
+			_, err = stmt.Exec(board, match_id)
 			Err_check(err)
 		}	
 	}

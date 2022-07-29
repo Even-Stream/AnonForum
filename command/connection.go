@@ -39,7 +39,7 @@ const (
 		VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)`
 	newpost_nfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Option) 
 		VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5)`
-	repadd_string = `INSERT INTO replies(Board, Source, Replier) VALUES (?, ?, ?)`
+	repadd_string = `INSERT INTO replies(Board, Source, Replier) VALUES (?1, ?2, (SELECT Id FROM latest WHERE Board = ?1) - 1)`
 	subadd_string = `INSERT INTO subjects(Board, Parent, Subject) VALUES (?, ?, ?)`
 	homeadd_string = `INSERT INTO latest(Board, Id) VALUES (?, ?)`
 )
