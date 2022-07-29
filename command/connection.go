@@ -17,7 +17,8 @@ const (
 	updatestring = `SELECT Id, Content, Time, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
 				COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev, Option FROM posts WHERE Parent = ? AND Board = ?`
 	update_repstring = `SELECT Replier FROM replies WHERE Source = ? AND Board = ?`
-	parent_collstring = `SELECT DISTINCT Parent FROM posts WHERE (Option <> "sage" OR Id = Parent) AND Board = ? ORDER BY Id DESC LIMIT 15`
+	parent_collstring = `SELECT Parent, MAX(Id) FROM posts WHERE (Option <> "sage" OR Id = Parent) AND Board = ? 
+		GROUP BY Parent ORDER BY MAX(Id) DESC LIMIT 15`
 	thread_headstring = `SELECT Content, Time, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
 				COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev
 				FROM posts
@@ -31,7 +32,8 @@ const (
 	parent_checkstring = `SELECT COUNT(*)
 				FROM posts
 				WHERE Parent = ? AND Board = ?`
-	thread_collstring = `SELECT DISTINCT Parent FROM posts WHERE (Option <> "sage" OR Id = Parent) AND Board = ? ORDER BY Id DESC`
+	thread_collstring = `SELECT Parent, MAX(Id) FROM posts WHERE (Option <> "sage" OR Id = Parent) AND Board = ? 
+		GROUP BY Parent ORDER BY MAX(Id) DESC`
 	subject_lookstring = `SELECT Subject FROM subjects WHERE Parent = ? AND Board = ?`
 	home_
 

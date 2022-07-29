@@ -110,9 +110,11 @@ func get_cat_posts(board string) ([]*Post, []string) {
 
 	for parent_rows.Next() {
 		var cparent Post
+		var filler int
 		
-		err = parent_rows.Scan(&cparent.Id)
+		err = parent_rows.Scan(&cparent.Id, &filler)
 		Err_check(err)
+
 		err = stmt.QueryRow(cparent.Id, board).Scan(&cparent.Content, &cparent.Time, &cparent.File,
 			&cparent.Filename, &cparent.Fileinfo, &cparent.Imgprev)
 		Query_err_check(err)
@@ -144,9 +146,10 @@ func get_threads(board string) ([]*Thread, int) {
 	
 	for parent_rows.Next() {
 		var fstpst Post
+		var filler int
 		var pst_coll []*Post
 		
-		err = parent_rows.Scan(&fstpst.Id)
+		err = parent_rows.Scan(&fstpst.Id, &filler)
 		Err_check(err)
 		err = stmt.QueryRow(fstpst.Id, board).Scan(&fstpst.Content, &fstpst.Time, &fstpst.File,
 			&fstpst.Filename, &fstpst.Fileinfo, &fstpst.Imgprev)
