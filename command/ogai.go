@@ -1,40 +1,34 @@
 package main
 
-
 import (
+    "database/sql"
+    "log"
+    "os"
+    "math/rand"
+    "time"
 
-	"database/sql"
-	"log"
-	"os"
-	"math/rand"
-	"time"
-
-	_ "github.com/mattn/go-sqlite3"
+    _ "github.com/mattn/go-sqlite3"
 )
-
 
 const rand_charset = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_"
 
-
 func Err_check(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
+    if err != nil {
+        log.Fatal(err)
+    }
 }
-
 
 func Query_err_check(err error) {
 
-	if err != nil {
-		if err == sql.ErrNoRows {
-			// there were no rows, but otherwise no error occurred
+    if err != nil {
+        if err == sql.ErrNoRows {
+            // there were no rows, but otherwise no error occurred
 
-		} else {
-				log.Fatal(err)
-			}
-	}
+        } else {
+                log.Fatal(err)
+            }
+    }
 }
-
 
 func Rand_gen() string {
 
@@ -44,7 +38,7 @@ func Rand_gen() string {
 
         c := rand_charset[rand.Intn(len(rand_charset))]
 
-	result += string(c)
+    result += string(c)
     }
 
     return result
@@ -53,17 +47,17 @@ func Rand_gen() string {
 
 func main() {
 
-	Load_conf()
+    Load_conf()
 
-	file, err := os.OpenFile(BP + "error.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
-	Err_check(err)
-	log.SetOutput(file)
+    file, err := os.OpenFile(BP + "error.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+    Err_check(err)
+    log.SetOutput(file)
 
-	rand.Seed(time.Now().UnixNano())
+    rand.Seed(time.Now().UnixNano())
 
-	//New_db()
-	Make_Conns()
-	//Build_thread() 
-	Listen()
+    New_db()
+    Make_Conns()
+    Build_thread("1", "ot")
+    Listen()
 
 }

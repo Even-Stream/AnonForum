@@ -8,27 +8,27 @@ import (
 
 // IPRateLimiter .
 type IPRateLimiter struct {
-    ips		map[string][]*rate.Limiter
-    mu		*sync.RWMutex
-    retR	rate.Limit
-    retB	int
-    postR	rate.Limit
-    postB	int
-    themeR	rate.Limit
-    themeB	int
+    ips        map[string][]*rate.Limiter
+    mu        *sync.RWMutex
+    retR    rate.Limit
+    retB    int
+    postR    rate.Limit
+    postB    int
+    themeR    rate.Limit
+    themeB    int
 }
 
 // NewIPRateLimiter .
 func NewIPRateLimiter(r []rate.Limit, b []int) *IPRateLimiter {
     i := &IPRateLimiter{
-        ips:	make(map[string][]*rate.Limiter),
-        mu:	&sync.RWMutex{},
-        retR:	r[0],
-        retB:	b[0],
-        postR:	r[1],
-        postB:	b[1],
-        themeR:	r[2],
-        themeB:	b[2],
+        ips:    make(map[string][]*rate.Limiter),
+        mu:    &sync.RWMutex{},
+        retR:    r[0],
+        retB:    b[0],
+        postR:    r[1],
+        postB:    b[1],
+        themeR:    r[2],
+        themeB:    b[2],
     }
 
     return i

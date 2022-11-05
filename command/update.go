@@ -1,243 +1,243 @@
 package main
 
 import (
-	"os"
-	"text/template"
-	"strconv"
-	"errors"
+    "os"
+    "text/template"
+    "strconv"
+    "errors"
 
-	_ "github.com/mattn/go-sqlite3"
+    _ "github.com/mattn/go-sqlite3"
 )
 
 //structures used in templates
 type Post struct {
-	Id int
-	Content string
-    	Time string
-    	File string
-	Filename string
-	Fileinfo string
-	Imgprev string
-	Option string
-	Replies []int
+    Id int
+    Content string
+    Time string
+    File string
+    Filename string
+    Fileinfo string
+    Imgprev string
+    Option string
+    Replies []int
 }
 
 type Thread struct {
-	BoardN string
-	Parent string
-	Subject string
-	Posts []*Post
-	Header []string
+    BoardN string
+    Parent string
+    Subject string
+    Posts []*Post
+    Header []string
 }
 
 type Board struct {
-	Name string 
-	Desc string
-	Threads []*Thread
-	Latest int
-	Header []string
+    Name string
+    Desc string
+    Threads []*Thread
+    Latest int
+    Header []string
 }
 
 type Catalog struct {
-	Name string
-	Posts []*Post
-	Subjects []string
-	Header []string
+    Name string
+    Posts []*Post
+    Subjects []string
+    Header []string
 }
 
 type Entry struct {
-	Title string
-	Content string
-	Date string
+    Title string
+    Content string
+    Date string
 }
 
 type Home struct {
-	Latest []*Post
-	Images []*Post
-	BList []string		//same as Header
-	News []*Entry
-	FAQ string
-	Rules string
-	Board_info string
+    Latest []*Post
+    Images []*Post
+    BList []string        //same as Header
+    News []*Entry
+    FAQ string
+    Rules string
+    Board_info string
 }
 
 //catalog template function for making new rows
 var catfuncmap = template.FuncMap{
-	"startrow": func(rowsize, index int) bool {
-		if index % rowsize == 0 {
-			return true
-		}
-		return false 
-	},
+    "startrow": func(rowsize, index int) bool {
+        if index % rowsize == 0 {
+            return true
+        }
+        return false
+    },
 }
 
 func dir_check(path string) {
 
-	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-		err := os.Mkdir(path, os.ModePerm)
-		Err_check(err)
-		err = os.Mkdir(path + "Files/", os.ModePerm)
-		Err_check(err)
-	}
+    if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+        err := os.Mkdir(path, os.ModePerm)
+        Err_check(err)
+        err = os.Mkdir(path + "Files/", os.ModePerm)
+        Err_check(err)
+    }
 }
 
 func get_subject(parent string, board string) string {
-	stmts := Checkout()
-	defer Checkin(stmts)
+    stmts := Checkout()
+    defer Checkin(stmts)
 
-	var subject string
+    var subject string
 
-	stmt := stmts["subject_look"]
-	err := stmt.QueryRow(parent, board).Scan(&subject)
-	Query_err_check(err)
+    stmt := stmts["subject_look"]
+    err := stmt.QueryRow(parent, board).Scan(&subject)
+    Query_err_check(err)
 
-	return subject
+    return subject
 }
 
 func get_cat_posts(board string) ([]*Post, []string) {
-	stmts := Checkout()
-	defer Checkin(stmts)
+    stmts := Checkout()
+    defer Checkin(stmts)
 
-	stmt0 := stmts["thread_coll"]
-	stmt := stmts["thread_head"]
+    stmt0 := stmts["thread_coll"]
+    stmt := stmts["thread_head"]
 
-	var cat_body []*Post
-	var subjects []string
+    var cat_body []*Post
+    var subjects []string
 
-	parent_rows, err := stmt0.Query(board)
-	Err_check(err)
-	defer parent_rows.Close()
+    parent_rows, err := stmt0.Query(board)
+    Err_check(err)
+    defer parent_rows.Close()
 
-	for parent_rows.Next() {
-		var cparent Post
-		var filler int
-		
-		err = parent_rows.Scan(&cparent.Id, &filler)
-		Err_check(err)
+    for parent_rows.Next() {
+        var cparent Post
+        var filler int
 
-		err = stmt.QueryRow(cparent.Id, board).Scan(&cparent.Content, &cparent.Time, &cparent.File,
-			&cparent.Filename, &cparent.Fileinfo, &cparent.Imgprev)
-		Query_err_check(err)
+        err = parent_rows.Scan(&cparent.Id, &filler)
+        Err_check(err)
 
-		cat_body = append(cat_body, &cparent)
-		subjects = append(subjects, get_subject(strconv.Itoa(cparent.Id), board))
-	}
+        err = stmt.QueryRow(cparent.Id, board).Scan(&cparent.Content, &cparent.Time, &cparent.File,
+            &cparent.Filename, &cparent.Fileinfo, &cparent.Imgprev)
+        Query_err_check(err)
 
-	return cat_body, subjects
+        cat_body = append(cat_body, &cparent)
+        subjects = append(subjects, get_subject(strconv.Itoa(cparent.Id), board))
+    }
+
+    return cat_body, subjects
 }
 
 //for board pages
 func get_threads(board string) ([]*Thread, int) {
-	stmts := Checkout()
-	defer Checkin(stmts)
-	
-	stmt0 := stmts["parent_coll"]
-	stmt := stmts["thread_head"]
-	stmt2 := stmts["thread_body"]
-	stmt3 := stmts["update_rep"]
-	stmt4 := stmts["lastid"]
+    stmts := Checkout()
+    defer Checkin(stmts)
 
-	var board_body []*Thread
+    stmt0 := stmts["parent_coll"]
+    stmt := stmts["thread_head"]
+    stmt2 := stmts["thread_body"]
+    stmt3 := stmts["update_rep"]
+    stmt4 := stmts["lastid"]
 
-	//tables will be called a board 
-	parent_rows, err := stmt0.Query(board)
-	Err_check(err)
-	defer parent_rows.Close()
-	
-	for parent_rows.Next() {
-		var fstpst Post
-		var filler int
-		var pst_coll []*Post
-		
-		err = parent_rows.Scan(&fstpst.Id, &filler)
-		Err_check(err)
-		err = stmt.QueryRow(fstpst.Id, board).Scan(&fstpst.Content, &fstpst.Time, &fstpst.File,
-			&fstpst.Filename, &fstpst.Fileinfo, &fstpst.Imgprev)
-		Query_err_check(err)
+    var board_body []*Thread
 
-		pst_coll = append(pst_coll, &fstpst)
+    //tables will be called a board 
+    parent_rows, err := stmt0.Query(board)
+    Err_check(err)
+    defer parent_rows.Close()
 
-		thread_rows, err := stmt2.Query(fstpst.Id, board)
-		Err_check(err)
-		defer thread_rows.Close()
+    for parent_rows.Next() {
+        var fstpst Post
+        var filler int
+        var pst_coll []*Post
 
-		for thread_rows.Next() {
-			var cpst Post
+        err = parent_rows.Scan(&fstpst.Id, &filler)
+        Err_check(err)
+        err = stmt.QueryRow(fstpst.Id, board).Scan(&fstpst.Content, &fstpst.Time, &fstpst.File,
+            &fstpst.Filename, &fstpst.Fileinfo, &fstpst.Imgprev)
+        Query_err_check(err)
 
-			err = thread_rows.Scan(&cpst.Id, &cpst.Content, &cpst.Time, &cpst.File,
-			&cpst.Filename, &cpst.Fileinfo, &cpst.Imgprev, &cpst.Option)
-			Err_check(err)
-			
-			pst_coll = append(pst_coll, &cpst)
-		}
+        pst_coll = append(pst_coll, &fstpst)
 
-		for _, pst := range pst_coll {
-			rep_rows, err := stmt3.Query(pst.Id, board)
-			Err_check(err)
-			
-			for rep_rows.Next() {
-				var replier int
-				rep_rows.Scan(&replier)
-				pst.Replies = append(pst.Replies, replier)
-			}
-			rep_rows.Close()
-		}
-		
-		sub := get_subject(strconv.Itoa(fstpst.Id), board)
-		var thr Thread
-		if sub != "" {
-			thr = Thread{BoardN: board, Posts: pst_coll, Subject: sub, Parent: strconv.Itoa(fstpst.Id)}
-		} else {
-			thr = Thread{BoardN: board, Posts: pst_coll, Parent: strconv.Itoa(fstpst.Id)}
-		}
+        thread_rows, err := stmt2.Query(fstpst.Id, board)
+        Err_check(err)
+        defer thread_rows.Close()
 
-		board_body = append(board_body, &thr)
-	}
-	
-	var latestid int
-	err = stmt4.QueryRow(board).Scan(&latestid)
-	Query_err_check(err)
-	//latestid will equal 0 when there are no posts yet
-	latestid++
+        for thread_rows.Next() {
+            var cpst Post
 
-	return board_body, latestid
+            err = thread_rows.Scan(&cpst.Id, &cpst.Content, &cpst.Time, &cpst.File,
+            &cpst.Filename, &cpst.Fileinfo, &cpst.Imgprev, &cpst.Option)
+            Err_check(err)
+
+            pst_coll = append(pst_coll, &cpst)
+        }
+
+        for _, pst := range pst_coll {
+            rep_rows, err := stmt3.Query(pst.Id, board)
+            Err_check(err)
+
+            for rep_rows.Next() {
+        var replier int
+        rep_rows.Scan(&replier)
+        pst.Replies = append(pst.Replies, replier)
+            }
+            rep_rows.Close()
+        }
+
+        sub := get_subject(strconv.Itoa(fstpst.Id), board)
+        var thr Thread
+        if sub != "" {
+            thr = Thread{BoardN: board, Posts: pst_coll, Subject: sub, Parent: strconv.Itoa(fstpst.Id)}
+        } else {
+            thr = Thread{BoardN: board, Posts: pst_coll, Parent: strconv.Itoa(fstpst.Id)}
+        }
+
+        board_body = append(board_body, &thr)
+    }
+
+    var latestid int
+    err = stmt4.QueryRow(board).Scan(&latestid)
+    Query_err_check(err)
+    //latestid will equal 0 when there are no posts yet
+    latestid++
+
+    return board_body, latestid
 }
 
 //for individual threads
 func get_posts(parent string, board string) ([]*Post, error) {
 
-	stmts := Checkout()
-	defer Checkin(stmts)
+    stmts := Checkout()
+    defer Checkin(stmts)
 
-  	stmt := stmts["update"]
-	stmt2 := stmts["update_rep"]
+    stmt := stmts["update"]
+    stmt2 := stmts["update_rep"]
 
-	rows, err := stmt.Query(parent, board)
-	Err_check(err)
-	defer rows.Close()
+    rows, err := stmt.Query(parent, board)
+    Err_check(err)
+    defer rows.Close()
 
-	var thread_body []*Post
+    var thread_body []*Post
 
-	for rows.Next() {
-		var pst Post
-		err = rows.Scan(&pst.Id, &pst.Content, &pst.Time, &pst.File,
-			&pst.Filename, &pst.Fileinfo, &pst.Imgprev, &pst.Option)
-		Err_check(err)
+    for rows.Next() {
+        var pst Post
+        err = rows.Scan(&pst.Id, &pst.Content, &pst.Time, &pst.File,
+            &pst.Filename, &pst.Fileinfo, &pst.Imgprev, &pst.Option)
+        Err_check(err)
 
-		rep_rows, err := stmt2.Query(pst.Id, board)
-		Err_check(err)
+        rep_rows, err := stmt2.Query(pst.Id, board)
+        Err_check(err)
 
-		for rep_rows.Next() {
-			var replier int
-			rep_rows.Scan(&replier)
-			pst.Replies = append(pst.Replies, replier)
-		}
-		
-		rep_rows.Close()
-		thread_body = append(thread_body, &pst)
-	}
+        for rep_rows.Next() {
+            var replier int
+            rep_rows.Scan(&replier)
+            pst.Replies = append(pst.Replies, replier)
+        }
 
-	return thread_body, err
+        rep_rows.Close()
+        thread_body = append(thread_body, &pst)
+    }
+
+    return thread_body, err
 }
 
 func Build_home() {
@@ -245,66 +245,66 @@ func Build_home() {
 }
 
 func Build_catalog(board string) {
-	cattemp := template.New("catalog.html").Funcs(catfuncmap)
-	cattemp, err := cattemp.ParseFiles(BP + "/templates/catalog.html")
-	Err_check(err)
+    cattemp := template.New("catalog.html").Funcs(catfuncmap)
+    cattemp, err := cattemp.ParseFiles(BP + "/templates/catalog.html")
+    Err_check(err)
 
-	path := BP + "head/" + board + "/"
-	dir_check(path)
+    path := BP + "head/" + board + "/"
+    dir_check(path)
 
-	f, err := os.Create(path + "/catalog.html")
-	Err_check(err)
-	defer f.Close()
+    f, err := os.Create(path + "/catalog.html")
+    Err_check(err)
+    defer f.Close()
 
-	posts, subjects := get_cat_posts(board)
-    
-	catalog := Catalog{Name: board, Posts: posts, Subjects: subjects, Header: Boards}
-	cattemp.Execute(f, catalog)
+    posts, subjects := get_cat_posts(board)
+
+    catalog := Catalog{Name: board, Posts: posts, Subjects: subjects, Header: Boards}
+    cattemp.Execute(f, catalog)
 }
 
 func Build_board(board string) {
-	boardtemp := template.New("board.html")
-	boardtemp, err := boardtemp.ParseFiles(BP + "/templates/board.html")
-	Err_check(err)
+    boardtemp := template.New("board.html")
+    boardtemp, err := boardtemp.ParseFiles(BP + "/templates/board.html")
+    Err_check(err)
 
-	path := BP + "head/" + board + "/"
-	dir_check(path)
+    path := BP + "head/" + board + "/"
+    dir_check(path)
 
-	f, err := os.Create(path + "index.html")
-	Err_check(err)
-	defer f.Close()
+    f, err := os.Create(path + "index.html")
+    Err_check(err)
+    defer f.Close()
 
-	threads, latestid := get_threads(board)
+    threads, latestid := get_threads(board)
 
-	cboard := Board{Name: board, Threads: threads, Latest: latestid, Header: Boards}
-	boardtemp.Execute(f, cboard)
-	
+    cboard := Board{Name: board, Threads: threads, Latest: latestid, Header: Boards}
+    boardtemp.Execute(f, cboard)
+
 }
 
 func Build_thread(parent string, board string) { //will accept argument for board and thread number
-	threadtemp := template.New("thread.html")
-	threadtemp, err := threadtemp.ParseFiles(BP + "/templates/thread.html")
-	Err_check(err)
+    threadtemp := template.New("thread.html")
+    threadtemp, err := threadtemp.ParseFiles(BP + "/templates/thread.html")
+    Err_check(err)
 
-	path := BP + "head/" + board + "/" 
-	dir_check(path)
+    path := BP + "head/" + board + "/"
+    dir_check(path)
 
-	f, err := os.Create(path + parent + ".html")
-	Err_check(err)
-	defer f.Close()
+    f, err := os.Create(path + parent + ".html")
+    Err_check(err)
+    defer f.Close()
 
-	posts, err := get_posts(parent, board)
+    posts, err := get_posts(parent, board)
 
-	sub := get_subject(parent, board)
-    
-	if err == nil {
-		var thr Thread 
+    sub := get_subject(parent, board)
 
-		if sub != "" {
-			thr = Thread{BoardN: board, Posts: posts, Subject: sub, Parent: parent, Header: Boards}
-		} else {
-			thr = Thread{BoardN: board, Posts: posts, Parent: parent, Header: Boards}
-		}
-		threadtemp.Execute(f, thr)
-	}
+    if err == nil {
+        var thr Thread
+
+        if sub != "" {
+            thr = Thread{BoardN: board, Posts: posts, Subject: sub, Parent: parent, Header: Boards}
+        } else {
+            thr = Thread{BoardN: board, Posts: posts, Parent: parent, Header: Boards}
+        }
+        threadtemp.Execute(f, thr)
+    }
 }

@@ -1,11 +1,11 @@
 package main
 
 import (
-	"net/http"
-	"strings"
-	"time"
+    "net/http"
+    "strings"
+    "time"
 
-	"golang.org/x/time/rate"
+    "golang.org/x/time/rate"
 )
 
 var rarr = []rate.Limit{20, .04, .5}
@@ -14,40 +14,40 @@ var limiter = NewIPRateLimiter(rarr, barr)
 
 func Listen() {
 
-	go func() {
-		for range time.Tick(time.Hour) {
-			limiter = NewIPRateLimiter(rarr, barr)
-	}}()
+    go func() {
+        for range time.Tick(time.Hour) {
+            limiter = NewIPRateLimiter(rarr, barr)
+    }}()
 
-	//listen mux
-	mux := http.NewServeMux()
-	mux.HandleFunc("/im/ret/", Get_prev)
-	mux.HandleFunc("/im/post/", New_post)
-	mux.HandleFunc("/im/theme/", Switch_theme)
-	http.ListenAndServe(":81", hongMeiling(mux))
+    //listen mux
+    mux := http.NewServeMux()
+    mux.HandleFunc("/im/ret/", Get_prev)
+    mux.HandleFunc("/im/post/", New_post)
+    mux.HandleFunc("/im/theme/", Switch_theme)
+    http.ListenAndServe(":81", hongMeiling(mux))
 }
 
 func hongMeiling(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {	
-				
-		var sel int
-		url := r.URL.String()
-		switch {
-			case strings.Contains(url, "ret"):
-				sel = 0
-			case strings.Contains(url, "post"):
-				sel = 1
-			case strings.Contains(url, "theme"):
-				sel = 2
-		}
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {    
 
-		climiter := limiter.GetLimiter(r.Header.Get("X-Real-IP"), sel)
+        var sel int
+        url := r.URL.String()
+        switch {
+            case strings.Contains(url, "ret"):
+                sel = 0
+            case strings.Contains(url, "post"):
+                sel = 1
+            case strings.Contains(url, "theme"):
+                sel = 2
+        }
 
-        	if !climiter.Allow() {
-            		http.Error(w, "Request limit exceeded. Please wait.", http.StatusTooManyRequests)
-            		return
-        	}
+        climiter := limiter.GetLimiter(r.Header.Get("X-Real-IP"), sel)
 
-		next.ServeHTTP(w, r)	
-	})
+            if !climiter.Allow() {
+                    http.Error(w, "Request limit exceeded. Please wait.", http.StatusTooManyRequests)
+                    return
+            }
+
+        next.ServeHTTP(w, r)    
+    })
 }

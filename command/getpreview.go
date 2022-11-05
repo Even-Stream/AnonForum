@@ -7,11 +7,11 @@ and send that post back
 */
 
 import (
-	"bytes"
-	"net/http"
-	"text/template"
+    "bytes"
+    "net/http"
+    "text/template"
 
-	_ "github.com/mattn/go-sqlite3"
+    _ "github.com/mattn/go-sqlite3"
 )
 
 type Prev struct {
@@ -22,38 +22,38 @@ type Prev struct {
 }
 
 func Get_prev(w http.ResponseWriter, req *http.Request) {
-	//retrieves post request 
+    //retrieves post request 
 
-	id := req.FormValue("p")
-	board := req.FormValue("board")
+    id := req.FormValue("p")
+    board := req.FormValue("board")
 
-	if id == "" || board == "" {
-		http.Error(w, "Invalid preview request.", http.StatusBadRequest)
-		return
-	}
+    if id == "" || board == "" {
+        http.Error(w, "Invalid preview request.", http.StatusBadRequest)
+        return
+    }
 
-	stmts := Checkout()
-  	defer Checkin(stmts)
-	stmt := stmts["prev"]
-	
-	var data string
-	var temp bytes.Buffer
-	var prv Prev
+    stmts := Checkout()
+      defer Checkin(stmts)
+    stmt := stmts["prev"]
 
-	row := stmt.QueryRow(id, board)
+    var data string
+    var temp bytes.Buffer
+    var prv Prev
 
-	err := row.Scan(&prv.Content, &prv.Imgprev)
-	Query_err_check(err)
+    row := stmt.QueryRow(id, board)
 
-	//Prev_body, err := template.New("todos").Parse("{{if .Imgprev}}<img src=\"/{{.Board}}/{{.Imgprev}}\">{{end}}{{.Content}}")
-	Prev_body, err := template.New("todos").Parse("{{if .Imgprev}}<img class=\"imspec\" src=\"Files/{{.Imgprev}}\">{{end}}{{.Content}}")
-	Err_check(err)
-	Prev_body.Execute(&temp, prv)
+    err := row.Scan(&prv.Content, &prv.Imgprev)
+    Query_err_check(err)
 
-	data = temp.String()	
+    //Prev_body, err := template.New("todos").Parse("{{if .Imgprev}}<img src=\"/{{.Board}}/{{.Imgprev}}\">{{end}}{{.Content}}")
+    Prev_body, err := template.New("todos").Parse("{{if .Imgprev}}<img class=\"imspec\" src=\"Files/{{.Imgprev}}\">{{end}}{{.Content}}")
+    Err_check(err)
+    Prev_body.Execute(&temp, prv)
 
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
+    data = temp.String()    
 
-	w.Write([]byte(data))
+    w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+    w.WriteHeader(http.StatusOK)
+
+    w.Write([]byte(data))
 }
