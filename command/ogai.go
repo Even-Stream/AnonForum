@@ -19,31 +19,27 @@ func Err_check(err error) {
 }
 
 func Query_err_check(err error) {
-
     if err != nil {
+
         if err == sql.ErrNoRows {
             // there were no rows, but otherwise no error occurred
-
         } else {
                 log.Fatal(err)
             }
+
     }
 }
 
 func Rand_gen() string {
-
     result := ""
 
     for i := 0; i < 6; i++ {
-
         c := rand_charset[rand.Intn(len(rand_charset))]
-
     result += string(c)
     }
 
     return result
 }
-
 
 func main() {
 
@@ -56,8 +52,12 @@ func main() {
     rand.Seed(time.Now().UnixNano())
 
     New_db()
-    Make_Conns()
-    Build_thread("1", "ot")
-    Listen()
+    Make_Conns() 
 
+    for _, board := range Boards{
+        Build_board(board)
+        Build_catalog(board)
+    }
+
+    Listen()
 }
