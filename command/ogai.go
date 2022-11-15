@@ -43,11 +43,11 @@ func Rand_gen() string {
 
 func main() {
 
-    Load_conf()
-
     file, err := os.OpenFile(BP + "error.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
     Err_check(err)
     log.SetOutput(file)
+
+    Load_conf()
 
     rand.Seed(time.Now().UnixNano())
 

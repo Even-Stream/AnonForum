@@ -1,6 +1,6 @@
 # Ogai image board configuration
 
-Base_path = #insert git cloned directory 
+Base_path = "/ogai/" #insert git cloned directory
 
 Boards = ["ot"]
 
