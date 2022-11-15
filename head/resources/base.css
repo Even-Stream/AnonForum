@@ -1,0 +1,175 @@
+@font-face {
+    font-family: 'MPlus';
+    font-style: normal;
+    font-weight: 400;
+    src: url('m-plus-2-v5-latin_japanese-regular.woff2') format('woff2'); 
+    font-display: block;
+}
+
+:focus{
+    outline: none;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+postwrap::before {
+    content: ">>";
+}
+
+postwrap::before, .prev {
+    position: absolute;
+}
+
+ref a, selfref a, .header
+{
+    text-decoration: none;
+}
+
+.headerblock {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    text-align: center;"
+}
+
+.header+.header::before {
+    content: " | ";
+}
+
+p, label, postwrap, a, postwrap::before, .thread {
+    font: 16px MPlus, Helvetica, Arial, sans-serif;
+}
+
+subject {
+    font-size: 1.1em;
+    overflow-wrap: anywhere;
+}
+
+img {
+    aspect-ratio:attr(width)/attr(height);
+}
+
+input {
+    padding-top: 5px;
+}
+
+textarea {
+    margin: 2vw;
+    width: 45%;
+    height: 25%;
+    max-width: 98% !important;
+    font: 14px MPlus, Helvetica, Arial, sans-serif;
+    outline: none;
+}
+
+.imspec {
+    appearance: none;
+    user-select: none;
+    cursor: pointer;
+    float: left;
+    padding-right: 15px;
+}
+
+.thread {
+    height: 40.44vh;
+    margin-left: 1%;
+    padding-bottom: 10px;
+}
+
+.post {
+    height: 12.81vh;
+    min-width: 19.09vw;
+    margin-bottom: .5%;
+    margin-left: 2.5%;
+}
+
+.post label {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.post .imspec {
+    padding-left: 7px;
+}
+
+.pcontent {
+    padding-right: 30px;
+    padding-left: 30px;
+    margin-bottom: 10px;
+    line-height: 1.5em;
+    overflow-wrap: anywhere;
+}
+
+.prev {
+    visibility: hidden;
+    border: .1rem solid;
+    padding: 7px;
+    content: var(--post);
+    max-width: 65%;
+    max-height: 70%;
+    margin-left: 1%;
+    margin-top: 2%;
+    position: absolute;
+    overflow: hidden;
+    user-select: none;
+}
+
+ref:hover+.prev {
+    visibility: visible;
+}
+
+.reply a {
+    font-size: 12px;
+    padding-left: 5px;
+}
+
+.image {
+    content: var(--mini);
+}
+
+.image:checked {
+    max-width: 80vw;
+    max-height: 85vh;
+    content: var(--maxi);
+}
+
+.thememenu {
+    float: right;
+}
+
+.catalog {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    word-wrap: break-word;
+    border-collapse: collapse;
+}
+
+.catalog td {
+    vertical-align: top;
+    padding: 4px 2px 4px 2px;
+}
+
+.catalog catcon {
+    width: 210px;
+    height: 328px;
+    overflow: hidden;
+    display: block;
+}
+
+.catalog .catimg {
+    padding-top: 5px;
+    max-height: 50%;
+}
+
+.catalog p {
+    font-size: 10pt;
+}
+
+.catalog subject {
+    font-size: 12pt;
+}
