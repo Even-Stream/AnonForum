@@ -38,40 +38,7 @@ type Board struct {
     Header []string
 }
 
-type Catalog struct {
-    Name string
-    Posts []*Post
-    Subjects []string
-    Header []string
-}
-
-type Entry struct {
-    Title string
-    Content string
-    Date string
-}
-
-type Home struct {
-    Latest []*Post
-    Images []*Post
-    BList []string        //same as Header
-    News []*Entry
-    FAQ string
-    Rules string
-    Board_info string
-}
-
-//catalog template function for making new rows
-var catfuncmap = template.FuncMap{
-    "startrow": func(rowsize, index int) bool {
-        if index % rowsize == 0 {
-            return true
-        }
-        return false
-    },
-}
-
-func dir_check(path string) {
+func Dir_check(path string) {
 
     if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
         err := os.Mkdir(path, os.ModePerm)
@@ -81,7 +48,7 @@ func dir_check(path string) {
     }
 }
 
-func get_subject(parent string, board string) string {
+func Get_subject(parent string, board string) string {
     stmts := Checkout()
     defer Checkin(stmts)
 
@@ -92,38 +59,6 @@ func get_subject(parent string, board string) string {
     Query_err_check(err)
 
     return subject
-}
-
-func get_cat_posts(board string) ([]*Post, []string) {
-    stmts := Checkout()
-    defer Checkin(stmts)
-
-    stmt0 := stmts["thread_coll"]
-    stmt := stmts["thread_head"]
-
-    var cat_body []*Post
-    var subjects []string
-
-    parent_rows, err := stmt0.Query(board)
-    Err_check(err)
-    defer parent_rows.Close()
-
-    for parent_rows.Next() {
-        var cparent Post
-        var filler int
-
-        err = parent_rows.Scan(&cparent.Id, &filler)
-        Err_check(err)
-
-        err = stmt.QueryRow(cparent.Id, board).Scan(&cparent.Content, &cparent.Time, &cparent.File,
-            &cparent.Filename, &cparent.Fileinfo, &cparent.Imgprev)
-        Query_err_check(err)
-
-        cat_body = append(cat_body, &cparent)
-        subjects = append(subjects, get_subject(strconv.Itoa(cparent.Id), board))
-    }
-
-    return cat_body, subjects
 }
 
 //for board pages
@@ -183,7 +118,7 @@ func get_threads(board string) ([]*Thread, int) {
             rep_rows.Close()
         }
 
-        sub := get_subject(strconv.Itoa(fstpst.Id), board)
+        sub := Get_subject(strconv.Itoa(fstpst.Id), board)
         var thr Thread
         if sub != "" {
             thr = Thread{BoardN: board, Posts: pst_coll, Subject: sub, Parent: strconv.Itoa(fstpst.Id)}
@@ -240,35 +175,13 @@ func get_posts(parent string, board string) ([]*Post, error) {
     return thread_body, err
 }
 
-func Build_home() {
-
-}
-
-func Build_catalog(board string) {
-    cattemp := template.New("catalog.html").Funcs(catfuncmap)
-    cattemp, err := cattemp.ParseFiles(BP + "/templates/catalog.html")
-    Err_check(err)
-
-    path := BP + "head/" + board + "/"
-    dir_check(path)
-
-    f, err := os.Create(path + "/catalog.html")
-    Err_check(err)
-    defer f.Close()
-
-    posts, subjects := get_cat_posts(board)
-
-    catalog := Catalog{Name: board, Posts: posts, Subjects: subjects, Header: Boards}
-    cattemp.Execute(f, catalog)
-}
-
 func Build_board(board string) {
     boardtemp := template.New("board.html")
     boardtemp, err := boardtemp.ParseFiles(BP + "/templates/board.html")
     Err_check(err)
 
     path := BP + "head/" + board + "/"
-    dir_check(path)
+    Dir_check(path)
 
     f, err := os.Create(path + "index.html")
     Err_check(err)
@@ -287,7 +200,7 @@ func Build_thread(parent string, board string) { //will accept argument for boar
     Err_check(err)
 
     path := BP + "head/" + board + "/"
-    dir_check(path)
+    Dir_check(path)
 
     f, err := os.Create(path + parent + ".html")
     Err_check(err)
@@ -295,7 +208,7 @@ func Build_thread(parent string, board string) { //will accept argument for boar
 
     posts, err := get_posts(parent, board)
 
-    sub := get_subject(parent, board)
+    sub := Get_subject(parent, board)
 
     if err == nil {
         var thr Thread

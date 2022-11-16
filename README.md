@@ -25,8 +25,6 @@ Other
 
 - Webp thumbnails 
 
-- Concurrent 
-
 - Uses Sqlite by default 
 
 - No PHP or Perl

@@ -15,7 +15,8 @@ const (
             COALESCE(Imgprev, '') Imgprev FROM posts WHERE Id = ? AND Board = ?`
     prev_parentstring = `SELECT Parent FROM posts WHERE Id = ? AND Board = ?`
     updatestring = `SELECT Id, Content, Time, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
-                COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev, Option FROM posts WHERE Parent = ? AND Board = ?`
+                COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev, Option FROM posts
+                WHERE Parent = ? AND Board = ?`
     update_repstring = `SELECT Replier FROM replies WHERE Source = ? AND Board = ?`
     parent_collstring = `SELECT Parent, MAX(Id) FROM posts WHERE (Option <> "sage" OR Id = Parent) AND Board = ? 
         GROUP BY Parent ORDER BY MAX(Id) DESC LIMIT 15`
@@ -35,8 +36,6 @@ const (
     thread_collstring = `SELECT Parent, MAX(Id) FROM posts WHERE (Option <> "sage" OR Id = Parent) AND Board = ? 
         GROUP BY Parent ORDER BY MAX(Id) DESC`
     subject_lookstring = `SELECT Subject FROM subjects WHERE Parent = ? AND Board = ?`
-    hp_collstring = ``
-    ht_collstring = ``
 
     newpost_wfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, File, Filename, Fileinfo, Imgprev, Option) 
         VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)`
@@ -138,15 +137,29 @@ func Make_Conns() {
         Err_check(err)
        
         //subject lookup
-        conn11, err:= sql.Open("sqlite3", db_uri)
+        conn11, err := sql.Open("sqlite3", db_uri)
         Err_check(err)    
 
         subject_lookstmt, err := conn11.Prepare(subject_lookstring)
         Err_check(err)
 
-        read_stmts := map[string]*sql.Stmt{"prev": prev_stmt, "prev_parent": prev_parentstmt, "update": updatestmt, "update_rep": update_repstmt, 
-            "parent_coll": parent_collstmt, "thread_head": thread_headstmt, "thread_body": thread_bodystmt, 
-            "lastid": lastid_stmt, "parent_check": parent_checkstmt, "thread_coll": thread_collstmt, "subject_look": subject_lookstmt}
+        conn10a, err := sql.Open("sqlite3", db_uri)
+        Err_check(err)
+
+        hp_collstmt, err := conn10a.Prepare("SELECT * FROM homepost")
+        Err_check(err)
+
+        conn10b, err := sql.Open("sqlite3", db_uri)
+        Err_check(err)
+
+        ht_collstmt, err := conn10b.Prepare("SELECT * FROM homethumb")
+        Err_check(err)
+        
+        read_stmts := map[string]*sql.Stmt{"prev": prev_stmt, "prev_parent": prev_parentstmt,
+            "update": updatestmt, "update_rep": update_repstmt, "parent_coll": parent_collstmt,
+            "thread_head": thread_headstmt, "thread_body": thread_bodystmt, "lastid": lastid_stmt,
+            "parent_check": parent_checkstmt, "thread_coll": thread_collstmt,"subject_look": subject_lookstmt,
+            "hp_coll": hp_collstmt, "ht_coll": ht_collstmt}
 
         readConns <- read_stmts
     }

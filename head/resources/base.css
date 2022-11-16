@@ -133,7 +133,7 @@ ref:hover+.prev {
 
 .image:checked {
     max-width: 80vw;
-    max-height: 85vh;
+    max-height: 80vh;
     content: var(--maxi);
 }
 
