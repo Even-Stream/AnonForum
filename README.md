@@ -46,7 +46,7 @@ go build -o ogai *.go
 
 `To use nginx, compile it with this configuration`
 
-sudo ./configure --with-http_ssl_module --with-http_v2_module --with-http_sub_module
+sudo ./configure --with-http_sub_module
 
 ## Project status
 7/29/22
