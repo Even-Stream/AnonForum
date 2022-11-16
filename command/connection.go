@@ -35,7 +35,8 @@ const (
     thread_collstring = `SELECT Parent, MAX(Id) FROM posts WHERE (Option <> "sage" OR Id = Parent) AND Board = ? 
         GROUP BY Parent ORDER BY MAX(Id) DESC`
     subject_lookstring = `SELECT Subject FROM subjects WHERE Parent = ? AND Board = ?`
-    home_
+    hp_collstring = ``
+    ht_collstring = ``
 
     newpost_wfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, File, Filename, Fileinfo, Imgprev, Option) 
         VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)`
@@ -43,7 +44,10 @@ const (
         VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5)`
     repadd_string = `INSERT INTO replies(Board, Source, Replier) VALUES (?1, ?2, (SELECT Id FROM latest WHERE Board = ?1) - 1)`
     subadd_string = `INSERT INTO subjects(Board, Parent, Subject) VALUES (?, ?, ?)`
-    homeadd_string = `INSERT INTO latest(Board, Id) VALUES (?, ?)`
+    hpadd_string = `INSERT INTO homepost(Board, Id, Content, Parent)
+        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3)`
+    htadd_string = `INSERT into homethumb(Board, Id, Parent, Imgprev)
+        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3)`
 )
 
 func Checkout() map[string]*sql.Stmt {
@@ -127,12 +131,12 @@ func Make_Conns() {
         Err_check(err)
 
         //catalog update statement
-        conn10, err:= sql.Open("sqlite3", db_uri)
+        conn10, err := sql.Open("sqlite3", db_uri)
         Err_check(err)    
 
         thread_collstmt, err := conn10.Prepare(thread_collstring)
         Err_check(err)
-
+       
         //subject lookup
         conn11, err:= sql.Open("sqlite3", db_uri)
         Err_check(err)    
@@ -173,7 +177,21 @@ func Make_Conns() {
     subadd_stmt, err := conn15.Prepare(subadd_string)
     Err_check(err)
 
-    write_stmts := map[string]*sql.Stmt{"newpost_wf": newpost_wfstmt, "newpost_nf": newpost_nfstmt, "repadd": repadd_stmt, "subadd": subadd_stmt}
+    conn16, err := sql.Open("sqlite3", db_uri)
+    Err_check(err)
+
+    hpadd_stmt, err := conn16.Prepare(hpadd_string)
+    Err_check(err)
+
+    conn17, err := sql.Open("sqlite3", db_uri)
+    Err_check(err)
+
+    htadd_stmt, err := conn17.Prepare(htadd_string)
+    Err_check(err)
+    
+    write_stmts := map[string]*sql.Stmt{"newpost_wf": newpost_wfstmt, "newpost_nf": newpost_nfstmt,
+        "repadd": repadd_stmt, "subadd": subadd_stmt,
+        "hpadd": hpadd_stmt, "htadd": htadd_stmt}
 
     writeConns <- write_stmts
 }

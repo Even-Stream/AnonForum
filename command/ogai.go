@@ -52,6 +52,7 @@ func main() {
     rand.Seed(time.Now().UnixNano())
 
     New_db()
+    
     Make_Conns() 
 
     for _, board := range Boards{

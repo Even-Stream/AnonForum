@@ -111,6 +111,8 @@ func New_post(w http.ResponseWriter, req *http.Request) {
         }
     }
 
+    hpadd_stmt := wstmts["hpadd"]
+
     //file present
     if file_err == nil {
         defer file.Close()
@@ -148,6 +150,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             file_info := gen_info(handler.Size, width, height)
 
             stmt := wstmts["newpost_wf"]
+            htadd_stmt := wstmts["htadd"]
 
             ofname := []rune(handler.Filename)
             rem := len(ofname) - 20
@@ -156,11 +159,17 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             }
             ffname := string(ofname[rem:])
 
+            _, err = hpadd_stmt.Exec(board, input, parent)
+            Err_check(err)
+            _, err = htadd_stmt.Exec(board, parent, file_pre + "s.webp")
+            Err_check(err)
             _, err = stmt.Exec(board, input, post_time, parent, file_name, ffname, file_info, file_pre + "s.webp", option)
             Err_check(err)
         }
     //file not present 
     } else {
+        _, err = hpadd_stmt.Exec(board, input, parent)
+        Err_check(err)
         stmt := wstmts["newpost_nf"]
         _, err := stmt.Exec(board, input, post_time, parent, option)
         Err_check(err)

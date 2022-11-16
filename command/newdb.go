@@ -66,13 +66,13 @@ func create_table(db *sql.DB) {
             SET Id = Id + 1
             WHERE Board = NEW.Board;
         END;`
-
+        
     trimHomePostStack := `CREATE TRIGGER homepost_trim
-        AFTER INSERT ON homeposts
+        AFTER INSERT ON homepost
         BEGIN
-            DELETE FROM homeposts WHERE ROWID =
-                IIF((SELECT COUNT(Id) FROM homeposts) > 15,
-                (SELECT min(ROWID) from homeposts), NULL);
+            DELETE FROM homepost WHERE ROWID =
+                IIF((SELECT COUNT(Id) FROM homepost) > 15,
+                (SELECT min(ROWID) from homepost), NULL);
         END;`
 
     trimHomeThumbStack := `CREATE TRIGGER homethumb_trim
