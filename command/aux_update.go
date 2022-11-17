@@ -51,18 +51,17 @@ var catfuncmap = template.FuncMap{
     },
 }
 
-
 func get_cat_posts(board string) ([]*Post, []string) {
     stmts := Checkout()
     defer Checkin(stmts)
 
-    stmt0 := stmts["thread_coll"]
-    stmt := stmts["thread_head"]
+    thread_collstmt := stmts["thread_coll"]
+    thread_headstmt := stmts["thread_head"]
 
     var cat_body []*Post
     var subjects []string
 
-    parent_rows, err := stmt0.Query(board)
+    parent_rows, err := thread_collstmt.Query(board)
     Err_check(err)
     defer parent_rows.Close()
 
@@ -73,7 +72,7 @@ func get_cat_posts(board string) ([]*Post, []string) {
         err = parent_rows.Scan(&cparent.Id, &filler)
         Err_check(err)
 
-        err = stmt.QueryRow(cparent.Id, board).Scan(&cparent.Content, &cparent.Time, &cparent.File,
+        err = thread_headstmt.QueryRow(cparent.Id, board).Scan(&cparent.Content, &cparent.Time, &cparent.File,
             &cparent.Filename, &cparent.Fileinfo, &cparent.Imgprev)
         Query_err_check(err)
 
@@ -82,6 +81,45 @@ func get_cat_posts(board string) ([]*Post, []string) {
     }
 
     return cat_body, subjects
+}
+
+func get_home() ([]*Hp, []*Ht) {
+    stmts := Checkout()
+    defer Checkin(stmts)
+
+    hp_collstmt := stmts["hp_coll"]
+    ht_collstmt := stmts["ht_coll"]
+
+    var home_posts []*Hp
+    var home_thumbs []*Ht
+
+    hp_rows, err := hp_collstmt.Query()
+    Err_check(err)
+    defer hp_rows.Close()
+
+    for hp_rows.Next() {
+        var chp Hp
+        
+        err = hp_rows.Scan(&chp.BoardN, &chp.Id, &chp.Content, &chp.Parent)
+        Err_check(err)
+
+        home_posts = append(home_posts, &chp)
+    }
+
+    ht_rows, err := ht_collstmt.Query()
+    Err_check(err)
+    defer ht_rows.Close()
+    
+    for ht_rows.Next() {
+        var cht Ht
+        
+        err = hp_rows.Scan(&cht.BoardN, &cht.Id, &cht.Parent, &cht.Imgprev)
+        Err_check(err)
+
+        home_thumbs = append(home_thumbs, &cht)
+    }
+
+    return home_posts, home_thumbs 
 }
 
 
@@ -93,7 +131,7 @@ func Build_catalog(board string) {
     path := BP + "head/" + board + "/"
     Dir_check(path)
 
-    f, err := os.Create(path + "/catalog.html")
+    f, err := os.Create(path + "catalog.html")
     Err_check(err)
     defer f.Close()
 
@@ -104,5 +142,19 @@ func Build_catalog(board string) {
 }
 
 func Build_home() {
+    hometemp := template.New("home.html")
+    hometemp, err := hometemp.ParseFiles(BP + "/templates/home.html")
+    Err_check(err)
 
+    path := BP + "head/"
+    Dir_check(path)
+
+    f, err := os.Create(path + "index.html")
+    Err_check(err)
+    defer f.Close()
+
+    hps, hts := get_home()
+
+    home := Home{Latest: hps, Thumbs: hts}
+    hometemp.Execute(f, home)
 }
