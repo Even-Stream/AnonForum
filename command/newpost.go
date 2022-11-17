@@ -192,7 +192,5 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     http.Redirect(w, req, req.Header.Get("Referer"), 302)
 
     Build_catalog(board)
-    if option != "sage" {
-        Build_home()
-    }
+    Build_home()
 }

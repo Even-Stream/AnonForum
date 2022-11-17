@@ -1,66 +1,19 @@
+.hbody {
+        background-image: url("hbg.png");
+}
+
+.hlogo {
+	content: url("logo.png");
+}
+
 .blink {
-	font-size: 1.1em;
-	text-decoration: none;
 	color: rgb(216, 68, 36);
-}
-
-.bmap > td {
-	padding: 10px;
-}
-
-.rpost > td {
-	border-bottom: thin solid;
-}
-
-.rpost p, .recpost p, .rlast {
-	font: 14px MPlus, Helvetica, Arial, sans-serif;
-	line-height: 0;
-}
-
-.recpost {
-	width: 70%;
-}
-
-.hcon {
-	width: 70%;
 }
 
 .hop {
-	font: 1em MPlus, Helvetica, Arial, sans-serif;
-	text-align: center;
-	text-decoration: none;
 	color: rgb(216, 68, 36);
-	user-select: none
 }
 
 .tcon {
 	background-color: rgba(253, 240, 241, .85);
-}
-
-.logo {
-    padding-bottom: 20px;
-}
-
-.mtxt {
-	padding-left: 10px;
-}
-
-.mim {
-    max-width: 100%;
-    max-height: 25vh;
-    top: 50%;
-}
-
-.mimg {
-    border: 1px solid;
-    border-right: none;
-    text-align: center;
-    height: auto;
-    width: 12vw;
-    display: block;
-    line-height: 0;
-}
-
-.mingt {
-    float: right;
 }

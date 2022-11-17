@@ -1,0 +1,19 @@
+.hbody {
+        background-image: url("burichan_hbg.png");
+}
+
+.hlogo {
+	content: url("burichan_logo.png");
+}
+
+.blink {
+	color: #34345C;
+}
+
+.hop {
+	color: #34345C;
+}
+
+.tcon {
+	background-color: rgba(238, 242, 255, .8);
+}

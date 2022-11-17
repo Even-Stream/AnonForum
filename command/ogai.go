@@ -56,6 +56,7 @@ func main() {
     Make_Conns() 
 
     for _, board := range Boards{
+        Build_home()
         Build_board(board)
         Build_catalog(board)
     }

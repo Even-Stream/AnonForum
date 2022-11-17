@@ -4,7 +4,6 @@ import (
     "os"
     "text/template"
     "strconv"
-    "errors"
 
     _ "github.com/mattn/go-sqlite3"
 )
@@ -17,14 +16,14 @@ type Catalog struct {
     Header []string
 }
 
-type Hp {
+type Hp struct {
     BoardN string
     Id int
     Content string
     Parent string
 }
 
-type Ht {
+type Ht struct {
     BoardN string
     Id int
     Parent string
@@ -113,7 +112,7 @@ func get_home() ([]*Hp, []*Ht) {
     for ht_rows.Next() {
         var cht Ht
         
-        err = hp_rows.Scan(&cht.BoardN, &cht.Id, &cht.Parent, &cht.Imgprev)
+        err = ht_rows.Scan(&cht.BoardN, &cht.Id, &cht.Parent, &cht.Imgprev)
         Err_check(err)
 
         home_thumbs = append(home_thumbs, &cht)

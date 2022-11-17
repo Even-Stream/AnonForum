@@ -146,13 +146,13 @@ func Make_Conns() {
         conn10a, err := sql.Open("sqlite3", db_uri)
         Err_check(err)
 
-        hp_collstmt, err := conn10a.Prepare("SELECT * FROM homepost")
+        hp_collstmt, err := conn10a.Prepare("SELECT * FROM homepost ORDER BY Id DESC")
         Err_check(err)
 
         conn10b, err := sql.Open("sqlite3", db_uri)
         Err_check(err)
 
-        ht_collstmt, err := conn10b.Prepare("SELECT * FROM homethumb")
+        ht_collstmt, err := conn10b.Prepare("SELECT * FROM homethumb ORDER BY Id DESC")
         Err_check(err)
         
         read_stmts := map[string]*sql.Stmt{"prev": prev_stmt, "prev_parent": prev_parentstmt,

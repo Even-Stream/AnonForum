@@ -3,15 +3,22 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <link rel="stylesheet" href="/resources/base_home.css">
     <link rel="stylesheet" href="/resources/default_home.css">
-    <script src="home.js" defer></script>
+    <script src="/resources/home.js" defer></script>
 </head>
 
-<body background="/resources/hbg.png">
+<body class="hbody">
+
+<center>
+<img class="logo hlogo">
+</center>
+
+{{range .Thumbs}}<p>{{.Imgprev}}</p>
+{{end}}<br><br>
+
+{{range .Latest}}<p>{{.Content}}</p>
+{{end}}<br><br>
 
 </body>
 </html>
-
-<center>
-<img src="purelogo2.png" width="270" height="120" alt="saya chan" class="logo">
-</center>
