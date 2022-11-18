@@ -1,0 +1,7 @@
+*.db
+*.db-shm
+*.db-wal
+*.png
+*.jpg
+*.webp
+
