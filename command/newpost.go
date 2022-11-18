@@ -39,7 +39,8 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 
     file, handler, file_err := req.FormFile("file")
 
-    if file_err != nil && strings.TrimSpace(req.FormValue("newpost")) == "" {
+    no_text := (strings.TrimSpace(req.FormValue("newpost")) == "")
+    if file_err != nil && no_text {
         http.Error(w, "Empty post.", http.StatusBadRequest)
         return
     }
@@ -159,8 +160,10 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             }
             ffname := string(ofname[rem:])
 
-            _, err = hpadd_stmt.Exec(board, input, parent)
-            Err_check(err)
+            if !no_text { 
+                _, err = hpadd_stmt.Exec(board, input, parent)
+                Err_check(err)
+            }
             _, err = htadd_stmt.Exec(board, parent, file_pre + "s.webp")
             Err_check(err)
             _, err = stmt.Exec(board, input, post_time, parent, file_name, ffname, file_info, file_pre + "s.webp", option)
