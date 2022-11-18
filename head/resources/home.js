@@ -5,9 +5,9 @@ idmap.set('About', 'arow');
 idmap.set('Rules', 'rrow');
 idmap.set('Boards', 'brow');
 
-function showMask(clicked_id) {
-    var sel = document.getElementById(clicked_id);
-    var crow = document.getElementById(idmap.get(clicked_id));
+function showMask() {
+    var sel = document.getElementById(this.id);
+    var crow = document.getElementById(idmap.get(this.id));
 
     if (crow.style.visibility=='collapse') {
         crow.style.visibility = 'visible';
@@ -18,10 +18,14 @@ function showMask(clicked_id) {
     }
 
     idmap.forEach((value, key) => {
-        if (key != clicked_id) {
+        if (key != this.id) {
 		document.getElementById(key).style.backgroundColor = 'transparent';
 		document.getElementById(value).style.visibility = 'collapse';
 	}
     });
 
 }
+
+idmap.forEach((value, key) => {
+	document.getElementById(key).addEventListener("click", showMask)
+});

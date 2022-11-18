@@ -14,11 +14,81 @@
 <img class="logo hlogo">
 </center>
 
-{{range .Thumbs}}<p>{{.Imgprev}}</p>
-{{end}}<br><br>
+<hr class="hline"><br>
 
-{{range .Latest}}<p>{{.Content}}</p>
-{{end}}<br><br>
+<center>
+<table border="0" class="tcon">
+
+<tbody>
+<!-- board name range -->
+    <tr class="bmap">
+        <td><a class="blink" href="/ot">/ot/ - Off Topic</a></td>
+    </tr>
+<!-- board name range -->
+</tbody></table>
+<br>
+
+
+<table class="hcon tcon" border="1">
+<tbody><tr>
+<td class="hop" id="Main" style="background-color: rgb(240, 193, 197);">Main</td> 
+<td class="hop" id="Rules" style="background-color: transparent;">Rules</td> 
+<td class="hop" id="About" style="background-color: transparent;">About</td> 
+<td class="hop" id="Boards" style="background-color: transparent;">Boards</td> 
+<td class="hop" id="News" style="background-color: transparent;">News</td> 
+</tr>
+
+<tr id="mrow" style="visibility: visible;">
+<td colspan="5" class="recpost">
+
+<table class="recpost" border="0" style="clear: left; float: left; padding-left: 10px;">
+{{range .Latest}}
+    <tr class="rpost"><td>
+    <a href="/{{.BoardN}}/{{.Parent}}.html#no{{.Id}}">
+        <p>{{.Content}}</p>
+    </a>
+    </td></tr>
+{{end}}
+</table>
+
+<table border="0" style="position: relative; left: 8vw;">
+{{range .Thumbs}}
+    <tr><td class="mimg">
+    <a href="/{{.BoardN}}/{{.Parent}}.html#no{{.Id}}">
+        <img src="/{{.BoardN}}/files/{{.Imgprev}}" class="mim">
+    </a>
+    </td></tr>
+{{end}}
+</table>
+</td>
+</tr>
+
+<tr id="nrow" style="visibility: collapse;">
+<td colspan="5">
+<p>News</p><br>
+</td>
+</tr>
+
+<tr id="arow" style="visibility: collapse;">
+<td colspan="5">
+<p>About</p><br>
+</td>
+</tr>
+
+<tr id="rrow" style="visibility: collapse;">
+<td colspan="5">
+<p>Rules</p><br>
+</td>
+</tr>
+
+<tr id="brow" style="visibility: collapse;">
+<td colspan="5">
+<p>Boards</p><br>
+</td>
+</tr>
+
+</tbody></table>
+</center>
 
 </body>
 </html>

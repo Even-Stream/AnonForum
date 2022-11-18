@@ -6,6 +6,10 @@
 	content: url("logo.png");
 }
 
+.hline {
+        color: rgb(216, 68, 36);
+}
+
 .blink {
 	color: rgb(216, 68, 36);
 }
@@ -16,4 +20,8 @@
 
 .tcon {
 	background-color: rgba(253, 240, 241, .85);
+}
+
+a {
+    color: rgb(153, 17, 23);
 }

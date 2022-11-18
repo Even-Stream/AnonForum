@@ -1,10 +1,17 @@
+@font-face {
+    font-family: 'MPlus';
+    font-style: normal;
+    font-weight: 400;
+    src: url('m-plus-2-v5-latin_japanese-regular.woff2') format('woff2'); 
+    font-display: block;
+}
+
 .hlogo {
     width: 21vw;
 }
 
-.blink {
-	font-size: 1.1em;
-	text-decoration: none;
+.hline {
+    width: 70vw;
 }
 
 .bmap > td {
@@ -15,13 +22,19 @@
 	border-bottom: thin solid;
 }
 
-.rpost p, .recpost p, .rlast {
+.rpost p, .recpost p, .rlast, .blink {
 	font: 14px MPlus, Helvetica, Arial, sans-serif;
 	line-height: 0;
 }
 
+.blink {
+	font-size: 1.1em;
+	text-decoration: none;
+}
+
 .recpost {
 	width: 70%;
+	margin-top: 10px;
 }
 
 .hcon {
@@ -61,4 +74,8 @@
 
 .mingt {
     float: right;
+}
+
+a {
+    text-decoration: none;
 }

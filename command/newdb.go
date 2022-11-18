@@ -71,7 +71,7 @@ func create_table(db *sql.DB) {
         AFTER INSERT ON homepost
         BEGIN
             DELETE FROM homepost WHERE ROWID =
-                IIF((SELECT COUNT(Id) FROM homepost) > 15,
+                IIF((SELECT COUNT(Id) FROM homepost) > 20,
                 (SELECT min(ROWID) from homepost), NULL);
         END;`
 

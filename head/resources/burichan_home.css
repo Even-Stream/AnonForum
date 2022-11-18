@@ -6,6 +6,10 @@
 	content: url("burichan_logo.png");
 }
 
+.hline {
+        color: #34345C;
+}
+
 .blink {
 	color: #34345C;
 }
@@ -16,4 +20,8 @@
 
 .tcon {
 	background-color: rgba(238, 242, 255, .8);
+}
+
+a {
+   color: #34345C;;
 }
