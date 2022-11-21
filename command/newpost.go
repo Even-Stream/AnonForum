@@ -19,7 +19,7 @@ var nip, _ = time.LoadLocation("Asia/Tokyo")
 var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif", "image/webp": ".webp"}
 
 const (
-    max_upload_size = 1024 * 1024 * 11    //11MB
+    max_upload_size = 20 << 20   //12MB
     max_post_length = 10000
 )
 
@@ -37,17 +37,17 @@ func New_post(w http.ResponseWriter, req *http.Request) {
         return
     }
 
+    req.Body = http.MaxBytesReader(w, req.Body, max_upload_size)
+    if err := req.ParseMultipartForm(10 << 20); err != nil {
+        http.Error(w, "Request size exceeds limit(10MB).", http.StatusBadRequest)
+        return
+    }
+
     file, handler, file_err := req.FormFile("file")
 
     no_text := (strings.TrimSpace(req.FormValue("newpost")) == "")
     if file_err != nil && no_text {
         http.Error(w, "Empty post.", http.StatusBadRequest)
-        return
-    }
-
-     req.Body = http.MaxBytesReader(w, req.Body, max_upload_size)
-    if err := req.ParseMultipartForm(max_upload_size); err != nil {
-        http.Error(w, "Request size exceeds limit(10MB).", http.StatusBadRequest)
         return
     }
 

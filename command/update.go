@@ -199,6 +199,7 @@ func Build_thread(parent string, board string) { //will accept argument for boar
     threadtemp, err := threadtemp.ParseFiles(BP + "/templates/thread.html")
     Err_check(err)
 
+
     path := BP + "head/" + board + "/"
     Dir_check(path)
 
@@ -206,9 +207,12 @@ func Build_thread(parent string, board string) { //will accept argument for boar
     Err_check(err)
     defer f.Close()
 
+
     posts, err := get_posts(parent, board)
 
+
     sub := Get_subject(parent, board)
+
 
     if err == nil {
         var thr Thread
@@ -220,4 +224,5 @@ func Build_thread(parent string, board string) { //will accept argument for boar
         }
         threadtemp.Execute(f, thr)
     }
+
 }

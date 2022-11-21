@@ -41,18 +41,24 @@ func Rand_gen() string {
     return result
 }
 
+func Time_report(entry string) {
+    log.Printf(entry)
+}
+
 func main() {
+
+    Load_conf()
 
     file, err := os.OpenFile(BP + "error.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
     Err_check(err)
-    log.SetOutput(file)
+    defer file.Close()
 
-    Load_conf()
+    log.SetOutput(file)
+    log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 
     rand.Seed(time.Now().UnixNano())
 
     New_db()
-    
     Make_Conns() 
 
     for _, board := range Boards{
@@ -60,6 +66,6 @@ func main() {
         Build_board(board)
         Build_catalog(board)
     }
-
+    
     Listen()
 }
