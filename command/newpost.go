@@ -4,6 +4,7 @@ import (
     "net/http"
     "time"
     "html"
+    "context"
     "io"
     "os"
     "strings"
@@ -29,8 +30,11 @@ func gen_info(size int64, width int, height int) string {
 }
 
 func New_post(w http.ResponseWriter, req *http.Request) {
-    //bad request filtering 
+    //time out
+    ctx, cancel := context.WithTimeout(req.Context(), 10 * time.Second)
+    defer cancel()
 
+    //bad request filtering 
     if req.Method != "POST" {
         http.Error(w, "Method not allowed.", http.StatusMethodNotAllowed)
         return
@@ -90,7 +94,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
         parent_checkstmt := WriteStrings["parent_check"]
         var parent_result int
 
-        err = new_tx.QueryRow(parent_checkstmt, parent, board).Scan(&parent_result)
+        err = new_tx.QueryRowContext(ctx, parent_checkstmt, parent, board).Scan(&parent_result)
         Query_err_check(err)
 
         if parent_result == 0 {
@@ -101,13 +105,13 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     //new thread logic
         threadid_stmt := WriteStrings["threadid"]
 
-        err = new_tx.QueryRow(threadid_stmt, board).Scan(&parent)
+        err = new_tx.QueryRowContext(ctx, threadid_stmt, board).Scan(&parent)
         Query_err_check(err)
         
         //subject insert
         if subject != "" {
             subadd_stmt := WriteStrings["subadd"]
-            _, err = new_tx.Exec(subadd_stmt, board, parent, subject)
+            _, err = new_tx.ExecContext(ctx, subadd_stmt, board, parent, subject)
             Err_check(err)
         }
     }
@@ -162,20 +166,20 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             ffname := string(ofname[rem:])
 
             if !no_text { 
-                _, err = new_tx.Exec(hpadd_stmt, board, input, parent)
+                _, err = new_tx.ExecContext(ctx, hpadd_stmt, board, input, parent)
                 Err_check(err)
             }
-            _, err = new_tx.Exec(htadd_stmt, board, parent, file_pre + "s.webp")
+            _, err = new_tx.ExecContext(ctx, htadd_stmt, board, parent, file_pre + "s.webp")
             Err_check(err)
-            _, err = new_tx.Exec(newpst_wfstmt, board, input, post_time, parent, file_name, ffname, file_info, file_pre + "s.webp", option)
+            _, err = new_tx.ExecContext(ctx, newpst_wfstmt, board, input, post_time, parent, file_name, ffname, file_info, file_pre + "s.webp", option)
             Err_check(err)
         }
     //file not present 
     } else {
-        _, err = new_tx.Exec(hpadd_stmt, board, input, parent)
+        _, err = new_tx.ExecContext(ctx, hpadd_stmt, board, input, parent)
         Err_check(err)
         newpost_nfstmt := WriteStrings["newpost_nf"]
-        _, err := new_tx.Exec(newpost_nfstmt, board, input, post_time, parent, option)
+        _, err := new_tx.ExecContext(ctx, newpost_nfstmt, board, input, post_time, parent, option)
         Err_check(err)
     }
 
@@ -186,7 +190,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
         for _, match := range repmatches {
             match_id, err := strconv.ParseUint(match, 10, 64)
             Err_check(err)
-            _, err = new_tx.Exec(repadd_stmt, board, match_id)
+            _, err = new_tx.ExecContext(ctx, repadd_stmt, board, match_id)
             Err_check(err)
         }    
     }
