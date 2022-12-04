@@ -11,7 +11,7 @@
 </head>
 
 <body>
-<p class="headerblock">{{range $key, $value :=  .Header}}<a class="header" href="/{{$key}}/catalog.html">/{{$key}}/</a> {{end}}</p><br><br>
+<p class="headerblock">{{range $key, $value :=  .Header}}<a class="header" href="/{{$key}}/catalog.html" title="{{$value}}">/{{$key}}/</a> {{end}}</p><br><br>
 <a href="/{{.Name}}/">Return</a>
 <table class="catalog">{{if .Posts}}{{$subs := .Subjects}}{{range $index, $value := .Posts}}
 {{if eq 0 $index}}<tr>

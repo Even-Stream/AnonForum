@@ -49,6 +49,6 @@ go build -o ogai *.go
 sudo ./configure --with-http_sub_module
 
 ## Project status
-7/29/22
+12/4/22
 
 ongoing
