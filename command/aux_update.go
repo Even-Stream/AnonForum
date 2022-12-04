@@ -13,7 +13,7 @@ type Catalog struct {
     Name string
     Posts []*Post
     Subjects []string
-    Header []string
+    Header map[string]string
 }
 
 type Hp struct {

@@ -2,39 +2,22 @@ package main
 
 //loads configuation information
 import (
-    "os"
     "log"    
 
-    toml "github.com/BurntSushi/toml"
+    ini "gopkg.in/ini.v1"
 )
 
 var BP string
-var Boards []string
-var Descs []string
-
-type Config struct {
-    Base_path    string
-    Boards        []string
-    Descs        []string
-}
+var Boards = make(map[string]string)
 
 func Load_conf() {
-    var conf Config 
-
-    tomlData, err := os.ReadFile("/etc/ogai.toml")
+    cfg, err := ini.Load("/etc/ogai.ini")
     Err_check(err)
 
-    _, err = toml.Decode(string(tomlData), &conf)
-    Err_check(err)
-    BP = conf.Base_path
-    Boards = conf.Boards
-    Descs = conf.Descs
+    BP = cfg.Section("").Key("base path").String()
+    Boards = cfg.Section("boards").KeysHash()
 
     if len(Boards) == 0 {
         log.Fatal("Configuration error: No visible boards.")
-    }
-
-    if len(Boards) != len(Descs) {
-        log.Fatal("Configuration error: # of boards and descriptions do not match.")
     }
 }

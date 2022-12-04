@@ -7,7 +7,6 @@ import (
     "io"
     "os"
     "strings"
-    slices "golang.org/x/exp/slices"
     "strconv"
 
     _ "github.com/mattn/go-sqlite3"
@@ -67,7 +66,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
         return
     }
 
-    if !(slices.Contains(Boards, board)) {
+    if _, board_check := Boards[board]; !board_check {
         http.Error(w, "Board is invalid.", http.StatusBadRequest)
         return
     }

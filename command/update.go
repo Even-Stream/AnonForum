@@ -27,14 +27,14 @@ type Thread struct {
     Parent string
     Subject string
     Posts []*Post
-    Header []string
+    Header map[string]string
 }
 
 type Board struct {
     Name string
     Desc string
     Threads []*Thread
-    Header []string
+    Header map[string]string
 }
 
 func Dir_check(path string) {
