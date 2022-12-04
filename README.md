@@ -30,7 +30,7 @@ Other
 - No PHP or Perl
 
 ## Compile Instructions
-sudo apt install build-essential cmake git
+sudo apt install build-essential cmake git libvips-dev
 
 `Compile the latest version of Go`
 

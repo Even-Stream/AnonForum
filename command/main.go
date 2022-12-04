@@ -12,6 +12,8 @@ import (
 
 const rand_charset = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_"
 
+var DB_uri string 
+
 func Err_check(err error) {
     if err != nil {
         log.Fatal(err)
@@ -58,7 +60,12 @@ func main() {
 
     rand.Seed(time.Now().UnixNano())
 
-    New_db()
+    if _, err = os.Stat(BP + "command/post-coll.db"); err != nil {
+        New_db()
+    }
+
+    db_path := BP + "command/post-coll.db"
+    DB_uri = "file://" + db_path + "?cache=private&_synchronous=NORMAL&_journal_mode=WAL"
     Make_Conns() 
 
     for _, board := range Boards{

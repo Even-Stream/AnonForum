@@ -19,7 +19,7 @@ var nip, _ = time.LoadLocation("Asia/Tokyo")
 var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif", "image/webp": ".webp"}
 
 const (
-    max_upload_size = 20 << 20   //12MB
+    max_upload_size = 20 << 20   //20MB
     max_post_length = 10000
 )
 
@@ -62,8 +62,8 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     subject := req.FormValue("subject")
     option := req.FormValue("option")
 
-    if parent == "" || board == "" {
-        http.Error(w, "Board or parent thread not specified.", http.StatusBadRequest)
+    if board == "" {
+        http.Error(w, "Board not specified.", http.StatusBadRequest)
         return
     }
 
@@ -78,41 +78,43 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     now := time.Now().In(nip)
     post_time := now.Format("1/2/06(Mon)15:04:05")
 
-    wstmts := writeCheckout()
-      defer writeCheckin(wstmts)
+    //begin transaction
+    new_conn := WriteConnCheckout()
+    defer WriteConnCheckin(new_conn)
+    new_tx, err := new_conn.Begin()
+    Err_check(err)
+    defer new_tx.Rollback()
+    
 
-    rstmts := Checkout()
-    defer Checkin(rstmts)
+    //new thread if no parent is specified
+    if parent != "" {
+        parent_checkstmt := WriteStrings["parent_check"]
+        var parent_result int
 
-    //new thread testing 
-    stmt0 := rstmts["parent_check"]
-    var parent_result int
+        err = new_tx.QueryRow(parent_checkstmt, parent, board).Scan(&parent_result)
+        Query_err_check(err)
 
-    err := stmt0.QueryRow(parent, board).Scan(&parent_result)
-    Query_err_check(err)
-
-    if parent_result == 0 {
-        stmt01 := rstmts["lastid"]
-        var latestid int
-
-        err = stmt01.QueryRow(board).Scan(&latestid)
-        Err_check(err)
-
-        latestid++
-        if parent != strconv.Itoa(latestid) {
+        if parent_result == 0 {
             http.Error(w, "Parent thread is invalid.", http.StatusBadRequest)
             return
-        } else {
-            //subject insert
-            if subject != "" {
-                stmt0A := wstmts["subadd"]
-                _, err = stmt0A.Exec(board, parent, subject)
-                Err_check(err)
-            }
+        }
+    } else {
+    //new thread logic
+        threadid_stmt := WriteStrings["threadid"]
+
+        err = new_tx.QueryRow(threadid_stmt, board).Scan(&parent)
+        Query_err_check(err)
+        
+        //subject insert
+        if subject != "" {
+            subadd_stmt := WriteStrings["subadd"]
+            _, err = new_tx.Exec(subadd_stmt, board, parent, subject)
+            Err_check(err)
         }
     }
+    
 
-    hpadd_stmt := wstmts["hpadd"]
+    hpadd_stmt := WriteStrings["hpadd"]
 
     //file present
     if file_err == nil {
@@ -122,7 +124,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
         ext, supp := mime_ext[mime_type]
 
         buffer := make([]byte, 512)
-        _, err := file.Read(buffer)
+        _, err = file.Read(buffer)
 
         if err == io.EOF {
             buffer = []byte("ts")
@@ -150,8 +152,8 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             width, height := Make_thumb(file_path, file_pre, file_name, mime_type)
             file_info := gen_info(handler.Size, width, height)
 
-            stmt := wstmts["newpost_wf"]
-            htadd_stmt := wstmts["htadd"]
+            newpst_wfstmt := WriteStrings["newpost_wf"]
+            htadd_stmt := WriteStrings["htadd"]
 
             ofname := []rune(handler.Filename)
             rem := len(ofname) - 20
@@ -161,34 +163,37 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             ffname := string(ofname[rem:])
 
             if !no_text { 
-                _, err = hpadd_stmt.Exec(board, input, parent)
+                _, err = new_tx.Exec(hpadd_stmt, board, input, parent)
                 Err_check(err)
             }
-            _, err = htadd_stmt.Exec(board, parent, file_pre + "s.webp")
+            _, err = new_tx.Exec(htadd_stmt, board, parent, file_pre + "s.webp")
             Err_check(err)
-            _, err = stmt.Exec(board, input, post_time, parent, file_name, ffname, file_info, file_pre + "s.webp", option)
+            _, err = new_tx.Exec(newpst_wfstmt, board, input, post_time, parent, file_name, ffname, file_info, file_pre + "s.webp", option)
             Err_check(err)
         }
     //file not present 
     } else {
-        _, err = hpadd_stmt.Exec(board, input, parent)
+        _, err = new_tx.Exec(hpadd_stmt, board, input, parent)
         Err_check(err)
-        stmt := wstmts["newpost_nf"]
-        _, err := stmt.Exec(board, input, post_time, parent, option)
+        newpost_nfstmt := WriteStrings["newpost_nf"]
+        _, err := new_tx.Exec(newpost_nfstmt, board, input, post_time, parent, option)
         Err_check(err)
     }
 
 
     //reply insert
     if len(repmatches) > 0 {
-        stmt := wstmts["repadd"]
+        repadd_stmt := WriteStrings["repadd"]
         for _, match := range repmatches {
             match_id, err := strconv.ParseUint(match, 10, 64)
             Err_check(err)
-            _, err = stmt.Exec(board, match_id)
+            _, err = new_tx.Exec(repadd_stmt, board, match_id)
             Err_check(err)
         }    
     }
+
+    err = new_tx.Commit()
+    Err_check(err)
 
     Build_thread(parent, board)
     http.Redirect(w, req, req.Header.Get("Referer"), 302)

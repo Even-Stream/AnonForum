@@ -34,7 +34,6 @@ type Board struct {
     Name string
     Desc string
     Threads []*Thread
-    Latest int
     Header []string
 }
 
@@ -62,7 +61,7 @@ func Get_subject(parent string, board string) string {
 }
 
 //for board pages
-func get_threads(board string) ([]*Thread, int) {
+func get_threads(board string) []*Thread {
     stmts := Checkout()
     defer Checkin(stmts)
 
@@ -70,7 +69,6 @@ func get_threads(board string) ([]*Thread, int) {
     stmt := stmts["thread_head"]
     stmt2 := stmts["thread_body"]
     stmt3 := stmts["update_rep"]
-    stmt4 := stmts["lastid"]
 
     var board_body []*Thread
 
@@ -129,13 +127,7 @@ func get_threads(board string) ([]*Thread, int) {
         board_body = append(board_body, &thr)
     }
 
-    var latestid int
-    err = stmt4.QueryRow(board).Scan(&latestid)
-    Query_err_check(err)
-    //latestid will equal 0 when there are no posts yet
-    latestid++
-
-    return board_body, latestid
+    return board_body
 }
 
 //for individual threads
@@ -187,9 +179,9 @@ func Build_board(board string) {
     Err_check(err)
     defer f.Close()
 
-    threads, latestid := get_threads(board)
+    threads := get_threads(board)
 
-    cboard := Board{Name: board, Threads: threads, Latest: latestid, Header: Boards}
+    cboard := Board{Name: board, Threads: threads, Header: Boards}
     boardtemp.Execute(f, cboard)
 
 }
