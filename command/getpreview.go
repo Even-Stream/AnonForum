@@ -10,6 +10,8 @@ import (
     "bytes"
     "net/http"
     "text/template"
+    "time"
+    "context"
 
     _ "github.com/mattn/go-sqlite3"
 )
@@ -21,8 +23,11 @@ type Prev struct {
     Imgprev string 
 }
 
+//retrieves post request
 func Get_prev(w http.ResponseWriter, req *http.Request) {
-    //retrieves post request 
+    //time out
+    ctx, cancel := context.WithTimeout(req.Context(), 100 * time.Millisecond)
+    defer cancel()
 
     id := req.FormValue("p")
     board := req.FormValue("board")
@@ -33,14 +38,14 @@ func Get_prev(w http.ResponseWriter, req *http.Request) {
     }
 
     stmts := Checkout()
-      defer Checkin(stmts)
+    defer Checkin(stmts)
     stmt := stmts["prev"]
 
     var data string
     var temp bytes.Buffer
     var prv Prev
 
-    row := stmt.QueryRow(id, board)
+    row := stmt.QueryRowContext(ctx, id, board)
 
     err := row.Scan(&prv.Content, &prv.Imgprev)
     Query_err_check(err)
