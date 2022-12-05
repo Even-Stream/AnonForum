@@ -103,15 +103,20 @@ func New_post(w http.ResponseWriter, req *http.Request) {
         }
     } else {
     //new thread logic
+        if file_err != nil {
+            http.Error(w, "Please upload a file.", http.StatusBadRequest)
+            return
+        }
+    
         threadid_stmt := WriteStrings["threadid"]
 
         err = new_tx.QueryRowContext(ctx, threadid_stmt, board).Scan(&parent)
         Query_err_check(err)
         
         //subject insert
-        if subject != "" {
+        if trimmed_subject := strings.TrimSpace(subject); trimmed_subject != "" {
             subadd_stmt := WriteStrings["subadd"]
-            _, err = new_tx.ExecContext(ctx, subadd_stmt, board, parent, subject)
+            _, err = new_tx.ExecContext(ctx, subadd_stmt, board, parent, trimmed_subject)
             Err_check(err)
         }
     }

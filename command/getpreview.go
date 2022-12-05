@@ -26,7 +26,7 @@ type Prev struct {
 //retrieves post request
 func Get_prev(w http.ResponseWriter, req *http.Request) {
     //time out
-    ctx, cancel := context.WithTimeout(req.Context(), 100 * time.Millisecond)
+    ctx, cancel := context.WithTimeout(req.Context(), 10 * time.Millisecond)
     defer cancel()
 
     id := req.FormValue("p")

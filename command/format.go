@@ -51,7 +51,7 @@ func removeDuplicates(strSlice []string) []string {
 func process(rawline, board string) (string, []string) {
 
     stmts := Checkout()
-      defer Checkin(stmts)
+    defer Checkin(stmts)
     stmt := stmts["prev_parent"]
 
     repmatches := make([]string, 0)
