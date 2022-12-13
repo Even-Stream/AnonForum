@@ -5,6 +5,8 @@ idmap.set('About', 'arow');
 idmap.set('Rules', 'rrow');
 idmap.set('Boards', 'brow');
 
+var style = getComputedStyle(document.body)
+
 function showMask() {
     var sel = document.getElementById(this.id);
     var crow = document.getElementById(idmap.get(this.id));
@@ -14,7 +16,7 @@ function showMask() {
     }
 
     if (sel.style.backgroundColor == 'transparent') {
-        sel.style.backgroundColor = 'rgb(240, 193, 197)';
+        sel.style.backgroundColor = style.getPropertyValue('--sel-color');
     }
 
     idmap.forEach((value, key) => {

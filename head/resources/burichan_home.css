@@ -1,3 +1,7 @@
+:root {
+	--sel-color: #D6DAF0;
+}
+
 .hbody {
         background-image: url("burichan_hbg.png");
 }
@@ -16,6 +20,10 @@
 
 .hop {
 	color: #34345C;
+}
+
+.fhop {
+	background-color: #D6DAF0;
 }
 
 .tcon {

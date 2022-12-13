@@ -1,3 +1,7 @@
+:root {
+	--sel-color: rgb(240, 193, 197);
+}
+
 .hbody {
         background-image: url("hbg.png");
 }
@@ -16,6 +20,10 @@
 
 .hop {
 	color: rgb(216, 68, 36);
+}
+
+.fhop {
+	background-color: rgb(240, 193, 197);
 }
 
 .tcon {
