@@ -13,7 +13,8 @@ type Catalog struct {
     Name string
     Posts []*Post
     Subjects []string
-    Header map[string]string
+    Header []string
+    HeaderDescs []string
 }
 
 type Hp struct {
@@ -33,7 +34,8 @@ type Ht struct {
 type Home struct {
     Latest []*Hp
     Thumbs []*Ht
-    BList []string        //same as Header
+    Header []string
+    HeaderDescs []string
     News string
     FAQ string
     Rules string
@@ -136,12 +138,14 @@ func Build_catalog(board string) {
 
     posts, subjects := get_cat_posts(board)
 
-    catalog := Catalog{Name: board, Posts: posts, Subjects: subjects, Header: Boards}
+    catalog := Catalog{Name: board, Posts: posts, Subjects: subjects,
+        Header: Board_names, HeaderDescs: Board_descs}
+
     cattemp.Execute(f, catalog)
 }
 
 func Build_home() {
-    hometemp := template.New("home.html")
+    hometemp := template.New("home.html").Funcs(catfuncmap)
     hometemp, err := hometemp.ParseFiles(BP + "/templates/home.html")
     Err_check(err)
 
@@ -154,6 +158,6 @@ func Build_home() {
 
     hps, hts := get_home()
 
-    home := Home{Latest: hps, Thumbs: hts}
+    home := Home{Latest: hps, Thumbs: hts, Header: Board_names, HeaderDescs: Board_descs}
     hometemp.Execute(f, home)
 }

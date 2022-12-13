@@ -15,9 +15,12 @@
 </style>
 </head>
 
-<body>
-<p class="headerblock">{{range $key, $value := .Header}}<a class="header" href="/{{$key}}" title="{{$value}}">/{{$key}}/</a> {{end}}</p><br><br>
-<a href="/{{.Name}}/catalog.html">Catalog</a>
+<body>{{$Descs := .HeaderDescs}}
+<p class="headerblock">{{range $index, $name := .Header}}
+    <a class="header" href="/{{$name}}" title="{{index $Descs $index}}">/{{$name}}/</a> {{end}}
+    <a class="header" href="/" title="front page">home</a>
+</p><br><br>
+<a class="navi" href="/{{.Name}}/catalog.html">Catalog</a>
 {{if .Threads}}{{range .Threads}}{{$Parent:= .Parent}}{{$sub:= .Subject}}{{$BoardN:= .BoardN}}{{if .Posts}}{{range slice .Posts 0 1}}
         <table id="no{{.Id}}" class="thread">
             <tr>

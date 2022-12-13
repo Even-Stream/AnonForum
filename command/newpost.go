@@ -70,7 +70,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
         return
     }
 
-    if _, board_check := Boards[board]; !board_check {
+    if _, board_check := Board_map[board]; !board_check {
         http.Error(w, "Board is invalid.", http.StatusBadRequest)
         return
     }

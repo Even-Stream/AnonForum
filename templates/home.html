@@ -21,8 +21,12 @@
 
 <tbody>
 <!-- board name range -->
-    <tr class="bmap">
-        <td><a class="blink" href="/ot">/ot/ - Off Topic</a></td>
+    {{$Descs := .HeaderDescs}}
+    {{range $index, $name :=  .Header}}
+    {{if eq 0 $index}}<tr class="bmap">
+    {{else if startrow 4 $index}}</tr><tr class="bmap">{{end}}
+        <td><a class="blink" href="{{$name}}">/{{$name}}/ - {{index $Descs $index}}</a></td>
+	{{end}}
     </tr>
 <!-- board name range -->
 </tbody></table>

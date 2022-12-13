@@ -40,6 +40,14 @@ ref a, selfref a, .header
     content: " | ";
 }
 
+.navi {
+    text-decoration: none;
+}
+
+.navi+.navi::before {
+    content: " | ";
+}
+
 p, label, postwrap, a, postwrap::before, .thread {
     font: 16px MPlus, Helvetica, Arial, sans-serif;
 }

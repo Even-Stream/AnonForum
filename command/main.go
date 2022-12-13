@@ -68,7 +68,7 @@ func main() {
     DB_uri = "file://" + db_path + "?cache=private&_synchronous=NORMAL&_journal_mode=WAL"
     Make_Conns() 
 
-    for _, board := range Boards{
+    for _, board := range Board_names{
         Build_home()
         Build_board(board)
         Build_catalog(board)
