@@ -6,3 +6,4 @@
 *.webp
 *.mod
 *.sum
+/head/*/*.html
