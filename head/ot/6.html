@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>test</title>
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="/resources/base.css">
+    <link rel="stylesheet" href="/resources/default.css">
+    <script src="/resources/htmx.js" defer></script>
+
+<style>
+
+.p6 {--mini: url('/ot/Files/1670875259437701034s.webp'); --maxi: url('/ot/Files/1670875259437701034.png');}
+</style>
+</head>
+
+<body>
+<p class="headerblock"><a class="header" href="/ot" title="Off Topic">/ot/</a> <a class="header" href="/test" title="Testing">/test/</a> </p><br><br>
+<a href="/ot/">Return</a>
+<a href="/">Home</a>
+<a href="/ot/catalog.html">Catalog</a>
+
+        <table id="no6" class="thread">
+            <tr>
+                <td>
+                    <label>File <a href="Files/1670875259437701034.png" download="68a5af41027cdb7f.png">68a5af41027cdb7f.png</a> - (42.94kB, 400x400)</label>
+                    <br>
+                    <input type="checkbox" class="image imspec p6" autocomplete="off"/>
+                    <label> <time>12/13/22(Tue)05:00:59</time> <selfref><a href="#no6">No. 6</a></selfref></label>
+                    <p class="pcontent">another</p>
+                </td>
+            </tr>
+        </table>
+
+    <postwrap>
+        <table id="no7" class="post">
+            <tr>
+                <td>
+                    <label><time class="">12/13/22(Tue)05:01:48</time> <selfref><a href="#no7">No. 7</a></selfref></label>
+                    <br>
+                    
+                    <p class="pcontent">try again</p>
+                </td>
+            </tr>
+        </table>
+    </postwrap>
+
+    <form action="/im/post/?parent=6&board=ot" enctype="multipart/form-data" method="Post">
+        <input type="checkbox" name="option" value="sage">
+        <textarea name="newpost" rows="8" cols="78">I'm putting the new post box at the bottom.</textarea>
+        <br>
+        <input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp">
+        <input type="submit" value="Reply">
+    </form>
+</body>
+</html>

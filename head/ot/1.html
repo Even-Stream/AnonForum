@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>test</title>
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="/resources/base.css">
+    <link rel="stylesheet" href="/resources/default.css">
+    <script src="/resources/htmx.js" defer></script>
+
+<style>
+
+.p1 {--mini: url('/ot/Files/1670953002433913061s.webp'); --maxi: url('/ot/Files/1670953002433913061.jpg');}
+.p2 {--mini: url('/ot/Files/1670953520364050964s.webp'); --maxi: url('/ot/Files/1670953520364050964.jpg');}
+</style>
+</head>
+
+<body>
+
+<p class="headerblock">
+    <a class="header" href="/ot" title="Off Topic">/ot/</a> 
+    <a class="header" href="/test" title="Testing">/test/</a> 
+    <a class="header" href="/an" title="Anime">/an/</a> 
+    <a class="header" href="/vn" title="Visual Novels">/vn/</a> 
+    <a class="header" href="/mu" title="Music">/mu/</a> 
+    <a class="header" href="/fb" title="Feedback">/fb/</a> 
+    <a class="header" href="/" title="front page">home</a>
+</p><br><br>
+<a class="navi" href="/ot/">Return</a>
+<a class="navi" href="/ot/catalog.html">Catalog</a>
+
+        <table id="no1" class="thread">
+            <tr>
+                <td>
+                    <label>File <a href="Files/1670953002433913061.jpg" download="83a3623b968cdb0.jpeg">83a3623b968cdb0.jpeg</a> - (326.4kB, 1024x768)</label>
+                    <br>
+                    <input type="checkbox" class="image imspec p1" autocomplete="off"/>
+                    <label> <time>12/14/22(Wed)02:36:42</time> <selfref><a href="#no1">No. 1</a></selfref></label>
+                    <p class="pcontent">Same order???</p>
+                </td>
+            </tr>
+        </table>
+
+    <postwrap>
+        <table id="no2" class="post">
+            <tr>
+                <td>
+                    <label><time class="">12/14/22(Wed)02:45:20</time> <selfref><a href="#no2">No. 2</a></selfref></label>
+                    <br>
+                    <label>File <a href="Files/1670953520364050964.jpg" download="ce6678992a38f9f.jpeg">ce6678992a38f9f.jpeg</a> - (341.7kB, 600x600)</label>
+                    <br>
+                    <input type="checkbox" class="image imspec p2" autocomplete="off"/>
+                    <p class="pcontent">another!!!</p>
+                </td>
+            </tr>
+        </table>
+    </postwrap>
+
+    <form action="/im/post/?parent=1&board=ot" enctype="multipart/form-data" method="Post">
+        <input type="checkbox" name="option" value="sage">
+        <textarea name="newpost" rows="8" cols="78">I'm putting the new post box at the bottom.</textarea>
+        <br>
+        <input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp">
+        <input type="submit" value="Reply">
+    </form>
+</body>
+</html>
