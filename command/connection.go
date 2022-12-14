@@ -41,8 +41,8 @@ const (
         VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5)`
     repadd_string = `INSERT INTO replies(Board, Source, Replier) VALUES (?1, ?2, (SELECT Id FROM latest WHERE Board = ?1) - 1)`
     subadd_string = `INSERT INTO subjects(Board, Parent, Subject) VALUES (?, ?, ?)`
-    hpadd_string = `INSERT INTO homepost(Board, Id, Content, Parent)
-        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3)`
+    hpadd_string = `INSERT INTO homepost(Board, Id, Content, TrunContent, Parent)
+        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4)`
     htadd_string = `INSERT into homethumb(Board, Id, Parent, Imgprev)
         VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3)`
     parent_checkstring = `SELECT COUNT(*)

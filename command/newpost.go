@@ -75,12 +75,6 @@ func New_post(w http.ResponseWriter, req *http.Request) {
         return
     }
 
-    input := html.EscapeString(req.FormValue("newpost"))
-    input, repmatches := Format_post(input, board)
-
-    now := time.Now().In(nip)
-    post_time := now.Format("1/2/06(Mon)15:04:05")
-
     //begin transaction
     new_conn := WriteConnCheckout()
     defer WriteConnCheckin(new_conn)
@@ -120,7 +114,13 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             Err_check(err)
         }
     }
-    
+
+    input := html.EscapeString(req.FormValue("newpost"))
+    home_content, home_truncontent := HProcess_post(input)
+    input, repmatches := Format_post(input, board)
+
+    now := time.Now().In(nip)
+    post_time := now.Format("1/2/06(Mon)15:04:05")
 
     hpadd_stmt := WriteStrings["hpadd"]
 
@@ -183,7 +183,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     }
 
     if !no_text { 
-        _, err = new_tx.ExecContext(ctx, hpadd_stmt, board, input, parent)
+        _, err = new_tx.ExecContext(ctx, hpadd_stmt, board, home_content, home_truncontent, parent)
         Err_check(err)
     }
 

@@ -47,8 +47,8 @@ func create_table(db *sql.DB) {
     createHomePostTableSQL := `CREATE TABLE homepost (
         "Board" TEXT NOT NULL,
         "Id" INTEGER NOT NULL,
-        "TrunContent" TEXT NOT NULL,
         "Content" TEXT NOT NULL,
+        "TrunContent" TEXT NOT NULL,
         "Parent" INTEGER NOT NULL
     );`
 

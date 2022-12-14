@@ -104,9 +104,9 @@ func Format_post(input, board string) (string, []string) {
     output, repmatches := process(scanner.Text(), board)
 
     for scanner.Scan() {
-        output = output + "\n"
+        output += "\n"
         coutput, crepmatches := process(scanner.Text(), board)     
-        output = output + coutput
+        output += coutput
         repmatches = append(repmatches, crepmatches...)
     }
 
@@ -117,3 +117,39 @@ func Format_post(input, board string) (string, []string) {
 
     return output, repmatches
 }
+
+func hprocess(rawline string) string {
+    postline := spoilreg.ReplaceAllString(rawline, "~~SPOILER~~")
+    postline = boldreg.ReplaceAllString(postline, `$1`)
+    postline = italicreg.ReplaceAllString(postline, `$1`)
+    return postline
+}
+
+func HProcess_post(input string) (string, string) {
+    scanner := bufio.NewScanner(strings.NewReader(input))
+    scanner.Scan()
+
+    output := hprocess(scanner.Text())
+
+    for scanner.Scan() {
+        output += "\n"
+        coutput := hprocess(scanner.Text())
+        output += coutput
+    }
+
+    //truncate output
+    ofpost := []rune(output)
+    var trunoutput string
+    plen := len(ofpost)
+    
+    if plen > 70 {
+        plen = 70 
+        trunoutput = string(ofpost[:plen])
+        trunoutput += "..."
+    } else {
+        trunoutput = string(ofpost)
+    }
+    trunoutput = nlreg.ReplaceAllString(trunoutput, " ")
+
+    return output, trunoutput 
+} 

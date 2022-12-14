@@ -21,6 +21,7 @@ type Hp struct {
     BoardN string
     Id int
     Content string
+    ContentFull string
     Parent string
 }
 
@@ -101,7 +102,7 @@ func get_home() ([]*Hp, []*Ht) {
     for hp_rows.Next() {
         var chp Hp
         
-        err = hp_rows.Scan(&chp.BoardN, &chp.Id, &chp.Content, &chp.Parent)
+        err = hp_rows.Scan(&chp.BoardN, &chp.Id, &chp.ContentFull, &chp.Content, &chp.Parent)
         Err_check(err)
 
         home_posts = append(home_posts, &chp)
