@@ -23,8 +23,7 @@
 }
 
 .rpost p, .recpost p, .rlast, .blink {
-	font: 14px MPlus, Helvetica, Arial, sans-serif;
-	line-height: 0;
+	font: 10.5pt MPlus, Helvetica, Arial, sans-serif;
 }
 
 .blink {

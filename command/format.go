@@ -14,9 +14,10 @@ var randreg = regexp.MustCompile(`p\$1`)
 var hashreg = regexp.MustCompile(`#/2/3.html`)
 var prevreg = regexp.MustCompile(`#board`)
 var quoreg = regexp.MustCompile(`&gt;(.+)`)
-var spoilreg = regexp.MustCompile(`~~(.+)~~`)
-var boldreg = regexp.MustCompile(`\*\*(.+)\*\*`)
-var italicreg = regexp.MustCompile(`__(.+)__`)
+
+var spoilreg = regexp.MustCompile(`~~([^<]+)~~`)
+var boldreg = regexp.MustCompile(`\*\*([^<])\*\*`)
+var italicreg = regexp.MustCompile(`__([^<]+)__`)
 var linkreg = regexp.MustCompile(`(http|ftp|https):\/\/(\S+)`)
 
 const (    

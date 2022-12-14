@@ -48,6 +48,17 @@ go build -o ogai *.go
 
 sudo ./configure --with-http_sub_module
 
+## Post Formatting
+quote: >example
+
+reply: >>1
+
+spoiler: ~~example~~
+
+bold: **example**
+
+italics: __example__
+
 ## Project status
 12/4/22
 

@@ -170,10 +170,6 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             }
             ffname := string(ofname[rem:])
 
-            if !no_text { 
-                _, err = new_tx.ExecContext(ctx, hpadd_stmt, board, input, parent)
-                Err_check(err)
-            }
             _, err = new_tx.ExecContext(ctx, htadd_stmt, board, parent, file_pre + "s.webp")
             Err_check(err)
             _, err = new_tx.ExecContext(ctx, newpst_wfstmt, board, input, post_time, parent, file_name, ffname, file_info, file_pre + "s.webp", option)
@@ -181,13 +177,15 @@ func New_post(w http.ResponseWriter, req *http.Request) {
         }
     //file not present 
     } else {
-        _, err = new_tx.ExecContext(ctx, hpadd_stmt, board, input, parent)
-        Err_check(err)
         newpost_nfstmt := WriteStrings["newpost_nf"]
         _, err := new_tx.ExecContext(ctx, newpost_nfstmt, board, input, post_time, parent, option)
         Err_check(err)
     }
 
+    if !no_text { 
+        _, err = new_tx.ExecContext(ctx, hpadd_stmt, board, input, parent)
+        Err_check(err)
+    }
 
     //reply insert
     if len(repmatches) > 0 {
