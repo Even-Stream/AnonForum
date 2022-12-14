@@ -44,9 +44,16 @@ go mod tidy
 
 go build -o ogai *.go
 
-`To use nginx, compile it with this configuration`
+`To use nginx`
+
+wget http://nginx.org/download/nginx-(current version number).tar.gz
+git clone https://github.com/vision5/ngx_devel_kit
+git clone https://github.com/openresty/set-misc-nginx-module
+
+cd nginx-current-version
 
 sudo ./configure --with-http_sub_module --add-module=../ngx_devel_kit --add-module=../set-misc-nginx-module
+sudo make & make install 
 
 ## Post Formatting
 quote: >example
