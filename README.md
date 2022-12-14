@@ -54,7 +54,7 @@ git clone https://github.com/vision5/ngx_devel_kit
 
 git clone https://github.com/openresty/set-misc-nginx-module
 
-cd nginx-current-version
+cd nginx-(current version)
 
 sudo ./configure --with-http_sub_module --add-module=../ngx_devel_kit --add-module=../set-misc-nginx-module
 

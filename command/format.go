@@ -9,8 +9,8 @@ import (
 var nlreg = regexp.MustCompile("\n")
 var tagreg = regexp.MustCompile("(br>)(<)")
 
-var repreg = regexp.MustCompile(`&gt;&gt;(\d+)\b`)
-var randreg = regexp.MustCompile(`p\$1`)
+var repreg = regexp.MustCompile(`(?i)&gt;&gt;(/(\D+)/)?(\d+)\b`)
+var randreg = regexp.MustCompile(`p\$2\$3`)
 var hashreg = regexp.MustCompile(`#/2/3.html`)
 var prevreg = regexp.MustCompile(`#board`)
 var quoreg = regexp.MustCompile(`&gt;(.+)`)
@@ -23,7 +23,7 @@ var linkreg = regexp.MustCompile(`(http|ftp|https):\/\/(\S+)`)
 const (    
     nlpost = "\n<br>"
     tagpost = "$1\n$2"
-    reppost = `<ref hx-get="/im/ret/?p=$1&board=#board" hx-trigger="mouseover once" hx-target="#p$1"><a href="#/2/3.html#no$1">&#62;&#62;$1</a></ref><box id="p$1" class="prev"></box>`
+    reppost = `<ref hx-get="/im/ret/?p=$3&board=#board" hx-trigger="mouseover once" hx-target="#p$2$3"><a href="#/2/3.html#no$3">&#62;&#62;$1$3</a></ref><box id="p$2$3" class="prev"></box>`
 )
 
 var reprandpost = reppost
@@ -49,7 +49,7 @@ func removeDuplicates(strSlice []string) []string {
     return list
 }
 
-func process(rawline, board string) (string, []string) {
+func process(rawline, board, orig_parent string) (string, []string) {
 
     stmts := Checkout()
     defer Checkin(stmts)
@@ -57,15 +57,29 @@ func process(rawline, board string) (string, []string) {
 
     repmatches := make([]string, 0)
     repparents := make([]string, 0)
+    repboards := make([]string, 0)
 
     repmatchcon := repreg.FindAllStringSubmatch(rawline, -1) 
     if repmatchcon != nil {
         for _, match := range repmatchcon {
-            repmatches = append(repmatches, match[1])
+
+            repmatches = append(repmatches, match[3])
+
+            var sboard string
+
+            if match[2] == "" {
+                sboard = board
+                repboards = append(repboards, board)
+            } else {
+                sboard = match[2]
+                repboards = append(repboards, match[2])
+            }
 
             var parent string
-            err := stmt.QueryRow(match[1], board).Scan(&parent)
+            err := stmt.QueryRow(match[3], sboard).Scan(&parent)
             Query_err_check(err)
+
+            if parent == "" {parent = orig_parent}
 
             repparents = append(repparents, parent)
         }
@@ -73,14 +87,21 @@ func process(rawline, board string) (string, []string) {
 
     postline := repreg.ReplaceAllString(rawline, reprandpost)
 
-    i := 0
+    rpi := 0
     postline = hashreg.ReplaceAllStringFunc(postline, func(match string) string {
-        cparent := repparents[i]
-        response := `/` + board + `/` + cparent + `.html`
-        i++
+        cboard := repboards[rpi]
+        cparent := repparents[rpi]
+        response := `/` + cboard + `/` + cparent + `.html`
+        rpi++
         return response  
     })
-    postline = prevreg.ReplaceAllString(postline, board)
+    
+    rbi := 0
+    postline = prevreg.ReplaceAllStringFunc(postline, func(match string) string {
+        cboard :=  repboards[rbi]
+        rbi++
+        return cboard
+    })
 
     postline = quoreg.ReplaceAllString(postline, quopost)
     postline = spoilreg.ReplaceAllString(postline, spoilpost)
@@ -91,7 +112,7 @@ func process(rawline, board string) (string, []string) {
     return postline, repmatches  
 }
 
-func Format_post(input, board string) (string, []string) {
+func Format_post(input, board, orig_parent string) (string, []string) {
 
     scanner := bufio.NewScanner(strings.NewReader(input))
     scanner.Scan()
@@ -99,13 +120,13 @@ func Format_post(input, board string) (string, []string) {
     //flexible statement
     rand_gen = Rand_gen()
 
-    reprandpost = randreg.ReplaceAllString(reppost, `p$$1-` + rand_gen)
+    reprandpost = randreg.ReplaceAllString(reppost, `p$$2$$3-` + rand_gen)
 
-    output, repmatches := process(scanner.Text(), board)
+    output, repmatches := process(scanner.Text(), board, orig_parent)
 
     for scanner.Scan() {
         output += "\n"
-        coutput, crepmatches := process(scanner.Text(), board)     
+        coutput, crepmatches := process(scanner.Text(), board, orig_parent)     
         output += coutput
         repmatches = append(repmatches, crepmatches...)
     }

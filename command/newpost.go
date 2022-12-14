@@ -117,7 +117,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 
     input := html.EscapeString(req.FormValue("newpost"))
     home_content, home_truncontent := HProcess_post(input)
-    input, repmatches := Format_post(input, board)
+    input, repmatches := Format_post(input, board, parent)
 
     now := time.Now().In(nip)
     post_time := now.Format("1/2/06(Mon)15:04:05")

@@ -44,14 +44,14 @@ func Get_prev(w http.ResponseWriter, req *http.Request) {
     var data string
     var temp bytes.Buffer
     var prv Prev
+    prv.Board = board
 
     row := stmt.QueryRowContext(ctx, id, board)
 
     err := row.Scan(&prv.Content, &prv.Imgprev)
     Query_err_check(err)
 
-    //Prev_body, err := template.New("todos").Parse("{{if .Imgprev}}<img src=\"/{{.Board}}/{{.Imgprev}}\">{{end}}{{.Content}}")
-    Prev_body, err := template.New("todos").Parse("{{if .Imgprev}}<img class=\"imspec\" src=\"Files/{{.Imgprev}}\">{{end}}{{.Content}}")
+    Prev_body, err := template.New("todos").Parse("{{if .Imgprev}}<img class=\"imspec\" src=\"/{{.Board}}/Files/{{.Imgprev}}\">{{end}}{{.Content}}")
     Err_check(err)
     Prev_body.Execute(&temp, prv)
 
