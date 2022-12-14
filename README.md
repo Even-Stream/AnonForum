@@ -53,11 +53,11 @@ quote: >example
 
 reply: >>1
 
-spoiler: ~~example~~
+spoiler: \~\~example\~\~
 
-bold: **example**
+bold: \*\*example\*\*
 
-italics: __example__
+italics: \_\_example\_\_
 
 ## Project status
 12/4/22
