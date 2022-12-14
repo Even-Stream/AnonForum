@@ -14,8 +14,8 @@
 .p{{.Id}} {--mini: url('/{{$name}}/Files/{{.Imgprev}}'); --maxi: url('/{{$name}}/Files/{{.File}}');}{{end}}{{end}}{{end}}{{end}}
 </style>
 </head>
-
 <body>{{$Descs := .HeaderDescs}}
+<img src="/resources/banners/cbanner.webp">
 <p class="headerblock">{{range $index, $name := .Header}}
     <a class="header" href="/{{$name}}" title="{{index $Descs $index}}">/{{$name}}/</a> {{end}}
     <a class="header" href="/" title="front page">home</a>

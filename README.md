@@ -46,7 +46,7 @@ go build -o ogai *.go
 
 `To use nginx, compile it with this configuration`
 
-sudo ./configure --with-http_sub_module
+sudo ./configure --with-http_sub_module --add-module=../ngx_devel_kit --add-module=../set-misc-nginx-module
 
 ## Post Formatting
 quote: >example

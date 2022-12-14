@@ -16,6 +16,7 @@
 </head>
 
 <body>
+<img src="/resources/banners/cbanner.webp">
 {{$Descs := .HeaderDescs}}
 <p class="headerblock">{{range $index, $name := .Header}}
     <a class="header" href="/{{$name}}" title="{{index $Descs $index}}">/{{$name}}/</a> {{end}}

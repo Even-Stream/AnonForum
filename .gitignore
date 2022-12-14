@@ -7,4 +7,5 @@
 *.mod
 *.sum
 *.log
+*.pprof
 /head/*/*.html
