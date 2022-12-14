@@ -46,7 +46,9 @@ go build -o ogai *.go
 
 `To use nginx`
 
-wget http://nginx.org/download/nginx-(current version number).tar.gz
+wget (current version from http://nginx.org/en/download.html)
+
+tar -xzvf nginx-(current version).tar.gz
 
 git clone https://github.com/vision5/ngx_devel_kit
 
