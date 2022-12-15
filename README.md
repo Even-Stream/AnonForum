@@ -64,6 +64,8 @@ quote: >example
 
 reply: >>1
 
+cross-board reply: >>/board/1
+
 spoiler: \~\~example\~\~
 
 bold: \*\*example\*\*
