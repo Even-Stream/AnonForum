@@ -13,7 +13,9 @@ Uses CSS instead of JS for some common features
 
 - Linked-to post highlighting 
 
-Takes advantage of Nginx features
+Takes advantage of Nginx capabilities
+
+- Banners with no JS
 
 - Theme picker with no JS
 

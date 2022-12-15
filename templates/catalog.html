@@ -14,8 +14,15 @@
 <p class="headerblock">{{range $index, $name :=  .Header}}
     <a class="header" href="/{{$name}}/catalog.html" title="{{index $Descs $index}}">/{{$name}}/</a>{{end}}
     <a class="header" href="/" title="front page">home</a>
-</p><br><br>
-<a class="navi" href="/{{.Name}}/">Return</a>
+</p><br>
+
+<center>
+<img class="bannerimg" src="/resources/banners/cbanner.webp">
+<p class="boardinfo">/{{.Name}}/ - {{.Desc}} Catalog</p></td>
+</center>
+<hr>
+
+<a class="navi" href="/{{.Name}}/">Return</a><br><br>
 <table class="catalog">{{if .Posts}}{{$subs := .Subjects}}{{range $index, $value := .Posts}}
 {{if eq 0 $index}}<tr>
 {{else if startrow 5 $index}}</tr><tr>{{end}}

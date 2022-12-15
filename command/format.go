@@ -13,7 +13,7 @@ var repreg = regexp.MustCompile(`(?i)&gt;&gt;(/(\D+)/)?(\d+)\b`)
 var randreg = regexp.MustCompile(`p\$2\$3`)
 var hashreg = regexp.MustCompile(`#/2/3.html`)
 var prevreg = regexp.MustCompile(`#board`)
-var quoreg = regexp.MustCompile(`&gt;(.+)`)
+var quoreg = regexp.MustCompile(`&gt;(\S.+)`)
 
 var spoilreg = regexp.MustCompile(`~~([^<]+)~~`)
 var boldreg = regexp.MustCompile(`\*\*([^<])\*\*`)

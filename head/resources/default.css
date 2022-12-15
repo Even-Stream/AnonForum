@@ -41,6 +41,10 @@ spoil:hover {
   background-color: inherit;
 }
 
+hr {
+    border-top: 1px solid rgb(216, 68, 36);
+}
+
 .post:target {
     background-color: rgb(239, 182, 165);
 }
@@ -63,4 +67,8 @@ selfref a, .reply a {
 
 .sage {
     color: rgb(216, 68, 36);
+}
+
+.bannerimg {
+    border: 1px solid rgb(220, 173, 177);
 }

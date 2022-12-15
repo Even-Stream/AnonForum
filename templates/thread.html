@@ -17,14 +17,20 @@
 </head>
 
 <body>
-<img src="/resources/banners/cbanner.webp">
 {{$Descs := .HeaderDescs}}
 <p class="headerblock">{{range $index, $name := .Header}}
     <a class="header" href="/{{$name}}" title="{{index $Descs $index}}">/{{$name}}/</a> {{end}}
     <a class="header" href="/" title="front page">home</a>
-</p><br><br>
+</p><br>
+
+<center>
+<img class="bannerimg" src="/resources/banners/cbanner.webp">
+<p class="boardinfo">/{{.BoardN}}/ - {{.BoardDesc}}</p></td>
+</center>
+<hr>
+
 <a class="navi" href="/{{.BoardN}}/">Return</a>
-<a class="navi" href="/{{.BoardN}}/catalog.html">Catalog</a>
+<a class="navi" href="/{{.BoardN}}/catalog.html">Catalog</a><br><br>
 {{if .Posts}}{{$sub:= .Subject}}{{range slice .Posts 0 1}}
         <table id="no{{.Id}}" class="thread">
             <tr>

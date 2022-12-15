@@ -11,6 +11,7 @@ import (
 //structures used in templates
 type Catalog struct {
     Name string
+    Desc string
     Posts []*Post
     Subjects []string
     Header []string
@@ -139,7 +140,7 @@ func Build_catalog(board string) {
 
     posts, subjects := get_cat_posts(board)
 
-    catalog := Catalog{Name: board, Posts: posts, Subjects: subjects,
+    catalog := Catalog{Name: board, Desc: Board_map[board],Posts: posts, Subjects: subjects,
         Header: Board_names, HeaderDescs: Board_descs}
 
     cattemp.Execute(f, catalog)

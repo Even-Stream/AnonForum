@@ -24,6 +24,7 @@ type Post struct {
 
 type Thread struct {
     BoardN string
+    BoardDesc string
     Parent string
     Subject string
     Posts []*Post
@@ -183,7 +184,8 @@ func Build_board(board string) {
 
     threads := get_threads(board)
 
-    cboard := Board{Name: board, Threads: threads, Header: Board_names, HeaderDescs: Board_descs}
+    cboard := Board{Name: board,  Desc: Board_map[board],Threads: threads,
+        Header: Board_names, HeaderDescs: Board_descs}
     boardtemp.Execute(f, cboard)
 
 }
@@ -212,10 +214,11 @@ func Build_thread(parent string, board string) { //will accept argument for boar
         var thr Thread
 
         if sub != "" {
-            thr = Thread{BoardN: board, Posts: posts, Subject: sub, Parent: parent,
-            Header: Board_names, HeaderDescs: Board_descs}
+            thr = Thread{BoardN: board, BoardDesc: Board_map[board],
+                Posts: posts, Subject: sub, Parent: parent,
+                Header: Board_names, HeaderDescs: Board_descs}
         } else {
-            thr = Thread{BoardN: board, Posts: posts, Parent: parent,
+            thr = Thread{BoardN: board, BoardDesc: Board_map[board], Posts: posts, Parent: parent,
             Header: Board_names, HeaderDescs: Board_descs}
         }
         threadtemp.Execute(f, thr)

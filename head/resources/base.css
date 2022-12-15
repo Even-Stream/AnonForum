@@ -30,7 +30,7 @@ ref a, selfref a, .header
 .headerblock {
     display: block;
     margin-block-start: 1em;
-    margin-block-end: 1em;
+    margin-block-end: 0em;
     margin-inline-start: 0px;
     margin-inline-end: 0px;
     text-align: center;"
@@ -50,6 +50,10 @@ ref a, selfref a, .header
 
 p, label, postwrap, a, postwrap::before, .thread {
     font: 1rem MPlus, Helvetica, Arial, sans-serif;
+}
+
+td {
+    vertical-align: top;
 }
 
 subject {
@@ -74,6 +78,10 @@ textarea {
     outline: none;
 }
 
+hr {
+    border: none;
+}
+
 .imspec {
     appearance: none;
     user-select: none;
@@ -83,7 +91,7 @@ textarea {
 }
 
 .thread {
-    height: 40.44vh;
+
     margin-left: 1%;
     padding-bottom: 10px;
 }
@@ -180,4 +188,8 @@ ref:hover+.prev {
 
 .catalog subject {
     font-size: 12pt;
+}
+
+.split {
+    margin-top: 25px;
 }
