@@ -32,31 +32,27 @@
 <a class="navi" href="/{{.BoardN}}/">Return</a>
 <a class="navi" href="/{{.BoardN}}/catalog.html">Catalog</a><br><br>
 {{if .Posts}}{{$sub:= .Subject}}{{range slice .Posts 0 1}}
-        <table id="no{{.Id}}" class="thread">
-            <tr>
-                <td>
+        <table id="no{{.Id}}" class="thread"><tr><td>
+
                     <label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
                     <input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>
                     <label>{{if $sub}}<subject>{{$sub}}</subject>{{end}} <time>{{.Time}}</time> <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
                     <p class="pcontent">{{.Content}}</p>
-                </td>
-            </tr>
-        </table>{{end}}
+
+        </td></tr></table>{{end}}
 {{range slice .Posts 1}}
     <postwrap>
-        <table id="no{{.Id}}" class="post">
-            <tr>
-                <td>
+        <table id="no{{.Id}}" class="post"><tr><td>
+
                     <label><time class="{{.Option}}">{{.Time}}</time> <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
                     <br>
                     {{if .File}}<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
                     <input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
                     {{if .Content}}<p class="pcontent">{{.Content}}</p>{{end}}
-                </td>
-            </tr>
-        </table>
+
+        </td></tr></table>
     </postwrap>
 {{end}}{{end}}
     <form action="/im/post/?parent={{.Parent}}&board={{.BoardN}}" enctype="multipart/form-data" method="Post">
