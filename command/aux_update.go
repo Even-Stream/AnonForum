@@ -52,6 +52,30 @@ var catfuncmap = template.FuncMap{
         }
         return false
     },
+
+    "getprev": func(content string) string {
+        counter := 0
+        output := Prevboxreg.ReplaceAllStringFunc(content, func(match string) string {
+            if counter > 3 {
+                return match
+            } else {
+                cbox := Prevboxreg.FindStringSubmatch(match)
+                prevcontent := Get_prev(cbox[1], cbox[2])
+                counter++
+                return match + prevcontent
+            }
+        })
+        return output
+    },
+}
+
+var homefuncmap = template.FuncMap{
+    "startrow": func(rowsize, index int) bool {
+        if index % rowsize == 0 {
+            return true
+        }
+        return false
+    },
 }
 
 func get_cat_posts(board string) ([]*Post, []string) {
@@ -147,7 +171,7 @@ func Build_catalog(board string) {
 }
 
 func Build_home() {
-    hometemp := template.New("home.html").Funcs(catfuncmap)
+    hometemp := template.New("home.html").Funcs(homefuncmap)
     hometemp, err := hometemp.ParseFiles(BP + "/templates/home.html")
     Err_check(err)
 

@@ -4,13 +4,9 @@ import (
     "database/sql"
     "log"
     "os"
-    "math/rand"
-    "time"
 
     _ "github.com/mattn/go-sqlite3"
 )
-
-const rand_charset = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_"
 
 var DB_uri string 
 
@@ -32,17 +28,6 @@ func Query_err_check(err error) {
     }
 }
 
-func Rand_gen() string {
-    result := ""
-
-    for i := 0; i < 6; i++ {
-        c := rand_charset[rand.Intn(len(rand_charset))]
-    result += string(c)
-    }
-
-    return result
-}
-
 func Time_report(entry string) {
     log.Printf(entry)
 }
@@ -57,8 +42,6 @@ func main() {
 
     log.SetOutput(file)
     log.SetFlags(log.LstdFlags | log.Lmicroseconds)
-
-    rand.Seed(time.Now().UnixNano())
 
     if _, err = os.Stat(BP + "command/post-coll.db"); err != nil {
         New_db()

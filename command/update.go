@@ -5,6 +5,7 @@ import (
     "text/template"
     "strconv"
     "errors"
+    "regexp"
 
     _ "github.com/mattn/go-sqlite3"
 )
@@ -40,6 +41,26 @@ type Board struct {
     HeaderDescs []string
     SThemes []string
 }
+
+var Prevboxreg = regexp.MustCompile(`<box class="prev" board="(\S+)" sid="(\S+)">`) 
+
+var prevfuncmap = template.FuncMap {
+    "getprev": func(content string) string {
+        counter := 0
+        output := Prevboxreg.ReplaceAllStringFunc(content, func(match string) string {
+            if counter > 3 {
+                return match
+            } else {
+                cbox := Prevboxreg.FindStringSubmatch(match)
+                prevcontent := Get_prev(cbox[1], cbox[2])             
+                counter++
+                return match + prevcontent
+            }
+        })
+        return output
+    },
+}
+
 
 func Dir_check(path string) {
 
@@ -172,7 +193,8 @@ func get_posts(parent string, board string) ([]*Post, error) {
 }
 
 func Build_board(board string) {
-    boardtemp := template.New("board.html")
+    boardtemp := template.New("board.html").Funcs(prevfuncmap)
+
     boardtemp, err := boardtemp.ParseFiles(BP + "/templates/board.html")
     Err_check(err)
 
@@ -189,10 +211,12 @@ func Build_board(board string) {
         Header: Board_names, HeaderDescs: Board_descs, SThemes: Themes}
     boardtemp.Execute(f, cboard)
 
-}
+}       
 
 func Build_thread(parent string, board string) { //will accept argument for board and thread number
-    threadtemp := template.New("thread.html")
+    threadtemp := template.New("thread.html").Funcs(prevfuncmap)
+
+
     threadtemp, err := threadtemp.ParseFiles(BP + "/templates/thread.html")
     Err_check(err)
 

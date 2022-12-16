@@ -8,10 +8,7 @@ and send that post back
 
 import (
     "bytes"
-    "net/http"
     "text/template"
-    "time"
-    "context"
 
     _ "github.com/mattn/go-sqlite3"
 )
@@ -24,18 +21,7 @@ type Prev struct {
 }
 
 //retrieves post request
-func Get_prev(w http.ResponseWriter, req *http.Request) {
-    //time out
-    ctx, cancel := context.WithTimeout(req.Context(), 10 * time.Millisecond)
-    defer cancel()
-
-    id := req.FormValue("p")
-    board := req.FormValue("board")
-
-    if id == "" || board == "" {
-        http.Error(w, "Invalid preview request.", http.StatusBadRequest)
-        return
-    }
+func Get_prev(board, id string) string {
 
     stmts := Checkout()
     defer Checkin(stmts)
@@ -46,7 +32,7 @@ func Get_prev(w http.ResponseWriter, req *http.Request) {
     var prv Prev
     prv.Board = board
 
-    row := stmt.QueryRowContext(ctx, id, board)
+    row := stmt.QueryRow(id, board)
 
     err := row.Scan(&prv.Content, &prv.Imgprev)
     Query_err_check(err)
@@ -55,10 +41,6 @@ func Get_prev(w http.ResponseWriter, req *http.Request) {
     Err_check(err)
     Prev_body.Execute(&temp, prv)
 
-    data = temp.String()    
-
-    w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-    w.WriteHeader(http.StatusOK)
-
-    w.Write([]byte(data))
+    data = temp.String()
+    return data
 }

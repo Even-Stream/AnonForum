@@ -21,7 +21,6 @@ func Listen() {
 
     //listen mux
     mux := http.NewServeMux()
-    mux.HandleFunc("/im/ret/", Get_prev)
     mux.HandleFunc("/im/post/", New_post)
     mux.HandleFunc("/im/theme/", Switch_theme)
     http.ListenAndServe(":81", hongMeiling(mux))
@@ -33,8 +32,6 @@ func hongMeiling(next http.Handler) http.Handler {
         var sel int
         url := r.URL.String()
         switch {
-            case strings.Contains(url, "ret"):
-                sel = 0
             case strings.Contains(url, "post"):
                 sel = 1
             case strings.Contains(url, "theme"):

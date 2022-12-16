@@ -22,7 +22,7 @@ postwrap::before, .prev {
     position: absolute;
 }
 
-ref a, selfref a, .header
+.ref, selfref a, .header
 {
     text-decoration: none;
 }
@@ -131,7 +131,7 @@ hr {
     user-select: none;
 }
 
-ref:hover+.prev {
+.ref:hover+.prev {
     visibility: visible;
 }
 

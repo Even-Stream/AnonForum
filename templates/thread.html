@@ -7,8 +7,6 @@
 
     <link rel="stylesheet" href="/resources/base.css">
     <link rel="stylesheet" href="/resources/default.css">
-    <script src="/resources/htmx.js" defer></script>
-    <noscript><style> .prev { display: none !important} </style></noscript>
 
 <style>{{$name := .BoardN}}
 {{range .Posts}}{{if .File}}
@@ -38,7 +36,7 @@
                     <br>
                     <input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>
                     <label>{{if $sub}}<subject>{{$sub}}</subject>{{end}} <time>{{.Time}}</time> <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref></label>
-                    <p class="pcontent">{{.Content}}</p>
+                    <p class="pcontent">{{getprev .Content}}</p>
 
         </td></tr></table>{{end}}
 {{range slice .Posts 1}}
@@ -50,7 +48,7 @@
                     {{if .File}}<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
                     <input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
-                    {{if .Content}}<p class="pcontent">{{.Content}}</p>{{end}}
+                    {{if .Content}}<p class="pcontent">{{getprev .Content}}</p>{{end}}
 
         </td></tr></table>
     </postwrap>

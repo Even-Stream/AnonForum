@@ -7,7 +7,6 @@
 
     <link rel="stylesheet" href="/resources/base.css">
     <link rel="stylesheet" href="/resources/default.css">
-    <script src="/resources/htmx.js" defer></script>
 </head>
 
 <body>{{$Descs := .HeaderDescs}}
@@ -29,7 +28,7 @@
 <td><catcon>
 <label><subject>{{index $subs $index}}</subject></label><br>
 <a href="{{.Id}}.html"><img class="catimg" src="Files/{{.Imgprev}}"></a><br>
-<p>{{.Content}}</p></catcon></td>{{end}}</tr>
+<p>{{getprev .Content}}</p></catcon></td>{{end}}</tr>
 {{end}}</table>
 </body>
 </html>
