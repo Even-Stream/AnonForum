@@ -7,19 +7,11 @@
 }
 
 .hlogo {
-	content: url("burichan_logo.png");
+	content: url("burichan_logo.webp");
 }
 
-.hline {
+.hline .blink .hop {
         color: #34345C;
-}
-
-.blink {
-	color: #34345C;
-}
-
-.hop {
-	color: #34345C;
 }
 
 .fhop {

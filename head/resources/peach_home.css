@@ -1,0 +1,27 @@
+:root {
+	--sel-color: rgb(246, 195, 171);
+}
+
+.hbody {
+        background-color: rgb(253, 244, 240);
+}
+
+.hlogo {
+	content: url("peach_logo.webp");
+}
+
+.hline .blink .hop {
+        rgb(121, 85, 68);
+}
+
+.fhop {
+	background-color: rgb(246, 195, 171);
+}
+
+.tcon {
+	background-color: rgba(253, 244, 240, .85);
+}
+
+a {
+    color: rgb(128, 32, 0);
+}

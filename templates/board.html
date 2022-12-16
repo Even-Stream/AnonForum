@@ -34,7 +34,7 @@
                     <label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
                     <input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>
-                    <label><a href="{{$Parent}}.html"><subject>{{if $sub}}{{$sub}}{{else}}Reply{{end}}</subject></a> <time>{{.Time}}</time> <selfref><a href="/{{$BoardN}}/{{$Parent}}.html#no{{.Id}}">No. {{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
+                    <label><a href="{{$Parent}}.html"><subject>{{if $sub}}{{$sub}}{{else}}Reply{{end}}</subject></a> <time>{{.Time}}</time> <selfref><a href="/{{$BoardN}}/{{$Parent}}.html#no{{.Id}}">No. {{.Id}}</a></selfref></label>
                     <p class="pcontent">{{.Content}}</p>
 
         </td></tr></table>{{end}}
@@ -65,8 +65,8 @@
     <form class="thememenu" action="/im/theme/" method="Post">
         <select name="theme">
             <option value="default">Styles</option>
-             <option value="default">Default</option>
-              <option value="burichan">Burichan</option>
+             <option value="default">default</option>{{range .SThemes}}
+              <option value="{{.}}">{{.}}</option>{{end}}
         </select>
         <input type="submit" value="Select">
     </form>

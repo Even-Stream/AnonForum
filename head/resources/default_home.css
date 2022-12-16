@@ -7,19 +7,11 @@
 }
 
 .hlogo {
-	content: url("logo.png");
+	content: url("logo.webp");
 }
 
-.hline {
+.hline .blink .hop {
         color: rgb(216, 68, 36);
-}
-
-.blink {
-	color: rgb(216, 68, 36);
-}
-
-.hop {
-	color: rgb(216, 68, 36);
 }
 
 .fhop {

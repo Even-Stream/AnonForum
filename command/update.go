@@ -38,6 +38,7 @@ type Board struct {
     Threads []*Thread
     Header []string
     HeaderDescs []string
+    SThemes []string
 }
 
 func Dir_check(path string) {
@@ -107,7 +108,7 @@ func get_threads(board string) []*Thread {
             pst_coll = append(pst_coll, &cpst)
         }
 
-        for _, pst := range pst_coll {
+        for _, pst := range pst_coll[1:] {
             rep_rows, err := stmt3.Query(pst.Id, board)
             Err_check(err)
 
@@ -185,7 +186,7 @@ func Build_board(board string) {
     threads := get_threads(board)
 
     cboard := Board{Name: board,  Desc: Board_map[board],Threads: threads,
-        Header: Board_names, HeaderDescs: Board_descs}
+        Header: Board_names, HeaderDescs: Board_descs, SThemes: Themes}
     boardtemp.Execute(f, cboard)
 
 }

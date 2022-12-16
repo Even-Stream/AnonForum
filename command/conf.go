@@ -12,6 +12,7 @@ var boards []*ini.Key
 var Board_names []string
 var Board_descs []string
 var Board_map map[string]string
+var Themes []string
 
 func Load_conf() {
     cfg, err := ini.Load("/etc/ogai.ini")
@@ -33,4 +34,6 @@ func Load_conf() {
     if len(Board_names) != len(Board_descs) {
         log.Fatal("Configuration error: Not all boards have a description")
    }
+
+   Themes = cfg.Section("misc").Key("themes").Strings(" ")
 }

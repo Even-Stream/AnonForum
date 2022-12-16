@@ -49,7 +49,7 @@ ref a, selfref a, .header
 }
 
 p, label, postwrap, a, postwrap::before, .thread {
-    font: 1rem MPlus, Helvetica, Arial, sans-serif;
+    font: 1rem MPlus, system-ui, Helvetica, Arial, sans-serif;
 }
 
 td {
@@ -91,14 +91,11 @@ hr {
 }
 
 .thread {
-
     margin-left: 1%;
     padding-bottom: 10px;
 }
 
 .post {
-    height: 12.81vh;
-    min-width: 19.09vw;
     margin-bottom: .5%;
     margin-left: 2.5%;
 }
@@ -114,7 +111,7 @@ hr {
 
 .pcontent {
     padding-right: 4%;
-    padding-left: 4%;
+    padding-left: 30px;
     margin-bottom: 10px;
     line-height: 1.5em;
     overflow-wrap: anywhere;

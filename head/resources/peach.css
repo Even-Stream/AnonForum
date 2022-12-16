@@ -1,0 +1,69 @@
+body {
+    background-color: rgb(253, 244, 240);
+}
+
+a {
+    color: rgb(121, 85, 68);
+}
+
+p, label, postwrap, .thread postwrap::before {
+    color: rgb(48, 34, 27);
+}
+
+subject {
+    color: rgb(121, 75, 75);
+}
+
+textarea {
+    border: solid 1px rgb(246, 195, 171);
+}
+
+textarea:focus {
+    border: solid 1px rgb(237, 169, 150);
+}
+
+quo {
+    color: rgb(119, 171, 56);
+}
+
+spoil {
+  color: black;
+  background-color: black;
+}
+
+spoil:hover {
+  color: inherit;
+  background-color: inherit;
+}
+
+hr {
+    border-top: 1px solid rgb(121, 85, 68);
+}
+
+.post:target {
+    background-color: rgb(209, 200, 236);
+}
+
+.prev {
+    border-color: rgb(209, 158, 158);
+}
+
+.post, .prev {
+    background-color: rgb(246, 195, 171);
+}
+
+selfref a, .reply a {
+    color: rgb(128, 32, 0);
+}
+
+.catalog td {
+    border: 2px dotted rgb(150, 63, 67);
+}
+
+.sage {
+    color: rgb(121, 85, 68);
+}
+
+.bannerimg {
+    border: 1px solid rgb(220, 184, 173);
+}
