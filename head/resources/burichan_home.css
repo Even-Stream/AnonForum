@@ -10,7 +10,7 @@
 	content: url("burichan_logo.webp");
 }
 
-.hline, .blink, .hop {
+.hline .blink .hop {
         color: #34345C;
 }
 

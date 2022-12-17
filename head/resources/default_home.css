@@ -10,7 +10,7 @@
 	content: url("logo.webp");
 }
 
-.hline, .blink, .hop {
+.hline .blink .hop {
         color: rgb(216, 68, 36);
 }
 

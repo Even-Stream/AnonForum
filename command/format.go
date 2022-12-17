@@ -10,6 +10,7 @@ var nlreg = regexp.MustCompile("\n")
 var tagreg = regexp.MustCompile("(br>)(<)")
 
 var repreg = regexp.MustCompile(`(?i)&gt;&gt;(/(\D+)/)?(\d+)\b`)
+var randreg = regexp.MustCompile(`p\$2\$3`)
 var hashreg = regexp.MustCompile(`#/2/3.html`)
 var prevreg = regexp.MustCompile(`#board`)
 var quoreg = regexp.MustCompile(`&gt;(\S.+)`)
@@ -22,9 +23,11 @@ var linkreg = regexp.MustCompile(`(http|ftp|https):\/\/(\S+)`)
 const (    
     nlpost = "\n<br>"
     tagpost = "$1\n$2"
-    reppost = `<a class="ref" href="#/2/3.html#no$3">&#62;&#62;$1$3</a><box class="prev" board="#board" sid="$3"></box>`
+    reppost = `<ref hx-get="/im/ret/?p=$3&board=#board" hx-trigger="mouseover once" hx-target="#p$2$3"><a href="#/2/3.html#no$3">&#62;&#62;$1$3</a></ref><box id="p$2$3" class="prev"></box>`
 )
 
+var reprandpost = reppost
+var rand_gen string
 const (
     quopost = `<quo>&#62;$1</quo>`
     spoilpost = `<spoil>$1</spoil>`
@@ -82,7 +85,7 @@ func process(rawline, board, orig_parent string) (string, []string) {
         }
     }
 
-    postline := repreg.ReplaceAllString(rawline, reppost)
+    postline := repreg.ReplaceAllString(rawline, reprandpost)
 
     rpi := 0
     postline = hashreg.ReplaceAllStringFunc(postline, func(match string) string {
@@ -115,6 +118,10 @@ func Format_post(input, board, orig_parent string) (string, []string) {
     scanner.Scan()
 
     //flexible statement
+    rand_gen = Rand_gen()
+
+    reprandpost = randreg.ReplaceAllString(reppost, `p$$2$$3-` + rand_gen)
+
     output, repmatches := process(scanner.Text(), board, orig_parent)
 
     for scanner.Scan() {
