@@ -18,8 +18,6 @@ Takes advantage of Nginx capabilities
 
 Other
 
-- Reply view with no JS
-
 - Files keep their original name when downloaded 
 
 - Embeded thumbnailer
