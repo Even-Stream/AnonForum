@@ -4,6 +4,7 @@
 *.png
 *.jpg
 *.webp
+*.gif
 *.mod
 *.sum
 *.log
