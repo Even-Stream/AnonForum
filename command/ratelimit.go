@@ -16,6 +16,8 @@ type IPRateLimiter struct {
     postB       int
     themeR      rate.Limit
     themeB      int
+    manR        rate.Limit
+    manB        int
 }
 
 // NewIPRateLimiter .
@@ -29,6 +31,8 @@ func NewIPRateLimiter(r []rate.Limit, b []int) *IPRateLimiter {
         postB:      b[1],
         themeR:     r[2],
         themeB:     b[2],
+        manR:       r[3],
+        manB:       b[3],
     }
 
     return i
@@ -43,7 +47,8 @@ func (i *IPRateLimiter) AddIP(ip string, sel int) *rate.Limiter {
     retLimiter := rate.NewLimiter(i.retR, i.retB)
     postLimiter := rate.NewLimiter(i.postR, i.postB)
     themeLimiter := rate.NewLimiter(i.themeR, i.themeB)
-    limiters := []*rate.Limiter{retLimiter, postLimiter, themeLimiter}
+    manLimiter := rate.NewLimiter(i.manR, i.manB)
+    limiters := []*rate.Limiter{retLimiter, postLimiter, themeLimiter, manLimiter}
 
     i.ips[ip] = limiters
 
@@ -53,15 +58,20 @@ func (i *IPRateLimiter) AddIP(ip string, sel int) *rate.Limiter {
 // GetLimiter returns the rate limiter for the provided IP address if it exists.
 // Otherwise calls AddIP to add IP address to the map
 func (i *IPRateLimiter) GetLimiter(ip string, sel int) *rate.Limiter {
+    
     i.mu.Lock()
     limiters, exists := i.ips[ip]
 
     if !exists {
+        
         i.mu.Unlock()
+
         return i.AddIP(ip, sel)
     }
 
+
     i.mu.Unlock()
+
 
     return limiters[sel]
 }

@@ -53,11 +53,11 @@ hr {
 }
 
 selfref a, .reply a {
-    color: rgb(128, 66, 0);
+    color: rgb(138, 79, 56);
 }
 
 .catalog td {
-    border: 2px dotted rgb(150, 63, 67);
+    border: 2px dotted rgb(131, 102, 85);
 }
 
 .sage {

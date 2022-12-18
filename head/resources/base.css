@@ -49,7 +49,7 @@ ref a, selfref a, .header
 }
 
 p, label, postwrap, a, postwrap::before, .thread {
-    font: 1rem MPlus, system-ui, Helvetica, Arial, sans-serif;
+    font: 15px MPlus, system-ui, Helvetica, Arial, sans-serif;
 }
 
 td {
@@ -74,7 +74,7 @@ textarea {
     width: 45%;
     height: 25%;
     max-width: 98% !important;
-    font: 14px MPlus, Helvetica, Arial, sans-serif;
+    font: 15px MPlus, Helvetica, Arial, sans-serif;
     outline: none;
 }
 
