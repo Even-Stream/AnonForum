@@ -1,0 +1,76 @@
+body {
+    background-color: rgb(30, 30, 30);
+}
+
+a {
+    color: #99225c;
+}
+
+p, label, postwrap, .thread postwrap::before {
+    color: #999999;
+}
+
+subject {
+    color: #8a4265;
+}
+
+textarea {
+    border: solid 1px rgb(46,46,46);
+    text-decoration-line: none;
+    color: #999999;
+    background-color: rgb(58, 59, 59);
+}
+
+textarea:focus {
+    border: solid 1px rgb(120, 120, 120);
+}
+
+quo {
+    color: rgb(119, 171, 56);
+}
+
+spoil {
+  color: black;
+  background-color: black;
+}
+
+spoil:hover {
+  color: inherit;
+  background-color: inherit;
+}
+
+hr {
+    border-top: 1px solid #2e2e2e;
+}
+
+.post:target {
+    background-color: rgba(44,44,51);
+}
+
+.prev {
+    border-color: #21212c;
+}
+
+.post, .prev {
+    background-color: rgb(46,46,46);
+}
+
+selfref a, .reply a {
+    color: #999999;
+}
+
+selfref a:hover {
+    color: #99225c;
+}
+
+.catalog td {
+    border: 2px dotted #98496f;
+}
+
+.sage {
+    color: #99225c;
+}
+
+.bannerimg {
+    border: 1px solid rgb(120, 120, 120);
+}

@@ -1,0 +1,35 @@
+:root {
+	--sel-color: rgb(46,46,46);
+}
+
+.hbody {
+        background-image: url("dark_hbg.png");
+}
+
+.hlogo {
+	content: url("dark_logo.webp");
+}
+
+.hline .blink .hop {
+        color: #99225c;
+}
+
+.fhop {
+	background-color: rgb(46,46,46);
+}
+
+.tcon {
+	background-color: rgba(30, 30, 30, .85);
+}
+
+.hop {
+    color: #999999;
+}
+
+.rpost td, .mimg {
+    border-color: #999999;
+}
+
+a {
+    color: #99225c;
+}
