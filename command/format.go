@@ -37,7 +37,7 @@ const (
     spoilpost = `<spoil>$1</spoil>`
     boldpost = `<b>$1</b>`
     italicpost = `<i>$1</i>`
-    linkpost = `$1<a href="$2://$3">$2://$3</a>`
+    linkpost = `$1<a href="$2://$3" rel="noopener noreferrer nofollow">$2://$3</a>`
 )
 
 func Conf_dependent() {
@@ -45,7 +45,7 @@ func Conf_dependent() {
                                 `(youtube.com\/watch\?v=|youtu.be\/|` + INV_INST + `\/watch\?v=)(\S+)`)
 
     vidpost = `<details><summary>$1$2$3 <a href="https://` + INV_INST + 
-    `/$3">[link]</a></summary><iframe src="https://` +
+    `/$3" rel="noopener noreferrer nofollow">[link]</a></summary><iframe src="https://` +
     INV_INST + `/embed/$3?autoplay=0" allowfullscreen="" width="560" height="315" frameborder="0"></iframe>` +
     `</details>` 
 }
