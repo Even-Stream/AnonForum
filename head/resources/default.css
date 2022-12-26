@@ -7,7 +7,7 @@ body {
     background-color: rgb(253, 240, 241);
 }
 
-a {
+a, summary {
     color: rgb(216, 68, 36);
 }
 

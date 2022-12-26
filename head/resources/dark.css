@@ -2,7 +2,7 @@ body {
     background-color: rgb(30, 30, 30);
 }
 
-a {
+a, summary {
     color: #99225c;
 }
 

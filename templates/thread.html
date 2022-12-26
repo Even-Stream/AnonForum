@@ -38,7 +38,7 @@
                     <br>
                     <input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>
                     <label>{{if $sub}}<subject>{{$sub}}</subject>{{end}} <time>{{.Time}}</time> <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref></label>
-                    <p class="pcontent">{{.Content}}</p>
+                    <div class="pcontent">{{.Content}}</p>
 
         </td></tr></table>{{end}}
 {{range slice .Posts 1}}
@@ -50,7 +50,7 @@
                     {{if .File}}<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
                     <input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
-                    {{if .Content}}<p class="pcontent">{{.Content}}</p>{{end}}
+                    {{if .Content}}<div class="pcontent">{{.Content}}</p>{{end}}
 
         </td></tr></table>
     </postwrap>

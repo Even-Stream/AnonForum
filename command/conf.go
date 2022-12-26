@@ -13,6 +13,7 @@ var Board_names []string
 var Board_descs []string
 var Board_map map[string]string
 var Themes []string
+var INV_INST string
 
 func Load_conf() {
     cfg, err := ini.Load("/etc/ogai.ini")
@@ -36,4 +37,6 @@ func Load_conf() {
    }
 
    Themes = cfg.Section("misc").Key("themes").Strings(" ")
+   INV_INST = cfg.Section("misc").Key("invinst").String()
+   Conf_dependent()
 }

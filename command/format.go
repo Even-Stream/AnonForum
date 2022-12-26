@@ -18,13 +18,17 @@ var quoreg = regexp.MustCompile(`&gt;(\S.+)`)
 var spoilreg = regexp.MustCompile(`~~([^<]+)~~`)
 var boldreg = regexp.MustCompile(`\*\*([^<])\*\*`)
 var italicreg = regexp.MustCompile(`__([^<]+)__`)
-var linkreg = regexp.MustCompile(`(http|ftp|https):\/\/(\S+)`)
+var linkreg = regexp.MustCompile(`([^>"]|\A)(http|ftp|https):\/\/(\S+)`)
+
+var vidreg *regexp.Regexp
 
 const (    
     nlpost = "\n<br>"
     tagpost = "$1\n$2"
     reppost = `<ref hx-get="/im/ret/?p=$3&board=#board" hx-trigger="mouseover once" hx-target="#p$2$3"><a href="#/2/3.html#no$3">&#62;&#62;$1$3</a></ref><box id="p$2$3" class="prev"></box>`
 )
+var vidpost string
+
 
 var reprandpost = reppost
 var rand_gen string
@@ -33,8 +37,18 @@ const (
     spoilpost = `<spoil>$1</spoil>`
     boldpost = `<b>$1</b>`
     italicpost = `<i>$1</i>`
-    linkpost = `<a href="$1://$2">$1://$2</a>`
+    linkpost = `$1<a href="$2://$3">$2://$3</a>`
 )
+
+func Conf_dependent() {
+    vidreg = regexp.MustCompile(`(https:\/\/|https:\/\/www\.)` +
+                                `(youtube.com\/watch\?v=|youtu.be\/|` + INV_INST + `\/watch\?v=)(\S+)`)
+
+    vidpost = `<details><summary>$1$2$3 <a href="https://` + INV_INST + 
+    `/$3">[link]</a></summary><iframe src="https://` +
+    INV_INST + `/embed/$3?autoplay=0" allowfullscreen="" width="560" height="315" frameborder="0"></iframe>` +
+    `</details>` 
+}
 
 
 func removeDuplicates(strSlice []string) []string {
@@ -107,6 +121,7 @@ func process(rawline, board, orig_parent string) (string, []string) {
     postline = spoilreg.ReplaceAllString(postline, spoilpost)
     postline = boldreg.ReplaceAllString(postline, boldpost)
     postline = italicreg.ReplaceAllString(postline, italicpost)
+    postline = vidreg.ReplaceAllString(postline, vidpost)
     postline = linkreg.ReplaceAllString(postline, linkpost)
 
     return postline, repmatches  

@@ -33,7 +33,7 @@ ref a, selfref a, .header
     margin-block-end: 0em;
     margin-inline-start: 0px;
     margin-inline-end: 0px;
-    text-align: center;"
+    text-align: center;
 }
 
 .header+.header::before {
@@ -61,10 +61,6 @@ subject {
     overflow-wrap: anywhere;
 }
 
-img {
-    aspect-ratio:attr(width)/attr(height);
-}
-
 input {
     padding-top: 5px;
 }
@@ -80,6 +76,11 @@ textarea {
 
 hr {
     border: none;
+}
+
+iframe {
+    margin-right: 30px;
+    margin-left: 30px;
 }
 
 .imspec {
@@ -112,6 +113,7 @@ hr {
 .pcontent {
     padding-right: 4%;
     padding-left: 30px;
+    margin-top: 15px;
     margin-bottom: 10px;
     line-height: 1.5em;
     overflow-wrap: anywhere;

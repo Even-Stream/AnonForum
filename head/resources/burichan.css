@@ -2,7 +2,7 @@ body {
     background-color: #EEF2FF;
 }
 
-a {
+a, summary {
     color: #34345C;
 }
 
