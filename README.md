@@ -20,6 +20,8 @@ Other
 
 - Files keep their original name when downloaded 
 
+- Video embedding with no js(also uses invidious automatically) 
+
 - Embeded thumbnailer
 
 - Webp thumbnails 

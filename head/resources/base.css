@@ -16,6 +16,7 @@ body {
 
 postwrap::before {
     content: ">>";
+    padding-top: 5px;
 }
 
 postwrap::before, .prev {
@@ -50,6 +51,12 @@ ref a, selfref a, .header
 
 p, label, postwrap, a, postwrap::before, .thread {
     font: 15px MPlus, system-ui, Helvetica, Arial, sans-serif;
+}
+
+postwrap {
+    display: grid;
+    width: max-content;
+    max-width: 100%;
 }
 
 td {
@@ -93,12 +100,17 @@ iframe {
 
 .thread {
     margin-left: 1%;
+    margin-right: 32px;
     padding-bottom: 10px;
 }
 
 .post {
     margin-bottom: .5%;
-    margin-left: 2.5%;
+    margin-left: 32px;
+    margin-right: 32px;
+    margin-top: 5px;
+    padding-top: 5px;
+    padding-bottom: 10px;
 }
 
 .post label {
@@ -107,16 +119,14 @@ iframe {
 }
 
 .post .imspec {
-    padding-left: 7px;
+    padding-left: 10px;
 }
 
 .pcontent {
-    padding-right: 4%;
+    padding-right: 30px;
     padding-left: 30px;
-    margin-top: 15px;
-    margin-bottom: 10px;
+    margin-top: 10px;
     line-height: 1.5em;
-    overflow-wrap: anywhere;
 }
 
 .prev {

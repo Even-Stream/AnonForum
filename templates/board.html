@@ -29,27 +29,27 @@
 
 <a class="navi" href="/{{.Name}}/catalog.html">Catalog</a><br><br>
 {{if .Threads}}{{range .Threads}}{{$Parent:= .Parent}}{{$sub:= .Subject}}{{$BoardN:= .BoardN}}{{if .Posts}}{{range slice .Posts 0 1}}
-        <table id="no{{.Id}}" class="thread"><tr><td>
+        <div id="no{{.Id}}" class="thread">
 
                     <label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
                     <input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>
                     <label><a href="{{$Parent}}.html"><subject>{{if $sub}}{{$sub}}{{else}}Reply{{end}}</subject></a> <time>{{.Time}}</time> <selfref><a href="/{{$BoardN}}/{{$Parent}}.html#no{{.Id}}">No. {{.Id}}</a></selfref></label>
-                    <div class="pcontent">{{.Content}}</p>
+                    <div class="pcontent">{{.Content}}</div>
 
-        </td></tr></table>{{end}}
+        </div>{{end}}
 {{range slice .Posts 1}}
     <postwrap>
-        <table id="no{{.Id}}" class="post"><tr><td>
+        <div id="no{{.Id}}" class="post">
 
                     <label><time class="{{.Option}}">{{.Time}}</time> <selfref><a href="/{{$BoardN}}/{{$Parent}}.html#no{{.Id}}">No. {{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
                     <br>
                     {{if .File}}<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
                     <input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
-                    {{if .Content}}<div class="pcontent">{{.Content}}</p>{{end}}
+                    {{if .Content}}<div class="pcontent">{{.Content}}</div>{{end}}
 
-        </td></tr></table>
+        </div>
     </postwrap>
 {{end}}{{end}}
 <hr class="split">
