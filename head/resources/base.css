@@ -122,6 +122,10 @@ iframe {
     padding-left: 10px;
 }
 
+.prev .imspec {
+    padding-left: 0px;
+}
+
 .pcontent {
     padding-right: 30px;
     padding-left: 30px;
@@ -132,7 +136,7 @@ iframe {
 .prev {
     visibility: hidden;
     border: .1rem solid;
-    padding: 7px;
+    padding: 10px;
     content: var(--post);
     max-width: 65%;
     max-height: 70%;
