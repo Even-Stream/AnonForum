@@ -22,14 +22,15 @@
 </p><br>
 
 <center>
-<img class="bannerimg" src="/resources/banners/cbanner.webp" height="102" width="302">
+<img class="bannerimg" src="/resources/banners/cbanner.webp" height="100" width="300">
 <p class="boardinfo">/{{.Name}}/ - {{.Desc}}</p></td>
 </center>
 <hr>
 
 <a class="navi" href="/{{.Name}}/catalog.html">Catalog</a><br><br>
 {{if .Threads}}{{range .Threads}}{{$Parent:= .Parent}}{{$sub:= .Subject}}{{$BoardN:= .BoardN}}{{if .Posts}}{{range slice .Posts 0 1}}
-        <div id="no{{.Id}}" class="thread">
+        <threadwrap>
+            <div id="no{{.Id}}" class="thread">
 
                     <label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
@@ -37,7 +38,8 @@
                     <label><a href="{{$Parent}}.html"><subject>{{if $sub}}{{$sub}}{{else}}Reply{{end}}</subject></a> <time>{{.Time}}</time> <selfref><a href="/{{$BoardN}}/{{$Parent}}.html#no{{.Id}}">No. {{.Id}}</a></selfref></label>
                     <div class="pcontent">{{.Content}}</div>
 
-        </div>{{end}}
+            </div>
+        </threadwrap>{{end}}
 {{range slice .Posts 1}}
     <postwrap>
         <div id="no{{.Id}}" class="post">
@@ -62,7 +64,7 @@
         <input type="submit" value="Submit">
     </form>
 
-    <form class="thememenu" action="/im/theme/" method="Post">
+    <form class="thememenu" action="/im/theme/" method="Get">
         <select name="theme">
             <option value="default">Styles</option>
              <option value="default">default</option>{{range .SThemes}}

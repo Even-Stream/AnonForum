@@ -29,6 +29,8 @@ func Get_prev(w http.ResponseWriter, req *http.Request) {
     ctx, cancel := context.WithTimeout(req.Context(), 10 * time.Millisecond)
     defer cancel()
 
+    if Request_filter(w, req, "GET", 1 << 13) == 0 {return}
+
     id := req.FormValue("p")
     board := req.FormValue("board")
 

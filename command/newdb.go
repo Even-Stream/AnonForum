@@ -59,6 +59,17 @@ func create_table(db *sql.DB) {
         "Imgprev" TEXT NOT NULL
     );`
 
+    createCredTableSQL := `CREATE TABLE credentials (
+        "Username" TEXT NOT NULL,
+        "Hash" TEXT NOT NULL,
+        "Type" INTEGER NOT NULL
+    );`
+
+    createTokenTableSQL := `CREATE TABLE tokens (
+        "Token" TEXT NOT NULL,
+        "Type" TEXT NOT NULL
+    );`
+
     //triggers
     createLatestTriggerSQL := `CREATE TRIGGER latest_update
         AFTER INSERT ON posts
@@ -112,6 +123,15 @@ func create_table(db *sql.DB) {
         Err_check(err)
     statement.Exec()
 
+
+    statement, err = db.Prepare(createCredTableSQL)
+        Err_check(err)
+    statement.Exec()
+
+    statement, err = db.Prepare(createTokenTableSQL)
+        Err_check(err)
+    statement.Exec()
+
     statement, err = db.Prepare(createLatestTriggerSQL)
         Err_check(err)
     statement.Exec()
@@ -134,12 +154,12 @@ func create_table(db *sql.DB) {
 
 func New_db() {
 
-    file, err := os.Create(BP + "command/post-coll.db")
+    file, err := os.Create(DB_path)
     Err_check(err)
 
     file.Close()
 
-    conn, err := sql.Open("sqlite3", BP + "command/post-coll.db")
+    conn, err := sql.Open("sqlite3", DB_path)
     Err_check(err)
     defer conn.Close()
 

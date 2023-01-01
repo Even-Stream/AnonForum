@@ -53,10 +53,13 @@ p, label, postwrap, a, postwrap::before, .thread {
     font: 15px MPlus, system-ui, Helvetica, Arial, sans-serif;
 }
 
-postwrap {
+postwrap, threadwrap {
     display: grid;
-    width: max-content;
     max-width: 100%;
+}
+
+postwrap {
+    width: max-content;
 }
 
 td {
