@@ -209,3 +209,19 @@ ref:hover+.prev {
 .split {
     margin-top: 25px;
 }
+
+.admin::after {
+    content: "✦admin✦";
+}
+
+.moderator::after {
+    content: "✦moderator✦";
+}
+
+.maid::after {
+    content: "✦maid✦";
+}
+
+.admin::after, .moderator::after, .maid::after {
+    padding-left: 10px;
+}

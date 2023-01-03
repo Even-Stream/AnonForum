@@ -69,6 +69,25 @@ func New_post(w http.ResponseWriter, req *http.Request) {
         return
     }
 
+    c, err := req.Cookie("session_token")
+
+    if err == nil {
+        sessionToken := c.Value
+        userSession, exists := Sessions[sessionToken]
+        if exists {
+            if userSession.IsExpired() {
+                delete(Sessions, sessionToken)
+            } else {
+                switch {
+                    case userSession.acc_type == Admin:
+                        option += " admin"
+                    case userSession.acc_type == Moderator:
+                        option += " moderator"
+                    case userSession.acc_type == Maid:
+                        option += " maid"
+                }   
+    }}}
+
     //begin transaction
     new_conn := WriteConnCheckout()
     defer WriteConnCheckin(new_conn)

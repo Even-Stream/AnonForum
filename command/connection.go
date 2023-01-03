@@ -22,7 +22,7 @@ const (
     parent_collstring = `SELECT Parent, MAX(Id) FROM posts WHERE (Option <> "sage" OR Id = Parent) AND Board = ? 
         GROUP BY Parent ORDER BY MAX(Id) DESC LIMIT 15`
     thread_headstring = `SELECT Content, Time, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
-                COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev
+                COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev, Option
                 FROM posts
                 WHERE Id = ? AND Board = ?`
     thread_bodystring = `SELECT * FROM (
@@ -30,7 +30,7 @@ const (
                 COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev, Option FROM posts 
                 WHERE Parent = ? AND Board = ? AND Id != Parent ORDER BY Id DESC LIMIT 5)
                 ORDER BY Id ASC`
-    thread_collstring = `SELECT Parent, MAX(Id) FROM posts WHERE (Option <> "sage" OR Id = Parent) AND Board = ? 
+    thread_collstring = `SELECT Parent, MAX(Id) FROM posts WHERE (instr(Option, 'sage') > 0 OR Id = Parent) AND Board = ? 
         GROUP BY Parent ORDER BY MAX(Id) DESC`
     subject_lookstring = `SELECT Subject FROM subjects WHERE Parent = ? AND Board = ?`
 

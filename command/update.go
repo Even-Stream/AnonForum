@@ -89,7 +89,7 @@ func get_threads(board string) []*Thread {
         err = parent_rows.Scan(&fstpst.Id, &filler)
         Err_check(err)
         err = stmt.QueryRow(fstpst.Id, board).Scan(&fstpst.Content, &fstpst.Time, &fstpst.File,
-            &fstpst.Filename, &fstpst.Fileinfo, &fstpst.Imgprev)
+            &fstpst.Filename, &fstpst.Fileinfo, &fstpst.Imgprev, &fstpst.Option)
         Query_err_check(err)
 
         pst_coll = append(pst_coll, &fstpst)

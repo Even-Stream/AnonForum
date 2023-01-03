@@ -10,7 +10,7 @@ p, .pcontent, label, postwrap, .thread postwrap::before {
     color: #999999;
 }
 
-subject {
+subject, .sage time {
     color: #8a4265;
 }
 
@@ -65,10 +65,6 @@ selfref a:hover {
 
 .catalog td {
     border: 2px dotted #98496f;
-}
-
-.sage {
-    color: #99225c;
 }
 
 .bannerimg {

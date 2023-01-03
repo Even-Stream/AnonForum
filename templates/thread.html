@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>test</title>
+    <title>/{{.BoardN}}/ - {{.BoardDesc}}</title>
      <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" href="/resources/base.css">
@@ -38,7 +38,7 @@
                     <label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
                     <input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>
-                    <label>{{if $sub}}<subject>{{$sub}}</subject>{{end}} <time>{{.Time}}</time> <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref></label>
+                    <label class="{{.Option}}">{{if $sub}}<subject>{{$sub}}</subject>{{end}} <time>{{.Time}}</time> <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref></label>
                     <div class="pcontent">{{.Content}}</div>
 
             </div>
@@ -47,7 +47,7 @@
     <postwrap>
         <div id="no{{.Id}}" class="post">
 
-                    <label><time class="{{.Option}}">{{.Time}}</time> <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
+                    <label class="{{.Option}}"><time>{{.Time}}</time> <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
                     <br>
                     {{if .File}}<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>

@@ -11,9 +11,9 @@ import (
     "github.com/google/uuid"
 )
 
-type Aca_type int64
+type Acc_type int64
 const (
-    Admin     Aca_type = iota
+    Admin     Acc_type = iota
     Moderator
     Maid
 )
@@ -42,8 +42,10 @@ const (
     <form action="/im/admf_verify/" enctype="multipart/form-data" method="Post">
         <label>Username:</label><br><br>
         <input name="username" type="text" value=""><br><br>
-       <label>Password:</label><br><br>
-        <input name="password" type="text" value=""><br><br>
+        <label>Password:</label><br><br>
+        <input name="password" type="password" value=""><br><br>
+        <label>Confirm Password:</label><br><br>
+        <input name="passwordcopy" type="password" value=""><br><br>
         <label>Token:</label><br><br>
         <input name="token" type="text" value=""><br><br>
         <input type="submit" value="Enter">
@@ -67,11 +69,12 @@ var params = &argon2id.Params{
 type session struct {
     username string
     expiry   time.Time
+    acc_type Acc_type
 }
 
-var sessions = map[string]session{}
+var Sessions = map[string]session{}
 
-func (s session) isExpired() bool {
+func (s session) IsExpired() bool {
     return s.expiry.Before(time.Now())
 }
 
@@ -120,8 +123,8 @@ func Create_account(w http.ResponseWriter, req *http.Request) {
 
 func Token_check (w http.ResponseWriter, req *http.Request) {
 
-    if Request_filter(w, req, "POST", 1 << 9) == 0 {return}
-    if err := req.ParseMultipartForm(1 << 9); err != nil {
+    if Request_filter(w, req, "POST", 1 << 10) == 0 {return}
+    if err := req.ParseMultipartForm(1 << 10); err != nil {
         http.Error(w, "Request size exceeds limit.", http.StatusBadRequest)
         return
     }
@@ -132,6 +135,13 @@ func Token_check (w http.ResponseWriter, req *http.Request) {
     if Entry_check(w, req, "username", username) == 0 {return}
     password := req.FormValue("password")
     if Entry_check(w, req, "password", password) == 0 {return}
+    passwordcopy := req.FormValue("passwordcopy")
+    if Entry_check(w, req, "passwordcopy", passwordcopy) == 0 {return}
+
+    if password != passwordcopy {
+        http.Error(w, "Passwords don't match.", http.StatusBadRequest)
+        return
+    }
 
     //look in database for token, if there, delete token, create account 
     conn, err := sql.Open("sqlite3", DB_uri)
@@ -140,7 +150,7 @@ func Token_check (w http.ResponseWriter, req *http.Request) {
     search_token_stmt, err := conn.Prepare(search_token_string)
     Err_check(err)
 
-    var acc_type Aca_type
+    var acc_type Acc_type
     err = search_token_stmt.QueryRow(token).Scan(&acc_type)
     if err == sql.ErrNoRows {
         http.Error(w, "Invalid token.", http.StatusBadRequest)
@@ -212,7 +222,7 @@ func Credential_check (w http.ResponseWriter, req *http.Request) {
     Err_check(err)
 
     var found_hash string
-    var acc_type Aca_type
+    var acc_type Acc_type
 
     err = search_user_stmt.QueryRow(username).Scan(&found_hash, &acc_type)
     if err == sql.ErrNoRows {
@@ -232,9 +242,10 @@ func Credential_check (w http.ResponseWriter, req *http.Request) {
     sessionToken := uuid.NewString()
     expiresAt := time.Now().Add(20 * time.Minute)
 
-    sessions[sessionToken] = session{
+    Sessions[sessionToken] = session{
         username: username,
         expiry:   expiresAt,
+        acc_type: acc_type,
     }
 
     http.SetCookie(w, &http.Cookie{
@@ -262,7 +273,7 @@ func Logout(w http.ResponseWriter, req *http.Request) {
     }
 
     sessionToken := c.Value
-    delete(sessions, sessionToken)
+    delete(Sessions, sessionToken)
 
     http.SetCookie(w, &http.Cookie{
         Name:    "session_token",
@@ -273,3 +284,6 @@ func Logout(w http.ResponseWriter, req *http.Request) {
 
     w.Write([]byte(html_head + `<p>Logged out.</p>` + html_foot))
 }
+
+
+//creating token(requires admin account)
