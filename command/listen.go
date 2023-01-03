@@ -25,7 +25,9 @@ func Listen() {
     mux.HandleFunc("/im/post/", New_post)
     mux.HandleFunc("/im/theme/", Switch_theme)
     mux.HandleFunc("/im/adm/", Console_enter)
-    mux.HandleFunc("/im/login/", Credential_check)
+    mux.HandleFunc("/im/admf_login/", Credential_check)
+    mux.HandleFunc("/im/admf_new/", Create_account)
+    mux.HandleFunc("/im/admf_verify/", Token_check)
     http.ListenAndServe(":81", hongMeiling(mux))
 }
 
@@ -43,7 +45,7 @@ func hongMeiling(next http.Handler) http.Handler {
                 sel = 2
             case strings.Contains(url, "adm"):
                 sel = 3
-            case strings.Contains(url, "login"):
+            case strings.Contains(url, "admf"):
                 sel = 4
         }
 
