@@ -28,6 +28,7 @@ func Listen() {
     mux.HandleFunc("/im/admf_login/", Credential_check)
     mux.HandleFunc("/im/admf_new/", Create_account)
     mux.HandleFunc("/im/admf_verify/", Token_check)
+    mux.HandleFunc("/im/admf_logout/", Logout)
     http.ListenAndServe(":81", hongMeiling(mux))
 }
 

@@ -2,10 +2,13 @@ package main
 
 import (
     "net/http"
-   "database/sql"
+    "database/sql"
+    "time"
+"fmt"
 
     "github.com/alexedwards/argon2id"
     _ "github.com/mattn/go-sqlite3"
+    "github.com/google/uuid"
 )
 
 type Aca_type int64
@@ -31,7 +34,7 @@ const (
         <label>Username:</label><br><br>
         <input name="username" type="text" value=""><br><br>
         <label>Password:</label><br><br>
-        <input name="password" type="text" value=""><br><br>
+        <input name="password" type="password" value=""><br><br>
         <input type="submit" value="Enter">
     </form>`
 
@@ -61,6 +64,16 @@ var params = &argon2id.Params{
 	KeyLength:   32,
 }
 
+type session struct {
+    username string
+    expiry   time.Time
+}
+
+var sessions = map[string]session{}
+
+func (s session) isExpired() bool {
+    return s.expiry.Before(time.Now())
+}
 
 func Admin_init() {
     conn, err := sql.Open("sqlite3", DB_uri)
@@ -211,10 +224,52 @@ func Credential_check (w http.ResponseWriter, req *http.Request) {
     match, err := argon2id.ComparePasswordAndHash(password, found_hash)
     Err_check(err)
 
-    if match != true {
+    if !match {
         http.Error(w, "Invalid credentials.", http.StatusBadRequest)
         return
-    } 
+    }
+
+    sessionToken := uuid.NewString()
+    expiresAt := time.Now().Add(20 * time.Minute)
+
+    sessions[sessionToken] = session{
+        username: username,
+        expiry:   expiresAt,
+    }
+
+    http.SetCookie(w, &http.Cookie{
+        Name:    "session_token",
+        Value:   sessionToken,
+        Expires: expiresAt,
+        Path: "/",
+    })
 
     w.Write([]byte(html_head + `<p>Welcome.</p>` + html_foot))
+}
+
+//account exit 
+func Logout(w http.ResponseWriter, req *http.Request) {
+    c, err := req.Cookie("session_token")
+
+    if err != nil {
+    fmt.Println(err)
+        if err == http.ErrNoCookie {
+            w.WriteHeader(http.StatusUnauthorized)
+            return
+        }
+        w.WriteHeader(http.StatusBadRequest)
+        return
+    }
+
+    sessionToken := c.Value
+    delete(sessions, sessionToken)
+
+    http.SetCookie(w, &http.Cookie{
+        Name:    "session_token",
+        Value:   "",
+        Expires: time.Now(),
+        Path: "/",
+    })
+
+    w.Write([]byte(html_head + `<p>Logged out.</p>` + html_foot))
 }
