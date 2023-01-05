@@ -23,11 +23,12 @@
 }
 
 .rpost p, .recpost p, .rlast, .blink {
-	font: 15px MPlus, system-ui, Helvetica, Arial, sans-serif;
+	font-family: MPlus, system-ui, Helvetica, Arial, sans-serif;
+        font-size: 15px;
 }
 
 .blink {
-	font-size: 1.1em;
+	font-size: 17px;
 	text-decoration: none;
 }
 
@@ -41,7 +42,8 @@
 }
 
 .hop {
-	font: 1em MPlus, Helvetica, Arial, sans-serif;
+	font-family: MPlus, Helvetica, Arial, sans-serif;
+        font-size: 17px;
 	text-align: center;
 	text-decoration: none;
 	user-select: none

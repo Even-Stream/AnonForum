@@ -11,6 +11,7 @@ import (
 
 //structures used in templates
 type Post struct {
+    BoardN string
     Id int
     Content string
     Time string

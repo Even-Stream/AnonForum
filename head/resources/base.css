@@ -49,8 +49,9 @@ ref a, selfref a, .header
     content: " | ";
 }
 
-p, label, postwrap, a, postwrap::before, .thread {
-    font: 15px MPlus, system-ui, Helvetica, Arial, sans-serif;
+p, label, postwrap, threadwrap, a, postwrap::before {
+    font-family: MPlus, system-ui, Helvetica, Arial, sans-serif;
+    font-size: 15px;
 }
 
 postwrap, threadwrap {
@@ -80,7 +81,8 @@ textarea {
     width: 45%;
     height: 25%;
     max-width: 98% !important;
-    font: 15px MPlus, Helvetica, Arial, sans-serif;
+    font-family: MPlus, Helvetica, Arial, sans-serif;
+    font-size: 15px;
     outline: none;
 }
 
@@ -208,6 +210,10 @@ ref:hover+.prev {
 
 .split {
     margin-top: 25px;
+}
+
+.boardinfo {
+    font-size: 17px;
 }
 
 .admin::after {

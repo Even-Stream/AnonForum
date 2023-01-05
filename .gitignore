@@ -9,4 +9,5 @@
 *.sum
 *.log
 *.pprof
+*.ico
 /head/*/*.html

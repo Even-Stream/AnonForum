@@ -2,8 +2,8 @@ package main
 
 import (
     "net/http"
-    "strings"
     "time"
+    "strings"
 
     "golang.org/x/time/rate"
 )
@@ -11,6 +11,14 @@ import (
 var rarr = []rate.Limit{20, .04, .5, 1, .1}
 var barr = []int{30, 1, 1, 1, 4}
 var limiter = NewIPRateLimiter(rarr, barr)
+
+var admf_map = map[string]bool {
+    "adm": true, 
+    "login": true,
+    "add": true,
+    "verify": true,
+    "logout": true,
+    "console": true,}
 
 func Listen() {
 
@@ -25,10 +33,11 @@ func Listen() {
     mux.HandleFunc("/im/post/", New_post)
     mux.HandleFunc("/im/theme/", Switch_theme)
     mux.HandleFunc("/im/adm/", Console_enter)
-    mux.HandleFunc("/im/admf_login/", Credential_check)
-    mux.HandleFunc("/im/admf_add/", Create_account)
-    mux.HandleFunc("/im/admf_verify/", Token_check)
-    mux.HandleFunc("/im/admf_logout/", Logout)
+    mux.HandleFunc("/im/login/", Credential_check)
+    mux.HandleFunc("/im/add/", Create_account)
+    mux.HandleFunc("/im/verify/", Token_check)
+    mux.HandleFunc("/im/logout/", Logout)
+    mux.HandleFunc("/im/console/", Load_console)
     http.ListenAndServe(":81", hongMeiling(mux))
 }
 
@@ -36,17 +45,19 @@ func hongMeiling(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {    
 
         var sel int
-        url := r.URL.String()
+        fullurl := r.URL.String()
+        url := strings.Split(fullurl, "/")[2]
+
         switch {
-            case strings.Contains(url, "ret"):
+            case url == "ret":
                 sel = 0
-            case strings.Contains(url, "post"):
+            case url == "post":
                 sel = 1
-            case strings.Contains(url, "theme"):
+            case url == "theme":
                 sel = 2
-            case strings.Contains(url, "adm"):
+            case url == "adm":
                 sel = 3
-            case strings.Contains(url, "admf"):
+            case admf_map[url]:
                 sel = 4
         }
 
