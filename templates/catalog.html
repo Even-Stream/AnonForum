@@ -30,7 +30,7 @@
 {{else if startrow 5 $index}}</tr><tr>{{end}}
 <td><catcon>
 <label><subject>{{index $subs $index}}</subject></label><br>
-<a href="{{.Id}}.html"><img class="catimg" src="Files/{{.Imgprev}}"></a><br>
+<a href="{{.Id}}.html"><img class="catimg" src={{if audiocheck .Filemime}}"/resources/audio_image.webp"{{else}}"Files/{{.Imgprev}}"{{end}}></a><br>
 <p>{{.Content}}</p></catcon></td>{{end}}</tr>
 {{end}}</table>
 </body>

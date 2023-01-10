@@ -72,7 +72,11 @@ subject {
     overflow-wrap: anywhere;
 }
 
-input {
+video {
+    padding-left: 14px;
+}
+
+input, video {
     padding-top: 5px;
 }
 
@@ -90,15 +94,39 @@ hr {
     border: none;
 }
 
+admbox {
+    border: 2px solid rosybrown;
+    width: 100%;
+    display: block;
+    margin-bottom: 20px;
+}
+
+.controls {
+    background-color: rosybrown;
+    padding: 5px;
+}
+
+quo > * {
+    color: inherit !important;
+}
+
 iframe {
     margin-right: 30px;
     margin-left: 30px;
+}
+
+.imspec, video {
+    float: left;
+    padding-right: 15px;
 }
 
 .imspec {
     appearance: none;
     user-select: none;
     cursor: pointer;
+}
+
+.audiospec {
     float: left;
     padding-right: 15px;
 }

@@ -77,7 +77,7 @@ const (
     new_user_string = `INSERT INTO credentials(Username, Hash, Type) VALUES (?, ?, ?)`
     search_user_string = `SELECT Hash, Type FROM credentials WHERE Username = ?`
 
-    ten_most_recent_string = `SELECT ROWID, Board, Id, Content, Time, COALESCE(File, '') AS File, 
+    ten_most_recent_string = `SELECT ROWID, Board, Id, Content, Time, Parent, COALESCE(File, '') AS File, 
             COALESCE(Filename, '') AS Filename,
             COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev, Option FROM posts
             ORDER BY ROWID DESC LIMIT 10`
@@ -308,6 +308,7 @@ func Logout(w http.ResponseWriter, req *http.Request) {
     }
 
     sessionToken := c.Value
+
     delete(Sessions, sessionToken)
 
     http.SetCookie(w, &http.Cookie{
@@ -345,7 +346,7 @@ func Load_console(w http.ResponseWriter, req *http.Request) {
 
     if userSession.IsExpired() {
         delete(Sessions, sessionToken)
-        http.Error(w, "Unauthorized.", http.StatusUnauthorized)
+        http.Error(w, "Session expired.", http.StatusUnauthorized)
         return
     } 
 
@@ -366,7 +367,7 @@ func Load_console(w http.ResponseWriter, req *http.Request) {
 
     for rows.Next() {
         var pst Post
-        err = rows.Scan(&filler, &pst.BoardN, &pst.Id, &pst.Content, &pst.Time, &pst.File,
+        err = rows.Scan(&filler, &pst.BoardN, &pst.Id, &pst.Content, &pst.Time, &pst.Parent, &pst.File,
                         &pst.Filename, &pst.Fileinfo, &pst.Imgprev, &pst.Option)
         Err_check(err)
         most_recent = append(most_recent, &pst)

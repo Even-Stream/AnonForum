@@ -16,18 +16,18 @@ const (
             COALESCE(Imgprev, '') Imgprev FROM posts WHERE Id = ? AND Board = ?`
     prev_parentstring = `SELECT Parent FROM posts WHERE Id = ? AND Board = ?`
     updatestring = `SELECT Id, Content, Time, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
-                COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev, Option FROM posts
+                COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Filemime, '') AS Filemime, COALESCE(Imgprev, '') Imgprev, Option FROM posts
                 WHERE Parent = ? AND Board = ?`
     update_repstring = `SELECT Replier FROM replies WHERE Source = ? AND Board = ?`
     parent_collstring = `SELECT Parent, MAX(Id) FROM posts WHERE (instr(Option, 'sage') = 0 OR Id = Parent) AND Board = ? 
         GROUP BY Parent ORDER BY MAX(Id) DESC LIMIT 15`
-    thread_headstring = `SELECT Content, Time, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
-                COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev, Option
+    thread_headstring = `SELECT Content, Time, Parent, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
+                COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Filemime, '') AS Filemime, COALESCE(Imgprev, '') Imgprev, Option
                 FROM posts
                 WHERE Id = ? AND Board = ?`
     thread_bodystring = `SELECT * FROM (
-                SELECT Id, Content, Time, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
-                COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev, Option FROM posts 
+                SELECT Id, Content, Time, Parent, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
+                COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Filemime, '') AS Filemime, COALESCE(Imgprev, '') Imgprev, Option FROM posts 
                 WHERE Parent = ? AND Board = ? AND Id != Parent ORDER BY Id DESC LIMIT 5)
                 ORDER BY Id ASC`
     thread_collstring = `SELECT Parent, MAX(Id) FROM posts WHERE (instr(Option, 'sage') = 0 OR Id = Parent) AND Board = ? 
@@ -35,8 +35,8 @@ const (
     subject_lookstring = `SELECT Subject FROM subjects WHERE Parent = ? AND Board = ?`
 
     //all inserts(and necessary queries) are preformed in one transaction 
-    newpost_wfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, File, Filename, Fileinfo, Imgprev, Option) 
-        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)`
+    newpost_wfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, File, Filename, Fileinfo, Filemime, Imgprev, Option) 
+        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)`
     newpost_nfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Option) 
         VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5)`
     repadd_string = `INSERT INTO replies(Board, Source, Replier) VALUES (?1, ?2, (SELECT Id FROM latest WHERE Board = ?1) - 1)`

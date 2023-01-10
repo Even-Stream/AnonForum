@@ -11,8 +11,8 @@
     <noscript><style> .prev { display: none !important} </style></noscript>
 
 <style>{{$name := .BoardN}}
-{{range .Posts}}{{if .File}}
-.p{{.Id}} {--mini: url('/{{$name}}/Files/{{.Imgprev}}'); --maxi: url('/{{$name}}/Files/{{.File}}');}{{end}}{{end}}
+{{range .Posts}}{{if .File}}{{if imagecheck .Filemime}}
+.p{{.Id}} {--mini: url('/{{$name}}/Files/{{.Imgprev}}'); --maxi: url('/{{$name}}/Files/{{.File}}');}{{end}}{{end}}{{end}}
 </style>
 </head>
 
@@ -37,7 +37,7 @@
 
                     <label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
-                    <input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>
+                    {{if audiocheck .Filemime}}<video controls poster='/resources/{{.Imgprev}}'><source src='/{{$name}}/Files/{{.File}}' type= 'audio/mp3'></video>{{else}}<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
                     <label class="{{.Option}}">{{if $sub}}<subject>{{$sub}}</subject>{{end}} <time>{{.Time}}</time> <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref></label>
                     <div class="pcontent">{{.Content}}</div>
 
@@ -51,17 +51,17 @@
                     <br>
                     {{if .File}}<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
-                    <input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
+                    {{if audiocheck .Filemime}}<video controls poster='/resources/{{.Imgprev}}'><source src='/{{$name}}/Files/{{.File}}' type= 'audio/mp3'></video>{{else}}<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}{{end}}
                     {{if .Content}}<div class="pcontent">{{.Content}}</div>{{end}}
 
         </div>
     </postwrap>
 {{end}}{{end}}
-    <form action="/im/post/?parent={{.Parent}}&board={{.BoardN}}" enctype="multipart/form-data" method="Post">
+    <form action="/im/post/?parent={{.TId}}&board={{.BoardN}}" enctype="multipart/form-data" method="Post">
         <input type="checkbox" name="option" value="sage">
         <textarea name="newpost" rows="8" cols="78">I'm putting the new post box at the bottom.</textarea>
         <br>
-        <input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp">
+        <input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp, audio/mpeg, audio/ogg, audio/flac, audio/opus">
         <input type="submit" value="Reply">
     </form>
 </body>

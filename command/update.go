@@ -5,6 +5,7 @@ import (
     "text/template"
     "strconv"
     "errors"
+    "strings"
 
     _ "github.com/mattn/go-sqlite3"
 )
@@ -15,9 +16,11 @@ type Post struct {
     Id int
     Content string
     Time string
+    Parent int
     File string
     Filename string
     Fileinfo string
+    Filemime string
     Imgprev string
     Option string
     Replies []int
@@ -25,8 +28,8 @@ type Post struct {
 
 type Thread struct {
     BoardN string
+    TId string
     BoardDesc string
-    Parent string
     Subject string
     Posts []*Post
     Header []string
@@ -40,6 +43,18 @@ type Board struct {
     Header []string
     HeaderDescs []string
     SThemes []string
+}
+
+//getting kind of file 
+var filefuncmap = template.FuncMap {
+    "imagecheck": func(filemime string) bool {
+        if strings.HasPrefix(filemime, "image") {return true}
+        return false
+    },
+    "audiocheck": func(filemime string) bool {
+        if strings.HasPrefix(filemime, "audio") {return true}
+        return false
+    },
 }
 
 func Dir_check(path string) {
@@ -58,8 +73,8 @@ func Get_subject(parent string, board string) string {
 
     var subject string
 
-    stmt := stmts["subject_look"]
-    err := stmt.QueryRow(parent, board).Scan(&subject)
+    subject_look_stmt := stmts["subject_look"]
+    err := subject_look_stmt.QueryRow(parent, board).Scan(&subject)
     Query_err_check(err)
 
     return subject
@@ -70,15 +85,15 @@ func get_threads(board string) []*Thread {
     stmts := Checkout()
     defer Checkin(stmts)
 
-    stmt0 := stmts["parent_coll"]
-    stmt := stmts["thread_head"]
-    stmt2 := stmts["thread_body"]
-    stmt3 := stmts["update_rep"]
+    parent_coll_stmt := stmts["parent_coll"]
+    thread_head_stmt := stmts["thread_head"]
+    thread_body_stmt := stmts["thread_body"]
+    update_rep_stmt := stmts["update_rep"]
 
     var board_body []*Thread
 
     //tables will be called a board 
-    parent_rows, err := stmt0.Query(board)
+    parent_rows, err := parent_coll_stmt.Query(board)
     Err_check(err)
     defer parent_rows.Close()
 
@@ -89,28 +104,28 @@ func get_threads(board string) []*Thread {
 
         err = parent_rows.Scan(&fstpst.Id, &filler)
         Err_check(err)
-        err = stmt.QueryRow(fstpst.Id, board).Scan(&fstpst.Content, &fstpst.Time, &fstpst.File,
-            &fstpst.Filename, &fstpst.Fileinfo, &fstpst.Imgprev, &fstpst.Option)
+        err = thread_head_stmt.QueryRow(fstpst.Id, board).Scan(&fstpst.Content, &fstpst.Time, &fstpst.Parent, &fstpst.File,
+            &fstpst.Filename, &fstpst.Fileinfo, &fstpst.Filemime, &fstpst.Imgprev, &fstpst.Option)
         Query_err_check(err)
 
         pst_coll = append(pst_coll, &fstpst)
 
-        thread_rows, err := stmt2.Query(fstpst.Id, board)
+        thread_rows, err := thread_body_stmt.Query(fstpst.Id, board)
         Err_check(err)
         defer thread_rows.Close()
 
         for thread_rows.Next() {
             var cpst Post
 
-            err = thread_rows.Scan(&cpst.Id, &cpst.Content, &cpst.Time, &cpst.File,
-            &cpst.Filename, &cpst.Fileinfo, &cpst.Imgprev, &cpst.Option)
+            err = thread_rows.Scan(&cpst.Id, &cpst.Content, &cpst.Time, &cpst.Parent, &cpst.File,
+                &cpst.Filename, &cpst.Fileinfo, &cpst.Filemime, &cpst.Imgprev, &cpst.Option)
             Err_check(err)
 
             pst_coll = append(pst_coll, &cpst)
         }
 
         for _, pst := range pst_coll[1:] {
-            rep_rows, err := stmt3.Query(pst.Id, board)
+            rep_rows, err := update_rep_stmt.Query(pst.Id, board)
             Err_check(err)
 
             for rep_rows.Next() {
@@ -124,9 +139,9 @@ func get_threads(board string) []*Thread {
         sub := Get_subject(strconv.Itoa(fstpst.Id), board)
         var thr Thread
         if sub != "" {
-            thr = Thread{BoardN: board, Posts: pst_coll, Subject: sub, Parent: strconv.Itoa(fstpst.Id)}
+            thr = Thread{Posts: pst_coll, Subject: sub}
         } else {
-            thr = Thread{BoardN: board, Posts: pst_coll, Parent: strconv.Itoa(fstpst.Id)}
+            thr = Thread{Posts: pst_coll}
         }
 
         board_body = append(board_body, &thr)
@@ -141,10 +156,10 @@ func get_posts(parent string, board string) ([]*Post, error) {
     stmts := Checkout()
     defer Checkin(stmts)
 
-    stmt := stmts["update"]
-    stmt2 := stmts["update_rep"]
+    update_stmt := stmts["update"]
+    update_rep_stmt := stmts["update_rep"]
 
-    rows, err := stmt.Query(parent, board)
+    rows, err := update_stmt.Query(parent, board)
     Err_check(err)
     defer rows.Close()
 
@@ -153,10 +168,10 @@ func get_posts(parent string, board string) ([]*Post, error) {
     for rows.Next() {
         var pst Post
         err = rows.Scan(&pst.Id, &pst.Content, &pst.Time, &pst.File,
-            &pst.Filename, &pst.Fileinfo, &pst.Imgprev, &pst.Option)
+            &pst.Filename, &pst.Fileinfo, &pst.Filemime, &pst.Imgprev, &pst.Option)
         Err_check(err)
 
-        rep_rows, err := stmt2.Query(pst.Id, board)
+        rep_rows, err := update_rep_stmt.Query(pst.Id, board)
         Err_check(err)
 
         for rep_rows.Next() {
@@ -173,7 +188,7 @@ func get_posts(parent string, board string) ([]*Post, error) {
 }
 
 func Build_board(board string) {
-    boardtemp := template.New("board.html")
+    boardtemp := template.New("board.html").Funcs(filefuncmap)
     boardtemp, err := boardtemp.ParseFiles(BP + "/templates/board.html")
     Err_check(err)
 
@@ -193,7 +208,7 @@ func Build_board(board string) {
 }
 
 func Build_thread(parent string, board string) { //will accept argument for board and thread number
-    threadtemp := template.New("thread.html")
+    threadtemp := template.New("thread.html").Funcs(filefuncmap)
     threadtemp, err := threadtemp.ParseFiles(BP + "/templates/thread.html")
     Err_check(err)
 
@@ -216,11 +231,11 @@ func Build_thread(parent string, board string) { //will accept argument for boar
         var thr Thread
 
         if sub != "" {
-            thr = Thread{BoardN: board, BoardDesc: Board_map[board],
-                Posts: posts, Subject: sub, Parent: parent,
+            thr = Thread{BoardN: board, TId: parent, BoardDesc: Board_map[board],
+                Posts: posts, Subject: sub,
                 Header: Board_names, HeaderDescs: Board_descs}
         } else {
-            thr = Thread{BoardN: board, BoardDesc: Board_map[board], Posts: posts, Parent: parent,
+            thr = Thread{BoardN: board, TId: parent, BoardDesc: Board_map[board], Posts: posts, 
             Header: Board_names, HeaderDescs: Board_descs}
         }
         threadtemp.Execute(f, thr)

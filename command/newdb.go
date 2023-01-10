@@ -21,6 +21,7 @@ func create_table(db *sql.DB) {
         "File" TEXT,
         "Filename" TEXT,
         "Fileinfo" TEXT,
+        "Filemime" TEXT,
         "Imgprev" TEXT,
         "Phash" TEXT,
         "Option" TEXT

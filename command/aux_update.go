@@ -4,6 +4,7 @@ import (
     "os"
     "text/template"
     "strconv"
+    "strings"
 
     _ "github.com/mattn/go-sqlite3"
 )
@@ -52,6 +53,10 @@ var catfuncmap = template.FuncMap{
         }
         return false
     },
+    "audiocheck": func(filemime string) bool {
+        if strings.HasPrefix(filemime, "audio") {return true}
+        return false
+    },
 }
 
 func get_cat_posts(board string) ([]*Post, []string) {
@@ -75,8 +80,8 @@ func get_cat_posts(board string) ([]*Post, []string) {
         err = parent_rows.Scan(&cparent.Id, &filler)
         Err_check(err)
 
-        err = thread_headstmt.QueryRow(cparent.Id, board).Scan(&cparent.Content, &cparent.Time, &cparent.File,
-            &cparent.Filename, &cparent.Fileinfo, &cparent.Imgprev, &cparent.Option)
+        err = thread_headstmt.QueryRow(cparent.Id, board).Scan(&cparent.Content, &cparent.Time, &cparent.Parent, &cparent.File,
+            &cparent.Filename, &cparent.Fileinfo, &cparent.Filemime, &cparent.Imgprev, &cparent.Option)
         Query_err_check(err)
 
         cat_body = append(cat_body, &cparent)

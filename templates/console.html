@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Console</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="/resources/base.css">
+    <link rel="stylesheet" href="/resources/console.css">
+    <link rel="stylesheet" href="/resources/default.css">
+    <script async src="/resources/htmx.js" defer></script>
+    <noscript><style> .prev { display: none !important} </style></noscript>
+
+<style>
+{{range .Posts}}{{if .File}}
+.p{{.Id}} {--mini: url('/{{.BoardN}}/Files/{{.Imgprev}}'); --maxi: url('/{{.BoardN}}/Files/{{.File}}');}{{end}}{{end}}
+</style>
+</head>
+
+<body>
+{{if .Posts}}
+    <admbox>
+        <threadwrap>
+            <box class="controls">
+                Master Controls<br>
+                test
+            </box>
+        </threadwrap>
+    </admbox>
+
+{{range .Posts}}
+    <admbox>
+        <threadwrap>
+            <box class="controls">
+                {{.BoardN}}
+            </box>
+        </threadwrap>
+
+        <threadwrap>
+            <div id="no{{.Id}}" class="post" {{if eq .Id .Parent}}style="background-color: inherit;"{{end}}>
+
+                    <label class="{{.Option}}"><time>{{.Time}}</time> <selfref><a href="/{{.BoardN}}/{{.Parent}}.html#no{{.Id}}">No. {{.Id}}</a></selfref></label>
+                    <br>
+                    {{if .File}}<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
+                    <br>
+                    <input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
+                    {{if .Content}}<div class="pcontent">{{.Content}}</div>{{end}}
+
+            </div>
+        </threadwrap>
+    </admbox>
+{{end}}{{end}}
+
+</body>
+</html>

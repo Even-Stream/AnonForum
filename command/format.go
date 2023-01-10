@@ -116,12 +116,12 @@ func process(rawline, board, orig_parent string) (string, []string) {
         return cboard
     })
 
-    postline = quoreg.ReplaceAllString(postline, quopost)
     postline = spoilreg.ReplaceAllString(postline, spoilpost)
     postline = boldreg.ReplaceAllString(postline, boldpost)
     postline = italicreg.ReplaceAllString(postline, italicpost)
     postline = vidreg.ReplaceAllString(postline, vidpost)
     postline = linkreg.ReplaceAllString(postline, linkpost)
+    postline = quoreg.ReplaceAllString(postline, quopost)
 
     return postline, repmatches  
 }

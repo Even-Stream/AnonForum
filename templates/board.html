@@ -28,14 +28,14 @@
 <hr>
 
 <a class="navi" href="/{{.Name}}/catalog.html">Catalog</a><br><br>
-{{if .Threads}}{{range .Threads}}{{$Parent:= .Parent}}{{$sub:= .Subject}}{{$BoardN:= .BoardN}}{{if .Posts}}{{range slice .Posts 0 1}}
+{{if .Threads}}{{range .Threads}}{{$sub:= .Subject}}{{if .Posts}}{{range slice .Posts 0 1}}
         <threadwrap>
             <div id="no{{.Id}}" class="thread">
 
                     <label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
-                    <input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>
-                    <label class="{{.Option}}"><a href="{{$Parent}}.html"><subject>{{if $sub}}{{$sub}}{{else}}Reply{{end}}</subject></a> <time>{{.Time}}</time> <selfref><a href="/{{$BoardN}}/{{$Parent}}.html#no{{.Id}}">No. {{.Id}}</a></selfref></label>
+                    {{if audiocheck .Filemime}}<video controls poster='/resources/{{.Imgprev}}'><source src='/{{$name}}/Files/{{.File}}' type= 'audio/mp3'></video>{{else}}<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
+                    <label class="{{.Option}}"><a href="{{.Parent}}.html"><subject>{{if $sub}}{{$sub}}{{else}}Reply{{end}}</subject></a> <time>{{.Time}}</time> <selfref><a href="/{{$name}}/{{.Parent}}.html#no{{.Id}}">No. {{.Id}}</a></selfref></label>
                     <div class="pcontent">{{.Content}}</div>
 
             </div>
@@ -44,11 +44,11 @@
     <postwrap>
         <div id="no{{.Id}}" class="post">
 
-                    <label class="{{.Option}}"><time>{{.Time}}</time> <selfref><a href="/{{$BoardN}}/{{$Parent}}.html#no{{.Id}}">No. {{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
+                    <label class="{{.Option}}"><time>{{.Time}}</time> <selfref><a href="/{{$name}}/{{.Parent}}.html#no{{.Id}}">No. {{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
                     <br>
                     {{if .File}}<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
-                    <input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
+                    {{if audiocheck .Filemime}}<video controls poster='/resources/{{.Imgprev}}'><source src='/{{$name}}/Files/{{.File}}' type= 'audio/mp3'></video>{{else}}<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}{{end}}
                     {{if .Content}}<div class="pcontent">{{.Content}}</div>{{end}}
 
         </div>
@@ -60,7 +60,7 @@
         <input name="subject" type="text" value=""><br>
         <textarea name="newpost" rows="8" cols="78">I'm putting the new post box at the bottom.</textarea>
         <br>
-        <input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp">
+        <input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp, audio/mpeg, audio/ogg, audio/flac, audio/opus">
         <input type="submit" value="Submit">
     </form>
 

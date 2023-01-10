@@ -12,20 +12,27 @@ import (
 
     _ "github.com/mattn/go-sqlite3"
     units "github.com/docker/go-units"
+    mimetype "github.com/gabriel-vasile/mimetype" 
 )
 
 var nip, _ = time.LoadLocation("Asia/Tokyo")
 
-var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif", "image/webp": ".webp"}
+var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif", "image/webp": ".webp",
+    "audio/mpeg": ".mp3", "audio/ogg": ".ogg", "audio/flac": ".flac", "audio/opus": ".opus"}
 
 const (
     max_upload_size = 11 << 20   //20MB
     max_post_length = 10000
 )
 
-func gen_info(size int64, width int, height int) string {
+func image_gen_info(size int64, width int, height int) string {
     file_info := units.HumanSize(float64(size))
     file_info = file_info + ", " + strconv.Itoa(width) + "x" + strconv.Itoa(height)
+    return file_info
+}
+
+func generic_gen_info(size int64) string {
+    file_info := units.HumanSize(float64(size))
     return file_info
 }
 
@@ -39,6 +46,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
         http.Error(w, "Request size exceeds limit.", http.StatusBadRequest)
         return
     }
+    defer req.MultipartForm.RemoveAll()
 
     file, handler, file_err := req.FormFile("file")
 
@@ -141,9 +149,6 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     if file_err == nil {
         defer file.Close()
 
-        mime_type := handler.Header["Content-Type"][0]
-        ext, supp := mime_ext[mime_type]
-
         buffer := make([]byte, 512)
         _, err = file.Read(buffer)
 
@@ -153,11 +158,13 @@ func New_post(w http.ResponseWriter, req *http.Request) {
         }
         Err_check(err)
 
-        _, supp2 := mime_ext[http.DetectContentType(buffer)]
+        mime_type := mimetype.Detect(buffer).String()
+        ext, supported_file := mime_ext[mime_type]
+
         _, err = file.Seek(0, io.SeekStart)
         Err_check(err)
 
-        if supp && supp2 {
+        if supported_file {
 
             file_pre := strconv.FormatInt(time.Now().UnixNano(), 10)
             file_name := file_pre + ext
@@ -169,9 +176,21 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 
             io.Copy(f, file)
 
-            //think about if a pdf is given 
-            width, height := Make_thumb(file_path, file_pre, file_name, mime_type)
-            file_info := gen_info(handler.Size, width, height)
+            //test type
+            var file_info string
+            switch {
+                case strings.HasPrefix(mime_type, "image"): 
+                    width, height := Make_thumb(file_path, file_pre, file_name, mime_type)
+                    file_info = image_gen_info(handler.Size, width, height)
+                    file_pre += "s.webp"
+                case strings.HasPrefix(mime_type, "audio"): 
+                    file_info = generic_gen_info(handler.Size)
+                    file_pre = "audio_image.webp"
+                default:
+                    http.Error(w, "Invalid MIME type.", http.StatusBadRequest)
+                    return
+            } 
+
 
             newpst_wfstmt := WriteStrings["newpost_wf"]
             htadd_stmt := WriteStrings["htadd"]
@@ -183,10 +202,13 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             }
             ffname := string(ofname[rem:])
 
-            _, err = new_tx.ExecContext(ctx, htadd_stmt, board, parent, file_pre + "s.webp")
+            _, err = new_tx.ExecContext(ctx, htadd_stmt, board, parent, file_pre)
             Err_check(err)
-            _, err = new_tx.ExecContext(ctx, newpst_wfstmt, board, input, post_time, parent, file_name, ffname, file_info, file_pre + "s.webp", option)
+            _, err = new_tx.ExecContext(ctx, newpst_wfstmt, board, input, post_time, parent, file_name, ffname, file_info, mime_type, file_pre, option)
             Err_check(err)
+        } else {
+              http.Error(w, "Unsupported file type.", http.StatusBadRequest)
+              return
         }
     //file not present 
     } else {
