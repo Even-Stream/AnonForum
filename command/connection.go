@@ -12,7 +12,7 @@ var writeConn = make(chan *sql.DB, 1)
 
 //statement strings
 const (
-    prev_string = `SELECT Content, 
+    prev_string = `SELECT Content, COALESCE(Filemime, '') Filemime,
             COALESCE(Imgprev, '') Imgprev FROM posts WHERE Id = ? AND Board = ?`
     prev_parentstring = `SELECT Parent FROM posts WHERE Id = ? AND Board = ?`
     updatestring = `SELECT Id, Content, Time, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 

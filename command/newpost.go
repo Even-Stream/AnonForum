@@ -9,19 +9,23 @@ import (
     "os"
     "strings"
     "strconv"
+    "bytes"
+    "image/png"
 
+    "github.com/zergon321/reisen"
     _ "github.com/mattn/go-sqlite3"
     units "github.com/docker/go-units"
-    mimetype "github.com/gabriel-vasile/mimetype" 
+    "github.com/gabriel-vasile/mimetype" 
 )
 
 var nip, _ = time.LoadLocation("Asia/Tokyo")
 
 var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif", "image/webp": ".webp",
-    "audio/mpeg": ".mp3", "audio/ogg": ".ogg", "audio/flac": ".flac", "audio/opus": ".opus"}
+    "audio/mpeg": ".mp3", "audio/ogg": ".ogg", "audio/flac": ".flac", "audio/opus": ".opus",
+    "video/webm": ".webm"}
 
 const (
-    max_upload_size = 11 << 20   //20MB
+    max_upload_size = 15 << 20   //15MB
     max_post_length = 10000
 )
 
@@ -174,36 +178,83 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             Err_check(err)
             defer f.Close()
 
-            io.Copy(f, file)
+            //maybe put this at the end?, or add separate decoder for detection
+
+            htadd_stmt := WriteStrings["htadd"]
 
             //test type
             var file_info string
             switch {
-                case strings.HasPrefix(mime_type, "image"): 
-                    width, height := Make_thumb(file_path, file_pre, file_name, mime_type)
+                case strings.HasPrefix(mime_type, "image"):
+                    file_buffer := bytes.NewBuffer(nil)
+                    io.Copy(file_buffer, file)
+ 
+                    width, height := Make_thumb(file_path, file_pre, file_buffer.Bytes(), 200)
                     file_info = image_gen_info(handler.Size, width, height)
                     file_pre += "s.webp"
+                    _, err = new_tx.ExecContext(ctx, htadd_stmt, board, parent, file_pre)
+                    Err_check(err)
+                    io.Copy(f, file_buffer)
                 case strings.HasPrefix(mime_type, "audio"): 
+                    io.Copy(f, file)
+                    file_info = generic_gen_info(handler.Size)
+
+                    media, err := reisen.NewMedia(file_path + file_name)
+	            Err_check(err)
+	            defer media.Close()
+                    err = media.OpenDecode()
+                    Err_check(err)
+
+                    vss := media.VideoStreams()
+                    if len(vss) > 0 {
+                        videoStream := media.VideoStreams()[0]
+	                err = videoStream.Open()
+                        Err_check(err)
+
+                        for {
+                            packet, gotPacket, err := media.ReadPacket()
+                            Err_check(err)
+                            if !gotPacket {break}
+                            
+                            if packet.Type() == reisen.StreamVideo {
+                                s := media.Streams()[packet.StreamIndex()].(*reisen.VideoStream)
+                                videoFrame, gotFrame, err := s.ReadVideoFrame()
+                                Err_check(err)
+                                if !gotFrame {break}
+                                if videoFrame == nil{continue}
+
+                                frimg := videoFrame.Image()
+                              
+                                cover_buffer := new(bytes.Buffer)
+                                err = png.Encode(cover_buffer, frimg.SubImage(frimg.Rect))
+                                Err_check(err)
+                                
+                                Make_thumb(file_path, file_pre, cover_buffer.Bytes(), 300)
+                                file_pre += "s.webp"
+                                break
+                            }
+                        }
+
+                    } else {file_pre = "audio_image.webp"}
+
+                case strings.HasPrefix(mime_type, "video"): 
                     file_info = generic_gen_info(handler.Size)
                     file_pre = "audio_image.webp"
+
                 default:
                     http.Error(w, "Invalid MIME type.", http.StatusBadRequest)
                     return
             } 
 
-
             newpst_wfstmt := WriteStrings["newpost_wf"]
-            htadd_stmt := WriteStrings["htadd"]
 
             ofname := []rune(handler.Filename)
-            rem := len(ofname) - 20
+            rem := len(ofname) - 50
             if rem < 0 {
                 rem = 0
             }
             ffname := string(ofname[rem:])
 
-            _, err = new_tx.ExecContext(ctx, htadd_stmt, board, parent, file_pre)
-            Err_check(err)
             _, err = new_tx.ExecContext(ctx, newpst_wfstmt, board, input, post_time, parent, file_name, ffname, file_info, mime_type, file_pre, option)
             Err_check(err)
         } else {

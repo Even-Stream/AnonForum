@@ -37,7 +37,7 @@
 
                     <label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
-                    {{if audiocheck .Filemime}}<video controls poster='/resources/{{.Imgprev}}'><source src='/{{$name}}/Files/{{.File}}' type= 'audio/mp3'></video>{{else}}<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
+                    {{if audiocheck .Filemime}}<video controls poster={{if eq .Imgprev "audio_image.webp"}}'/resources/audio_image.webp'{{else}}'/{{$name}}/Files/{{.Imgprev}}'{{end}}><source src='/{{$name}}/Files/{{.File}}' type= '{{.Filemime}}'></video>{{else}}<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
                     <label class="{{.Option}}">{{if $sub}}<subject>{{$sub}}</subject>{{end}} <time>{{.Time}}</time> <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref></label>
                     <div class="pcontent">{{.Content}}</div>
 
@@ -51,7 +51,7 @@
                     <br>
                     {{if .File}}<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
-                    {{if audiocheck .Filemime}}<video controls poster='/resources/{{.Imgprev}}'><source src='/{{$name}}/Files/{{.File}}' type= 'audio/mp3'></video>{{else}}<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}{{end}}
+                    {{if avcheck .Filemime}}<video controls poster={{if eq .Imgprev "audio_image.webp"}}'/resources/audio_image.webp'{{else}}'/{{$name}}/Files/{{.Imgprev}}'{{end}}><source src='/{{$name}}/Files/{{.File}}' type= '{{.Filemime}}'></video>{{else}}<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}{{end}}
                     {{if .Content}}<div class="pcontent">{{.Content}}</div>{{end}}
 
         </div>
@@ -61,7 +61,9 @@
         <input type="checkbox" name="option" value="sage">
         <textarea name="newpost" rows="8" cols="78">I'm putting the new post box at the bottom.</textarea>
         <br>
-        <input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp, audio/mpeg, audio/ogg, audio/flac, audio/opus">
+        <input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp, 
+            audio/mpeg, audio/ogg, audio/flac, .opus
+            video/webm">
         <input type="submit" value="Reply">
     </form>
 </body>

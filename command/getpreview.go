@@ -20,6 +20,7 @@ type Prev struct {
     Id int
     Board string
     Content string
+    Filemime string
     Imgprev string 
 }
 
@@ -50,10 +51,10 @@ func Get_prev(w http.ResponseWriter, req *http.Request) {
 
     row := stmt.QueryRowContext(ctx, id, board)
 
-    err := row.Scan(&prv.Content, &prv.Imgprev)
+    err := row.Scan(&prv.Content, &prv.Filemime, &prv.Imgprev)
     Query_err_check(err)
 
-    Prev_body, err := template.New("todos").Parse("{{if .Imgprev}}<img class=\"imspec\" src=\"/{{.Board}}/Files/{{.Imgprev}}\">{{end}}{{.Content}}")
+    Prev_body, err := template.New("todos").Funcs(Filefuncmap).Parse(`{{if .Imgprev}}{{if audiocheck .Filemime}}<img class="imspec" src="/resources/audio_image.webp">{{else}}<img class="imspec" src="/{{.Board}}/Files/{{.Imgprev}}">{{end}}{{end}}{{.Content}}`)
     Err_check(err)
     Prev_body.Execute(&temp, prv)
 

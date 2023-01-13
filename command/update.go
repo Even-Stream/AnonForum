@@ -46,13 +46,22 @@ type Board struct {
 }
 
 //getting kind of file 
-var filefuncmap = template.FuncMap {
+var Filefuncmap = template.FuncMap {
     "imagecheck": func(filemime string) bool {
         if strings.HasPrefix(filemime, "image") {return true}
         return false
     },
+    "avcheck": func(filemime string) bool {
+        if strings.HasPrefix(filemime, "audio") {return true}
+        if strings.HasPrefix(filemime, "video") {return true}
+        return false
+    },
     "audiocheck": func(filemime string) bool {
         if strings.HasPrefix(filemime, "audio") {return true}
+        return false
+    },
+    "videocheck": func(filemime string) bool {
+        if strings.HasPrefix(filemime, "video") {return true}
         return false
     },
 }
@@ -188,7 +197,7 @@ func get_posts(parent string, board string) ([]*Post, error) {
 }
 
 func Build_board(board string) {
-    boardtemp := template.New("board.html").Funcs(filefuncmap)
+    boardtemp := template.New("board.html").Funcs(Filefuncmap)
     boardtemp, err := boardtemp.ParseFiles(BP + "/templates/board.html")
     Err_check(err)
 
@@ -208,7 +217,7 @@ func Build_board(board string) {
 }
 
 func Build_thread(parent string, board string) { //will accept argument for board and thread number
-    threadtemp := template.New("thread.html").Funcs(filefuncmap)
+    threadtemp := template.New("thread.html").Funcs(Filefuncmap)
     threadtemp, err := threadtemp.ParseFiles(BP + "/templates/thread.html")
     Err_check(err)
 

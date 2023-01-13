@@ -79,8 +79,10 @@ const (
 
     ten_most_recent_string = `SELECT ROWID, Board, Id, Content, Time, Parent, COALESCE(File, '') AS File, 
             COALESCE(Filename, '') AS Filename,
-            COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Imgprev, '') Imgprev, Option FROM posts
+            COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Filemime, '') AS Filemime, COALESCE(Imgprev, '') Imgprev, Option FROM posts
             ORDER BY ROWID DESC LIMIT 10`
+
+   delete_post_string = `DELETE FROM posts WHERE Id = ?`
 
     most_recent_string = `test: {{range .Posts}}
         {{.Content}}
@@ -294,6 +296,7 @@ func Credential_check (w http.ResponseWriter, req *http.Request) {
     w.Write([]byte(html_head + html_toconsole_head + `<p>Welcome.</p>` + html_foot))
 }
 
+
 //account exit 
 func Logout(w http.ResponseWriter, req *http.Request) {
     c, err := req.Cookie("session_token")
@@ -324,6 +327,46 @@ func Logout(w http.ResponseWriter, req *http.Request) {
 
 //creating token(requires admin account)
 
+func Admin_actions(w http.ResponseWriter, req *http.Request) {
+    c, err := req.Cookie("session_token")
+
+    if err != nil {
+        if err == http.ErrNoCookie {
+            http.Error(w, "Unauthorized.", http.StatusUnauthorized)
+            return
+        }
+        w.WriteHeader(http.StatusBadRequest)
+        return
+    }
+
+    sessionToken := c.Value
+    userSession, exists := Sessions[sessionToken]
+    if !exists {
+        http.Error(w, "Unauthorized.", http.StatusUnauthorized)
+        return
+    }
+
+    if userSession.IsExpired() {
+        delete(Sessions, sessionToken)
+        http.Error(w, "Session expired.", http.StatusUnauthorized)
+        return
+    }
+
+    actions := req.FormValue("actions")
+    if Entry_check(w, req, "actions", actions) == 0 {return}
+    ids := req.FormValue("ids")
+    if Entry_check(w, req, "ids", ids) == 0 {return}
+
+    switch {
+        case actions == "delete":
+        
+        default:
+            http.Error(w, "Invalid action.", http.StatusUnauthorized)
+            return
+    }
+}
+
+
 //the console
 func Load_console(w http.ResponseWriter, req *http.Request) {
     c, err := req.Cookie("session_token")
@@ -350,7 +393,7 @@ func Load_console(w http.ResponseWriter, req *http.Request) {
         return
     } 
 
-//put this in a function, with the query string being an input. Every query will return an array of posts
+    //put this in a function, with the query string being an input. Every query will return an array of posts
     conn, err := sql.Open("sqlite3", DB_uri)
     Err_check(err)
     defer conn.Close()
@@ -368,13 +411,13 @@ func Load_console(w http.ResponseWriter, req *http.Request) {
     for rows.Next() {
         var pst Post
         err = rows.Scan(&filler, &pst.BoardN, &pst.Id, &pst.Content, &pst.Time, &pst.Parent, &pst.File,
-                        &pst.Filename, &pst.Fileinfo, &pst.Imgprev, &pst.Option)
+                        &pst.Filename, &pst.Fileinfo, &pst.Filemime, &pst.Imgprev, &pst.Option)
         Err_check(err)
         most_recent = append(most_recent, &pst)
     }
 
     if err == nil {
-        mostrecent_temp := template.New("console.html")
+        mostrecent_temp := template.New("console.html").Funcs(Filefuncmap)
         mostrecent_temp, err := mostrecent_temp.ParseFiles(BP + "/templates/console.html")
         Err_check(err)
 

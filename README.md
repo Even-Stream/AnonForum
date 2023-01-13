@@ -22,8 +22,6 @@ Other
 
 - Video embedding with no js(also uses invidious automatically) 
 
-- Embeded thumbnailer
-
 - Webp thumbnails 
 
 - Uses Sqlite by default 

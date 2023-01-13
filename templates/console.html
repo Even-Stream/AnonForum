@@ -12,8 +12,8 @@
     <noscript><style> .prev { display: none !important} </style></noscript>
 
 <style>
-{{range .Posts}}{{if .File}}
-.p{{.Id}} {--mini: url('/{{.BoardN}}/Files/{{.Imgprev}}'); --maxi: url('/{{.BoardN}}/Files/{{.File}}');}{{end}}{{end}}
+{{range .Posts}}{{if .File}}{{if imagecheck .Filemime}}
+.p{{.Id}} {--mini: url('/{{.BoardN}}/Files/{{.Imgprev}}'); --maxi: url('/{{.BoardN}}/Files/{{.File}}');}{{end}}{{end}}{{end}}
 </style>
 </head>
 
@@ -43,7 +43,7 @@
                     <br>
                     {{if .File}}<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
-                    <input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
+                    {{if audiocheck .Filemime}}<video controls poster='/resources/{{.Imgprev}}'><source src='/{{.BoardN}}/Files/{{.File}}' type= 'audio/mp3'></video>{{else}}<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}{{end}}
                     {{if .Content}}<div class="pcontent">{{.Content}}</div>{{end}}
 
             </div>
