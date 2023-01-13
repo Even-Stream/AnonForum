@@ -74,6 +74,8 @@ subject {
 
 video {
     padding-left: 14px;
+    max-height: 300px;
+    max-width: 300px;
 }
 
 input, video {
