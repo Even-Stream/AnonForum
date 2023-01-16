@@ -13,7 +13,7 @@
 
 <style>
 {{range .Posts}}{{if .File}}{{if imagecheck .Filemime}}
-.p{{.Id}} {--mini: url('/{{.BoardN}}/Files/{{.Imgprev}}'); --maxi: url('/{{.BoardN}}/Files/{{.File}}');}{{end}}{{end}}{{end}}
+.p{{.Id}}{{.BoardN}} {--mini: url('/{{.BoardN}}/Files/{{.Imgprev}}'); --maxi: url('/{{.BoardN}}/Files/{{.File}}');}{{end}}{{end}}{{end}}
 </style>
 </head>
 
@@ -33,6 +33,11 @@
         <threadwrap>
             <box class="controls">
                 {{.BoardN}}
+                <form action="/im/mod/?ids={{.Id}}&boards={{.BoardN}}" enctype="multipart/form-data" method = "Post">
+                    <input type="hidden" name="actions" value="delete">
+                    <input type="hidden" name="parents" value="{{.Parent}}">
+                    <input type="submit" value="Delete">
+                </form>
             </box>
         </threadwrap>
 
@@ -41,9 +46,9 @@
 
                     <label class="{{.Option}}"><time>{{.Time}}</time> <selfref><a href="/{{.BoardN}}/{{.Parent}}.html#no{{.Id}}">No. {{.Id}}</a></selfref></label>
                     <br>
-                    {{if .File}}<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
+                    {{if .File}}<label>File <a href="/{{.BoardN}}/Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
-                    {{if audiocheck .Filemime}}<video controls poster='/resources/{{.Imgprev}}'><source src='/{{.BoardN}}/Files/{{.File}}' type= 'audio/mp3'></video>{{else}}<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}{{end}}
+                    {{if avcheck .Filemime}}<video controls poster={{if eq .Imgprev "audio_image.webp"}}'/resources/audio_image.webp'{{else}}'/{{.BoardN}}/Files/{{.Imgprev}}'{{end}}><source src='/{{.BoardN}}/Files/{{.File}}' type= '{{.Filemime}}'></video>{{else}}<input type="checkbox" class="image imspec p{{.Id}}{{.BoardN}}" autocomplete="off"/>{{end}}{{end}}
                     {{if .Content}}<div class="pcontent">{{.Content}}</div>{{end}}
 
             </div>

@@ -18,7 +18,8 @@ var admf_map = map[string]bool {
     "add": true,
     "verify": true,
     "logout": true,
-    "console": true,}
+    "console": true,
+    "mod": true,}
 
 func Listen() {
 
@@ -38,6 +39,7 @@ func Listen() {
     mux.HandleFunc("/im/verify/", Token_check)
     mux.HandleFunc("/im/logout/", Logout)
     mux.HandleFunc("/im/console/", Load_console)
+    mux.HandleFunc("/im/mod/", Admin_actions)
     http.ListenAndServe(":81", hongMeiling(mux))
 }
 

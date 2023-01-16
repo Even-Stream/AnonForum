@@ -20,12 +20,12 @@ import (
 
 var nip, _ = time.LoadLocation("Asia/Tokyo")
 
-var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif", "image/webp": ".webp",
-    "audio/mpeg": ".mp3", "audio/ogg": ".ogg", "audio/flac": ".flac", "audio/opus": ".opus",
-    "video/webm": ".webm"}
+var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif", "image/webp": ".webp", "image/avif": ".avif",
+    "audio/mpeg": ".mp3", "audio/ogg": ".ogg", "audio/flac": ".flac", "audio/opus": ".opus", "audio/x-m4a": ".m4a",
+    "video/webm": ".webm", "video/mp4": ".mp4"}
 
 const (
-    max_upload_size = 15 << 20   //15MB
+    max_upload_size = 20 << 20   //20MB
     max_post_length = 10000
 )
 

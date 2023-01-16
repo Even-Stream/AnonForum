@@ -34,7 +34,7 @@
 
                     <label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
-                    {{if audiocheck .Filemime}}<video controls poster={{if eq .Imgprev "audio_image.webp"}}'/resources/audio_image.webp'{{else}}'/{{$name}}/Files/{{.Imgprev}}'{{end}}><source src='/{{$name}}/Files/{{.File}}' type= '{{.Filemime}}'></video>{{else}}<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
+                    {{if avcheck .Filemime}}<video controls poster={{if eq .Imgprev "audio_image.webp"}}'/resources/audio_image.webp'{{else}}'/{{$name}}/Files/{{.Imgprev}}'{{end}}><source src='/{{$name}}/Files/{{.File}}' type= '{{.Filemime}}'></video>{{else}}<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
                     <label class="{{.Option}}"><a href="{{.Parent}}.html"><subject>{{if $sub}}{{$sub}}{{else}}Reply{{end}}</subject></a> <time>{{.Time}}</time> <selfref><a href="/{{$name}}/{{.Parent}}.html#no{{.Id}}">No. {{.Id}}</a></selfref></label>
                     <div class="pcontent">{{.Content}}</div>
 
@@ -60,8 +60,8 @@
         <input name="subject" type="text" value=""><br>
         <textarea name="newpost" rows="8" cols="78">I'm putting the new post box at the bottom.</textarea>
         <br>
-        <input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp, 
-            audio/mpeg, audio/ogg, audio/flac, video/webm, .opus">
+        <input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp, image/avif,
+            audio/mpeg, audio/ogg, audio/flac, video/webm, video/mp4, .opus, .m4a">
         <input type="submit" value="Submit">
     </form>
 
