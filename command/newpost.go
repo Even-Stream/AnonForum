@@ -70,6 +70,12 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     board := req.FormValue("board")
     subject := req.FormValue("subject")
     option := req.FormValue("option")
+    identity := req.Header.Get("X-Real-IP")
+
+    if identity == "" {
+        http.Error(w, "No IP?", http.StatusBadRequest)
+        return
+    }
 
     if board == "" {
         http.Error(w, "Board not specified.", http.StatusBadRequest)
@@ -259,7 +265,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             }
             ffname := string(ofname[rem:])
 
-            _, err = new_tx.ExecContext(ctx, newpst_wfstmt, board, input, post_time, parent, file_name, ffname, file_info, mime_type, file_pre, option)
+            _, err = new_tx.ExecContext(ctx, newpst_wfstmt, board, input, post_time, parent, identity, file_name, ffname, file_info, mime_type, file_pre, option)
             Err_check(err)
         } else {
               http.Error(w, "Unsupported file type.", http.StatusBadRequest)
@@ -268,7 +274,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     //file not present 
     } else {
         newpost_nfstmt := WriteStrings["newpost_nf"]
-        _, err := new_tx.ExecContext(ctx, newpost_nfstmt, board, input, post_time, parent, option)
+        _, err := new_tx.ExecContext(ctx, newpost_nfstmt, board, input, post_time, parent, identity, option)
         Err_check(err)
     }
 

@@ -38,6 +38,11 @@
                     <input type="hidden" name="parents" value="{{.Parent}}">
                     <input type="submit" value="Delete">
                 </form>
+
+                <form action="/im/mod/?ids={{.Id}}&boards={{.BoardN}}" enctype="multipart/form-data" method = "Post">
+                    <input type="hidden" name="actions" value="ban">
+                    <input type="submit" value="Ban">
+                </form>
             </box>
         </threadwrap>
 

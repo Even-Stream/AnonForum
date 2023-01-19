@@ -33,12 +33,13 @@ const (
     thread_collstring = `SELECT Parent, MAX(Id) FROM posts WHERE (instr(Option, 'sage') = 0 OR Id = Parent) AND Board = ? 
         GROUP BY Parent ORDER BY MAX(Id) DESC`
     subject_lookstring = `SELECT Subject FROM subjects WHERE Parent = ? AND Board = ?`
+    ban_search_string = `SELECT Duration FROM banned WHERE Identifier = ?`
 
     //all inserts(and necessary queries) are preformed in one transaction 
-    newpost_wfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, File, Filename, Fileinfo, Filemime, Imgprev, Option) 
-        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)`
-    newpost_nfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Option) 
-        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5)`
+    newpost_wfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, File, Filename, Fileinfo, Filemime, Imgprev, Option) 
+        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)`
+    newpost_nfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, Option) 
+        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6)`
     repadd_string = `INSERT INTO replies(Board, Source, Replier) VALUES (?1, ?2, (SELECT Id FROM latest WHERE Board = ?1) - 1)`
     subadd_string = `INSERT INTO subjects(Board, Parent, Subject) VALUES (?, ?, ?)`
     hpadd_string = `INSERT INTO homepost(Board, Id, Content, TrunContent, Parent)
@@ -135,6 +136,12 @@ func Make_Conns() {
         subject_lookstmt, err := conn11.Prepare(subject_lookstring)
         Err_check(err)
 
+        conn12, err := sql.Open("sqlite3", DB_uri)
+        Err_check(err)
+
+        ban_search_stmt, err := conn12.Prepare(ban_search_string)
+        Err_check(err)
+
         conn10a, err := sql.Open("sqlite3", DB_uri)
         Err_check(err)
 
@@ -146,11 +153,12 @@ func Make_Conns() {
 
         ht_collstmt, err := conn10b.Prepare("SELECT * FROM homethumb ORDER BY ROWID DESC")
         Err_check(err)
+
         
         read_stmts := map[string]*sql.Stmt{"prev": prev_stmt, "prev_parent": prev_parentstmt,
             "update": updatestmt, "update_rep": update_repstmt, "parent_coll": parent_collstmt,
             "thread_head": thread_headstmt, "thread_body": thread_bodystmt,
-            "thread_coll": thread_collstmt,"subject_look": subject_lookstmt,
+            "thread_coll": thread_collstmt,"subject_look": subject_lookstmt, "ban_search": ban_search_stmt,
             "hp_coll": hp_collstmt, "ht_coll": ht_collstmt}
 
         readConns <- read_stmts

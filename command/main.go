@@ -58,24 +58,19 @@ func main() {
 
     log.SetOutput(file)
     log.SetFlags(log.LstdFlags | log.Lmicroseconds)
-
     rand.Seed(time.Now().UnixNano())
 
     DB_path = BP + "command/post-coll.db"
     DB_uri = "file://" + DB_path + "?cache=private&_synchronous=NORMAL&_journal_mode=WAL"
-
     if _, err = os.Stat(DB_path); err != nil {
         New_db()
         Admin_init()
     }
-
     Make_Conns() 
-
     for _, board := range Board_names{
         Build_home()
         Build_board(board)
         Build_catalog(board)
     }
-    
     Listen()
 }

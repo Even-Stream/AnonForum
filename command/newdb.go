@@ -71,6 +71,11 @@ func create_table(db *sql.DB) {
         "Type" TEXT NOT NULL
     );`
 
+    createBannedTableSQL := `CREATE TABLE banned (
+        "Identifier" TEXT NOT NULL,
+        "Duration" TEXT NOT NULL
+    );`
+
     //triggers
     createLatestTriggerSQL := `CREATE TRIGGER latest_update
         AFTER INSERT ON posts
@@ -130,6 +135,10 @@ func create_table(db *sql.DB) {
     statement.Exec()
 
     statement, err = db.Prepare(createTokenTableSQL)
+        Err_check(err)
+    statement.Exec()
+
+    statement, err = db.Prepare(createBannedTableSQL)
         Err_check(err)
     statement.Exec()
 

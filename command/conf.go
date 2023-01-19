@@ -3,6 +3,7 @@ package main
 //loads configuation information
 import (
     "log"
+    "os"
 
     ini "gopkg.in/ini.v1"
 )
@@ -16,7 +17,10 @@ var Themes []string
 var INV_INST string
 
 func Load_conf() {
-    cfg, err := ini.Load("/etc/ogai.ini")
+    homedir, err := os.UserHomeDir()
+    Err_check(err)
+    
+    cfg, err := ini.Load(homedir +  "/.config/ogai.ini")
     Err_check(err)
 
     BP = cfg.Section("").Key("base path").String()

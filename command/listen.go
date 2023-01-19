@@ -40,7 +40,7 @@ func Listen() {
     mux.HandleFunc("/im/logout/", Logout)
     mux.HandleFunc("/im/console/", Load_console)
     mux.HandleFunc("/im/mod/", Admin_actions)
-    http.ListenAndServe(":81", hongMeiling(mux))
+    http.ListenAndServe(":1024", hongMeiling(mux))
 }
 
 func hongMeiling(next http.Handler) http.Handler {

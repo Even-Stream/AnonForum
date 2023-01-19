@@ -5,6 +5,7 @@ import (
     "database/sql"
     "os"
     "strings"
+    "time"
     
     _ "github.com/mattn/go-sqlite3"
 )
@@ -12,6 +13,7 @@ import (
 const (
     get_files_string = `SELECT COALESCE(File, '') AS File, COALESCE(Imgprev, '') AS Imgprev FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`
     delete_post_string = `DELETE FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`
+    ban_string = `INSERT INTO banned(Identifier, Duration) VALUES ((SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2), ?3)`
 )
 
 func Admin_actions(w http.ResponseWriter, req *http.Request) {
@@ -46,11 +48,12 @@ func Admin_actions(w http.ResponseWriter, req *http.Request) {
     if Entry_check(w, req, "ids", ids) == 0 {return}
     boards := req.FormValue("boards")	
     if Entry_check(w, req, "boards", boards) == 0 {return}
-    parents := req.FormValue("parents")
-    if Entry_check(w, req, "parents", parents) == 0 {return}
 
     switch {
         case actions == "delete":
+
+            parents := req.FormValue("parents")
+            if Entry_check(w, req, "parents", parents) == 0 {return}
 
             conn, err := sql.Open("sqlite3", DB_uri)
             Err_check(err)
@@ -94,6 +97,22 @@ func Admin_actions(w http.ResponseWriter, req *http.Request) {
             Build_board(boards)
             Build_catalog(boards)
             Build_home()
+
+        case actions == "ban":
+            conn, err := sql.Open("sqlite3", DB_uri)
+            Err_check(err)
+            defer conn.Close()
+            ban_stmt, err := conn.Prepare(ban_string)
+            Err_check(err)
+
+            duration := req.FormValue("duration")
+            var time_dur time.Time
+            if duration == "" {
+                time_dur = time.Now().Add(time.Hour * 24 * 5)
+            }
+
+            ban_stmt.Exec(ids, boards, time_dur.Format(time.UnixDate))
+
         default:
             http.Error(w, "Invalid action.", http.StatusUnauthorized)
             return
