@@ -73,7 +73,7 @@ func create_table(db *sql.DB) {
 
     createBannedTableSQL := `CREATE TABLE banned (
         "Identifier" TEXT NOT NULL,
-        "Duration" TEXT NOT NULL
+        "Expiry" TEXT NOT NULL
     );`
 
     //triggers

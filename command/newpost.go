@@ -20,7 +20,8 @@ import (
 
 var nip, _ = time.LoadLocation("Asia/Tokyo")
 
-var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif", "image/webp": ".webp", "image/avif": ".avif",
+var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", 
+    "image/gif": ".gif", "image/webp": ".webp", "image/avif": ".avif", "image/vnd.mozilla.apng": ".apng",
     "audio/mpeg": ".mp3", "audio/ogg": ".ogg", "audio/flac": ".flac", "audio/opus": ".opus", "audio/x-m4a": ".m4a",
     "video/webm": ".webm", "video/mp4": ".mp4"}
 
@@ -113,6 +114,23 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     Err_check(err)
     defer new_tx.Rollback()
     
+    ban_searchstmt := WriteStrings["ban_search"]
+    var ban_result string
+    err = new_tx.QueryRowContext(ctx, ban_searchstmt, identity).Scan(&ban_result)
+
+    if ban_result != "" {
+    //user was banned
+        ban_expiry, err := time.Parse(time.UnixDate, ban_result)
+        Err_check(err)
+
+        if time.Now().In(Loc).Before(ban_expiry) {
+        //user is still banned
+            http.Error(w, "You are banned until: " + ban_result, http.StatusBadRequest)
+            return
+        } else {
+        //delete entry in ban table
+        }
+    }
 
     //new thread if no parent is specified
     if parent != "" {

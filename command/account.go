@@ -96,7 +96,7 @@ var params = &argon2id.Params{
 	KeyLength:   32,
 }
 
-var loc, _ = time.LoadLocation("UTC")
+var Loc, _ = time.LoadLocation("UTC")
 
 type Query_results struct {
     Posts []*Post
@@ -111,7 +111,7 @@ type session struct {
 var Sessions = map[string]session{}
 
 func (s session) IsExpired() bool {
-    return s.expiry.Before(time.Now().In(loc))
+    return s.expiry.Before(time.Now().In(Loc))
 }
 
 func Admin_init() {
@@ -276,7 +276,7 @@ func Credential_check (w http.ResponseWriter, req *http.Request) {
     }
 
     sessionToken := uuid.NewString()
-    expiresAt := time.Now().In(loc).Add(20 * time.Minute)
+    expiresAt := time.Now().In(Loc).Add(20 * time.Minute)
 
     Sessions[sessionToken] = session{
         username: username,

@@ -33,7 +33,6 @@ const (
     thread_collstring = `SELECT Parent, MAX(Id) FROM posts WHERE (instr(Option, 'sage') = 0 OR Id = Parent) AND Board = ? 
         GROUP BY Parent ORDER BY MAX(Id) DESC`
     subject_lookstring = `SELECT Subject FROM subjects WHERE Parent = ? AND Board = ?`
-    ban_search_string = `SELECT Duration FROM banned WHERE Identifier = ?`
 
     //all inserts(and necessary queries) are preformed in one transaction 
     newpost_wfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, File, Filename, Fileinfo, Filemime, Imgprev, Option) 
@@ -50,11 +49,13 @@ const (
                 FROM posts
                 WHERE Parent = ? AND Board = ?`
     threadid_string = `SELECT Id FROM latest WHERE Board = ?`
+    ban_search_string = `SELECT Expiry FROM banned WHERE Identifier = ? LIMIT 1`
 )
 
 var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_nf": newpost_nfstring,
         "repadd": repadd_string, "subadd": subadd_string, "hpadd": hpadd_string,
-        "htadd": htadd_string, "parent_check": parent_checkstring, "threadid" : threadid_string}
+        "htadd": htadd_string, 
+        "parent_check": parent_checkstring, "threadid" : threadid_string, "ban_search": ban_search_string}
 
 func Checkout() map[string]*sql.Stmt {
         return <-readConns
@@ -136,12 +137,6 @@ func Make_Conns() {
         subject_lookstmt, err := conn11.Prepare(subject_lookstring)
         Err_check(err)
 
-        conn12, err := sql.Open("sqlite3", DB_uri)
-        Err_check(err)
-
-        ban_search_stmt, err := conn12.Prepare(ban_search_string)
-        Err_check(err)
-
         conn10a, err := sql.Open("sqlite3", DB_uri)
         Err_check(err)
 
@@ -158,7 +153,7 @@ func Make_Conns() {
         read_stmts := map[string]*sql.Stmt{"prev": prev_stmt, "prev_parent": prev_parentstmt,
             "update": updatestmt, "update_rep": update_repstmt, "parent_coll": parent_collstmt,
             "thread_head": thread_headstmt, "thread_body": thread_bodystmt,
-            "thread_coll": thread_collstmt,"subject_look": subject_lookstmt, "ban_search": ban_search_stmt,
+            "thread_coll": thread_collstmt,"subject_look": subject_lookstmt,
             "hp_coll": hp_collstmt, "ht_coll": ht_collstmt}
 
         readConns <- read_stmts

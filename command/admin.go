@@ -13,7 +13,7 @@ import (
 const (
     get_files_string = `SELECT COALESCE(File, '') AS File, COALESCE(Imgprev, '') AS Imgprev FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`
     delete_post_string = `DELETE FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`
-    ban_string = `INSERT INTO banned(Identifier, Duration) VALUES ((SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2), ?3)`
+    ban_string = `INSERT INTO banned(Identifier, Expiry) VALUES ((SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2), ?3)`
 )
 
 func Admin_actions(w http.ResponseWriter, req *http.Request) {
@@ -106,12 +106,12 @@ func Admin_actions(w http.ResponseWriter, req *http.Request) {
             Err_check(err)
 
             duration := req.FormValue("duration")
-            var time_dur time.Time
+            var ban_expiry time.Time
             if duration == "" {
-                time_dur = time.Now().Add(time.Hour * 24 * 5)
+                ban_expiry = time.Now().In(Loc).Add(time.Minute) //.Hour * 24 * 5)
             }
 
-            ban_stmt.Exec(ids, boards, time_dur.Format(time.UnixDate))
+            ban_stmt.Exec(ids, boards, ban_expiry.Format(time.UnixDate))
 
         default:
             http.Error(w, "Invalid action.", http.StatusUnauthorized)
