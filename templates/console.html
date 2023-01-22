@@ -14,6 +14,10 @@
 <style>
 {{range .Posts}}{{if .File}}{{if imagecheck .Filemime}}
 .p{{.Id}}{{.BoardN}} {--mini: url('/{{.BoardN}}/Files/{{.Imgprev}}'); --maxi: url('/{{.BoardN}}/Files/{{.File}}');}{{end}}{{end}}{{end}}
+
+input {
+    border: none;
+}
 </style>
 </head>
 
@@ -33,15 +37,23 @@
         <threadwrap>
             <box class="controls">
                 {{.BoardN}}
-                <form action="/im/mod/?ids={{.Id}}&boards={{.BoardN}}" enctype="multipart/form-data" method = "Post">
-                    <input type="hidden" name="actions" value="delete">
+                <form action="/im/mod/" enctype="multipart/form-data" method = "Post">
                     <input type="hidden" name="parents" value="{{.Parent}}">
-                    <input type="submit" value="Delete">
-                </form>
-
-                <form action="/im/mod/?ids={{.Id}}&boards={{.BoardN}}" enctype="multipart/form-data" method = "Post">
-                    <input type="hidden" name="actions" value="ban">
-                    <input type="submit" value="Ban">
+                    <input type="hidden" name="ids" value="{{.Id}}">
+                    <input type="hidden" name="boards" value="{{.BoardN}}">
+                    <input type="submit" name="actions" value="Delete">
+                    <input type="submit" name="actions" value="Delete File">
+                    Days: <input type="text" name="days" size="1" value="4">
+                    Hours: <input type="text" name="hours" size="1" value="0">
+                    Message: <input type="text" name="message" value="USER WAS BANNED FOR THIS POST">
+                    <input type="submit" name="actions" value="Ban">
+                    <input type="submit" name="actions" value="Ban and Delete">
+                    <input type="submit" name="actions" value="Ban and Delete All by User">
+                    {{if eq .Id .Parent}}<br><br>
+                    <input type="submit" name="actions" value="Lock">
+                    <input type="submit" name="actions" value="Pin">
+                    <input type="submit" name="actions" value="Unlock">
+                    <input type="submit" name="actions" value="Unpin">{{end}}
                 </form>
             </box>
         </threadwrap>

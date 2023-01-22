@@ -115,11 +115,15 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     defer new_tx.Rollback()
     
     ban_searchstmt := WriteStrings["ban_search"]
-    var ban_result string
-    err = new_tx.QueryRowContext(ctx, ban_searchstmt, identity).Scan(&ban_result)
+    ban_rows, err := new_tx.QueryContext(ctx, ban_searchstmt, identity)
+    Err_check(err)
+    defer ban_rows.Close()
 
-    if ban_result != "" {
+    for ban_rows.Next() {
     //user was banned
+        var ban_result string
+        err = ban_rows.Scan(&ban_result) 
+
         ban_expiry, err := time.Parse(time.UnixDate, ban_result)
         Err_check(err)
 
@@ -128,8 +132,13 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             http.Error(w, "You are banned until: " + ban_result, http.StatusBadRequest)
             return
         } else {
-        //delete entry in ban table
+            ban_removestmt := WriteStrings["ban_remove"]
+            _, err = new_tx.ExecContext(ctx, ban_removestmt, identity)
+            Err_check(err)
         }
+
+        err = new_tx.QueryRowContext(ctx, ban_searchstmt, identity).Scan(&ban_result)
+        Query_err_check(err)
     }
 
     //new thread if no parent is specified

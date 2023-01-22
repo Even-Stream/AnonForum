@@ -100,6 +100,14 @@ func create_table(db *sql.DB) {
                 IIF((SELECT COUNT(Id) FROM homethumb) > 5,
                 (SELECT min(ROWID) from homethumb), NULL);
         END;`
+
+    deleteFromHome := `CREATE TRIGGER deletefrom_home
+        AFTER DELETE ON posts
+        FOR EACH ROW
+        BEGIN
+            DELETE FROM homepost WHERE (Id = OLD.Id OR Parent = OLD.Id) AND Board = OLD.Board;
+            DELETE FROM homethumb WHERE (Id = OLD.Id OR Parent = OLD.Id) AND Board = OLD.Board;
+        END`
         
     //how new posts know what their id is 
     latestseedSQL := `INSERT INTO latest (Board, Id) VALUES (cb, 1);`
@@ -151,6 +159,10 @@ func create_table(db *sql.DB) {
     statement.Exec()
 
     statement, err = db.Prepare(trimHomeThumbStack)
+        Err_check(err)
+    statement.Exec()
+
+    statement, err = db.Prepare(deleteFromHome)
         Err_check(err)
     statement.Exec()
 

@@ -49,8 +49,7 @@ func Admin_actions(w http.ResponseWriter, req *http.Request) {
     boards := req.FormValue("boards")	
     if Entry_check(w, req, "boards", boards) == 0 {return}
 
-    switch {
-        case actions == "delete":
+        if strings.HasSuffix(actions, "Delete") {
 
             parents := req.FormValue("parents")
             if Entry_check(w, req, "parents", parents) == 0 {return}
@@ -91,14 +90,15 @@ func Admin_actions(w http.ResponseWriter, req *http.Request) {
             Err_check(err)
 
             delete_post_stmt.Exec(ids, boards)
-            http.Redirect(w, req, req.Header.Get("Referer"), 302)
+
 
             Build_thread(parents, boards)
             Build_board(boards)
             Build_catalog(boards)
             Build_home()
-
-        case actions == "ban":
+        }
+        
+        if strings.HasPrefix(actions, "Ban") {
             conn, err := sql.Open("sqlite3", DB_uri)
             Err_check(err)
             defer conn.Close()
@@ -108,13 +108,12 @@ func Admin_actions(w http.ResponseWriter, req *http.Request) {
             duration := req.FormValue("duration")
             var ban_expiry time.Time
             if duration == "" {
-                ban_expiry = time.Now().In(Loc).Add(time.Minute) //.Hour * 24 * 5)
+                ban_expiry = time.Now().In(Loc).Add(time.Minute * 3) //.Hour * 24 * 5)
             }
 
             ban_stmt.Exec(ids, boards, ban_expiry.Format(time.UnixDate))
+        }
 
-        default:
-            http.Error(w, "Invalid action.", http.StatusUnauthorized)
-            return
-    }
+        http.Redirect(w, req, req.Header.Get("Referer"), 302)
+    
 }

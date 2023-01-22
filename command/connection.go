@@ -49,13 +49,15 @@ const (
                 FROM posts
                 WHERE Parent = ? AND Board = ?`
     threadid_string = `SELECT Id FROM latest WHERE Board = ?`
-    ban_search_string = `SELECT Expiry FROM banned WHERE Identifier = ? LIMIT 1`
+    ban_search_string = `SELECT Expiry FROM banned WHERE Identifier = ? ORDER BY ROWID ASC`
+    ban_remove_string = `DELETE FROM banned WHERE ROWID IN (SELECT ROWID FROM banned WHERE Identifier = ? ORDER BY ROWID ASC LIMIT 1)`
 )
 
 var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_nf": newpost_nfstring,
         "repadd": repadd_string, "subadd": subadd_string, "hpadd": hpadd_string,
         "htadd": htadd_string, 
-        "parent_check": parent_checkstring, "threadid" : threadid_string, "ban_search": ban_search_string}
+        "parent_check": parent_checkstring, "threadid" : threadid_string, 
+        "ban_search": ban_search_string, "ban_remove": ban_remove_string}
 
 func Checkout() map[string]*sql.Stmt {
         return <-readConns
