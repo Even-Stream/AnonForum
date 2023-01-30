@@ -21,7 +21,10 @@ const (
 const (
     html_head = `<!DOCTYPE html>
     <html>
-    <head>`
+    <head>
+        <style>
+            body {background-color: #000000f0; color: #ffffffdb;}
+        </style>`
     
     html_def_head = `
         <title>Administration</title>
@@ -70,12 +73,6 @@ const (
         <input name="token" type="text" value=""><br><br>
         <input type="submit" value="Enter">
     </form>`
-
-    add_token_string = `INSERT INTO tokens(Token, Type) VALUES (?, ?)`
-    search_token_string = `SELECT Type FROM tokens WHERE Token = ?`
-    delete_token_string = `DELETE FROM tokens where Token = ?`
-    new_user_string = `INSERT INTO credentials(Username, Hash, Type) VALUES (?, ?, ?)`
-    search_user_string = `SELECT Hash, Type FROM credentials WHERE Username = ?`
 
     ten_most_recent_string = `SELECT ROWID, Board, Id, Content, Time, Parent, COALESCE(File, '') AS File, 
             COALESCE(Filename, '') AS Filename,

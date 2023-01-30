@@ -8,8 +8,8 @@ import (
     "golang.org/x/time/rate"
 )
 
-var rarr = []rate.Limit{20, .04, .5, 1, .1}
-var barr = []int{30, 1, 1, 1, 4}
+var rarr = []rate.Limit{20, .04, .5, 1, 20}
+var barr = []int{30, 1, 1, 1, 10}
 var limiter = NewIPRateLimiter(rarr, barr)
 
 var admf_map = map[string]bool {

@@ -2,21 +2,17 @@ package main
 
 import (
     "net/http"
-    "database/sql"
     "os"
     "strings"
     "time"
-    
-    _ "github.com/mattn/go-sqlite3"
-)
-
-const (
-    get_files_string = `SELECT COALESCE(File, '') AS File, COALESCE(Imgprev, '') AS Imgprev FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`
-    delete_post_string = `DELETE FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`
-    ban_string = `INSERT INTO banned(Identifier, Expiry) VALUES ((SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2), ?3)`
+    "fmt"
+    "context"
 )
 
 func Admin_actions(w http.ResponseWriter, req *http.Request) {
+    ctx, cancel := context.WithTimeout(req.Context(), 10 * time.Second)
+    defer cancel()
+
     c, err := req.Cookie("session_token")
 
     if err != nil {
@@ -48,21 +44,41 @@ func Admin_actions(w http.ResponseWriter, req *http.Request) {
     if Entry_check(w, req, "ids", ids) == 0 {return}
     boards := req.FormValue("boards")	
     if Entry_check(w, req, "boards", boards) == 0 {return}
+    parents := req.FormValue("parents")
+
+    update_posts := false
+
+    //begin transaction
+    new_conn := WriteConnCheckout()
+    defer WriteConnCheckin(new_conn)
+    new_tx, err := new_conn.Begin()
+    Err_check(err)
+    defer new_tx.Rollback()
+
+        if strings.HasPrefix(actions, "Ban") {
+            fmt.Println("confirmation")
+
+            duration := req.FormValue("duration")
+            var ban_expiry time.Time
+            if duration == "" {
+                ban_expiry = time.Now().In(Loc).Add(time.Minute * 3) //.Hour * 24 * 5)
+            }
+
+            fmt.Println(ban_expiry)
+            ban_stmt := WriteStrings["ban"]
+            _, err = new_tx.ExecContext(ctx, ban_stmt, ids, boards, ban_expiry.Format(time.UnixDate))
+            Err_check(err)
+        }
 
         if strings.HasSuffix(actions, "Delete") {
-
-            parents := req.FormValue("parents")
             if Entry_check(w, req, "parents", parents) == 0 {return}
 
-            conn, err := sql.Open("sqlite3", DB_uri)
-            Err_check(err)
-            defer conn.Close()
-            get_files_stmt, err := conn.Prepare(get_files_string)
-            Err_check(err)
+            get_files_stmt := WriteStrings["get_files"]
 
             //DO FOR ALL FILES
-            file_rows, err := get_files_stmt.Query(ids, boards)
+            file_rows, err := new_tx.QueryContext(ctx, get_files_stmt, ids, boards)
             Err_check(err)
+
             defer file_rows.Close()
 
             for file_rows.Next() {
@@ -83,37 +99,22 @@ func Admin_actions(w http.ResponseWriter, req *http.Request) {
                     }
             }}
 
-            conn2, err := sql.Open("sqlite3", DB_uri)
-            Err_check(err)
-            defer conn2.Close()
-            delete_post_stmt, err := conn2.Prepare(delete_post_string)
+            delete_post_stmt := WriteStrings["delete_post"]
+            _, err = new_tx.ExecContext(ctx, delete_post_stmt, ids, boards)
             Err_check(err)
 
-            delete_post_stmt.Exec(ids, boards)
+            update_posts = true
+        }
 
+        err = new_tx.Commit()
+        Err_check(err)
 
+        if update_posts {
             Build_thread(parents, boards)
             Build_board(boards)
             Build_catalog(boards)
             Build_home()
         }
-        
-        if strings.HasPrefix(actions, "Ban") {
-            conn, err := sql.Open("sqlite3", DB_uri)
-            Err_check(err)
-            defer conn.Close()
-            ban_stmt, err := conn.Prepare(ban_string)
-            Err_check(err)
-
-            duration := req.FormValue("duration")
-            var ban_expiry time.Time
-            if duration == "" {
-                ban_expiry = time.Now().In(Loc).Add(time.Minute * 3) //.Hour * 24 * 5)
-            }
-
-            ban_stmt.Exec(ids, boards, ban_expiry.Format(time.UnixDate))
-        }
 
         http.Redirect(w, req, req.Header.Get("Referer"), 302)
-    
 }
