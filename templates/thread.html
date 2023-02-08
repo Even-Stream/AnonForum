@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/resources/base.css">
     <link rel="stylesheet" href="/resources/default.css">
     <script async src="/resources/htmx.js" defer></script>
+    <script async src="/resources/thread.js" defer></script>
     <noscript><style> .prev { display: none !important} </style></noscript>
 
 <style>{{$name := .BoardN}}
@@ -38,7 +39,7 @@
                     <label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
                     {{if avcheck .Filemime}}<video controls poster={{if eq .Imgprev "audio_image.webp"}}'/resources/audio_image.webp'{{else}}'/{{$name}}/Files/{{.Imgprev}}'{{end}}><source src='/{{$name}}/Files/{{.File}}' type= '{{.Filemime}}'></video>{{else}}<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
-                    <label class="{{.Option}}">{{if $sub}}<subject>{{$sub}}</subject>{{end}} <time>{{.Time}}</time> <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref></label>
+                    <label class="{{.Option}}">{{if $sub}}<subject>{{$sub}}</subject>{{end}} <time>{{.Time}}</time> <selfref><a href="#no{{.Id}}">No. </a><a class="plink" href="#newpost">{{.Id}}</a></selfref></label>
                     <div class="pcontent">{{.Content}}</div>
 
             </div>
@@ -47,7 +48,7 @@
     <postwrap>
         <div id="no{{.Id}}" class="post">
 
-                    <label class="{{.Option}}"><time>{{.Time}}</time> <selfref><a href="#no{{.Id}}">No. {{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
+                    <label class="{{.Option}}"><time>{{.Time}}</time> <selfref><a href="#no{{.Id}}">No. </a><a class="plink" href="#newpost">{{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
                     <br>
                     {{if .File}}<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
@@ -59,7 +60,7 @@
 {{end}}{{end}}
     <form action="/im/post/?parent={{.TId}}&board={{.BoardN}}" enctype="multipart/form-data" method="Post">
         <input type="checkbox" name="option" value="sage">
-        <textarea name="newpost" rows="8" cols="78">I'm putting the new post box at the bottom.</textarea>
+        <textarea id="newpost" name="newpost" rows="8" cols="78">I'm putting the new post box at the bottom.</textarea>
         <br>
         <input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp, image/avif
             audio/mpeg, audio/ogg, audio/flac, audio/x-m4a, video/webm, video/mp4, .opus, .m4a">
