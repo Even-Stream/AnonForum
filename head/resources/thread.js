@@ -6,3 +6,21 @@ function AddIdToNewPost(e) {
     let id = e.target.innerText;
     document.getElementById('newpost').value += '>>' + id + '\n';
 }
+
+
+const replies = document.querySelectorAll('a.preview');
+
+replies.forEach(reply => 
+    reply.addEventListener('mouseover', GetPostData, 
+    {once : true, capture: false})
+);
+
+async function GetPostData (e) {
+    let url = e.target.getAttribute('prev-get');
+    let response = await fetch(url)
+    response.text().then((text) => {
+        console.log(text)
+        e.target.insertAdjacentHTML('afterend', 
+            '<box class="prev">' + text + '</box>')
+    });
+}

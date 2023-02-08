@@ -23,7 +23,7 @@ postwrap::before, .prev {
     position: absolute;
 }
 
-ref a, selfref a, .header
+.preview, selfref a, .header
 {
     text-decoration: none;
 }
@@ -182,7 +182,7 @@ iframe {
     user-select: none;
 }
 
-ref:hover+.prev {
+.preview:hover+.prev {
     visibility: visible;
 }
 

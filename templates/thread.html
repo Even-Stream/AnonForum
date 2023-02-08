@@ -7,10 +7,7 @@
 
     <link rel="stylesheet" href="/resources/base.css">
     <link rel="stylesheet" href="/resources/default.css">
-    <script async src="/resources/htmx.js" defer></script>
     <script async src="/resources/thread.js" defer></script>
-    <noscript><style> .prev { display: none !important} </style></noscript>
-
 <style>{{$name := .BoardN}}
 {{range .Posts}}{{if .File}}{{if imagecheck .Filemime}}
 .p{{.Id}} {--mini: url('/{{$name}}/Files/{{.Imgprev}}'); --maxi: url('/{{$name}}/Files/{{.File}}');}{{end}}{{end}}{{end}}
