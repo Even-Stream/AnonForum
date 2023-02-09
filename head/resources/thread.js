@@ -19,7 +19,6 @@ async function GetPostData (e) {
     let url = e.target.getAttribute('prev-get');
     let response = await fetch(url)
     response.text().then((text) => {
-        console.log(text)
         e.target.insertAdjacentHTML('afterend', 
             '<box class="prev">' + text + '</box>')
     });

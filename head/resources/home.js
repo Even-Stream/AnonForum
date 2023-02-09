@@ -1,33 +1,21 @@
-const idmap = new Map();
-idmap.set('Main', 'mrow');
-idmap.set('News', 'nrow');
-idmap.set('About', 'arow');
-idmap.set('Rules', 'rrow');
-idmap.set('Boards', 'brow');
+const selectedcolor = getComputedStyle(document.body).getPropertyValue('--sel-color');
 
-var style = getComputedStyle(document.body)
+const menubuttons = document.querySelectorAll('td.hop');
 
-function showMask() {
-    var sel = document.getElementById(this.id);
-    var crow = document.getElementById(idmap.get(this.id));
+menubuttons.forEach(menubutton => menubutton.addEventListener('click', SwitchToRow, false));
 
-    if (crow.style.visibility=='collapse') {
-        crow.style.visibility = 'visible';
-    }
+function SwitchToRow(e) {
+    let visibleid = this.id + 'row';
+    menubuttons.forEach(menubutton => {
+        if(menubutton.id === this.id) {
+            menubutton.style.backgroundColor = selectedcolor;
+        } else {menubutton.style.backgroundColor = 'transparent';}
 
-    if (sel.style.backgroundColor == 'transparent') {
-        sel.style.backgroundColor = style.getPropertyValue('--sel-color');
-    }
+        let currentid = menubutton.id + 'row';
+        let menurow = document.getElementById(currentid);
 
-    idmap.forEach((value, key) => {
-        if (key != this.id) {
-		document.getElementById(key).style.backgroundColor = 'transparent';
-		document.getElementById(value).style.visibility = 'collapse';
-	}
+        if(menurow.id !== visibleid) {
+            menurow.style.visibility = 'collapse';
+        } else {menurow.style.visibility = 'visible';}
     });
-
 }
-
-idmap.forEach((value, key) => {
-	document.getElementById(key).addEventListener("click", showMask)
-});

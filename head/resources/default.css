@@ -61,6 +61,10 @@ selfref a, .reply a {
     color: rgb(153, 17, 23);
 }
 
+selfref a:hover {
+    color: rgb(216, 68, 36);
+}
+
 .catalog td {
     border: 2px dotted rgb(150, 63, 67);
 }
