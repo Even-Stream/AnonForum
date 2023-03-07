@@ -33,7 +33,7 @@ func Admin_actions(w http.ResponseWriter, req *http.Request) {
         delete(Sessions, sessionToken)
         http.Error(w, "Session expired.", http.StatusUnauthorized)
         return
-    }
+    } else {Account_refresh(w, sessionToken)}
 
     //use maps for these(no duplicates)
     actions := req.FormValue("actions")

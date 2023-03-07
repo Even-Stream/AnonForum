@@ -94,6 +94,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             if userSession.IsExpired() {
                 delete(Sessions, sessionToken)
             } else {
+                Account_refresh(w, sessionToken)
                 switch {
                     case userSession.acc_type == Admin:
                         option += " admin"

@@ -1,11 +1,5 @@
 package main
 
-/*
-this program will receive a request for a post, 
-retrieve that post from a database, 
-and send that post back
-*/
-
 import (
     "bytes"
     "net/http"
@@ -18,9 +12,20 @@ type Prev struct {
     Id int
     Board string
     Content string
+    Time string
     Filemime string
     Imgprev string 
+    Option string
 }
+
+const (
+    prev_body = `<label class="{{.Option}}"><time>{{.Time}}</time></label>
+        <br> <div class="prevcontent">
+        {{if .Imgprev}}{{if audiocheck .Filemime}}
+        <img class="imspec" src="/resources/audio_image.webp">
+        {{else}}<img class="imspec" src="/{{.Board}}/Files/{{.Imgprev}}">{{end}}{{end}}
+        {{.Content}}</div>`
+)
 
 //retrieves post request
 func Get_prev(w http.ResponseWriter, req *http.Request) {
@@ -47,10 +52,10 @@ func Get_prev(w http.ResponseWriter, req *http.Request) {
 
     row := stmt.QueryRowContext(ctx, id, board)
 
-    err := row.Scan(&prv.Content, &prv.Filemime, &prv.Imgprev)
+    err := row.Scan(&prv.Content, &prv.Time, &prv.Filemime, &prv.Imgprev, &prv.Option)
     Query_err_check(err)
 
-    Prev_body, err := template.New("todos").Funcs(Filefuncmap).Parse(`{{if .Imgprev}}{{if audiocheck .Filemime}}<img class="imspec" src="/resources/audio_image.webp">{{else}}<img class="imspec" src="/{{.Board}}/Files/{{.Imgprev}}">{{end}}{{end}}{{.Content}}`)
+    Prev_body, err := template.New("todos").Funcs(Filefuncmap).Parse(prev_body)
     Err_check(err)
     Prev_body.Execute(&temp, prv)
 

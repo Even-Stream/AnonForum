@@ -83,7 +83,7 @@ type session struct {
     acc_type Acc_type
 }
 
-var Sessions = map[string]session{}
+var Sessions = map[string]*session{}
 
 func (s session) IsExpired() bool {
     return s.expiry.Before(time.Now().In(Loc))
@@ -191,6 +191,18 @@ func Token_check (w http.ResponseWriter, req *http.Request) {
     w.Write([]byte(html_head + html_tologin_head + `<p>Account created.</p>` + html_foot))
 }
 
+func Account_refresh(w http.ResponseWriter, sessionToken string) {
+    expiresAt := time.Now().In(Loc).Add(2 * time.Minute)
+    Sessions[sessionToken].expiry = expiresAt
+
+    http.SetCookie(w, &http.Cookie{
+        Name:    "session_token",
+        Value:   sessionToken,
+        Expires: expiresAt,
+        Path: "/",
+    })
+}
+
 func Credential_check (w http.ResponseWriter, req *http.Request) {
 
     if Request_filter(w, req, "POST", 1 << 9) == 0 {return}
@@ -236,9 +248,9 @@ func Credential_check (w http.ResponseWriter, req *http.Request) {
     }
 
     sessionToken := uuid.NewString()
-    expiresAt := time.Now().In(Loc).Add(20 * time.Minute)
+    expiresAt := time.Now().In(Loc).Add(2 * time.Minute)
 
-    Sessions[sessionToken] = session{
+    Sessions[sessionToken] = &session{
         username: username,
         expiry:   expiresAt,
         acc_type: acc_type,
@@ -310,7 +322,7 @@ func Load_console(w http.ResponseWriter, req *http.Request) {
         delete(Sessions, sessionToken)
         http.Error(w, "Session expired.", http.StatusUnauthorized)
         return
-    } 
+    }
 
     //put this in a function, with the query string being an input. Every query will return an array of posts
     conn, err := sql.Open("sqlite3", DB_uri)

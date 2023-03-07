@@ -161,6 +161,11 @@ iframe {
     padding-left: 0px;
 }
 
+.prev label {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
 .pcontent {
     padding-right: 30px;
     padding-left: 30px;
@@ -168,10 +173,18 @@ iframe {
     line-height: 1.5em;
 }
 
+.prevcontent {
+    margin-top: 5px;
+    padding-left: 5px;
+}
+
 .prev {
     visibility: hidden;
     border: .1rem solid;
-    padding: 10px;
+    padding-top: 5px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
     content: var(--post);
     max-width: 65%;
     max-height: 70%;
