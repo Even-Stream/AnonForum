@@ -6,12 +6,10 @@ import (
     "strings"
     "time"
     "fmt"
-    "context"
 )
 
 func Admin_actions(w http.ResponseWriter, req *http.Request) {
-    ctx, cancel := context.WithTimeout(req.Context(), 10 * time.Second)
-    defer cancel()
+    ctx := req.Context()
 
     c, err := req.Cookie("session_token")
 

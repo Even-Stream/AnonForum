@@ -33,7 +33,7 @@ const (
 
     html_tologin_head = `
         <title>Administration</title>
-        <meta http-equiv="refresh" content="1; url=/im/adm/" />
+        <meta http-equiv="refresh" content="1; url=/login.html" />
     </head>
     <body><center><br>`	
 
@@ -51,28 +51,6 @@ const (
 
     html_foot = `</center></body>
     </html>`
-
-    entry_form = `
-    <form action="/im/login/" enctype="multipart/form-data" method="Post">
-        <label>Username:</label><br><br>
-        <input name="username" type="text" value=""><br><br>
-        <label>Password:</label><br><br>
-        <input name="password" type="password" value=""><br><br>
-        <input type="submit" value="Enter">
-    </form>`
-
-    create_form = `
-    <form action="/im/verify/" enctype="multipart/form-data" method="Post">
-        <label>Username:</label><br><br>
-        <input name="username" type="text" value=""><br><br>
-        <label>Password:</label><br><br>
-        <input name="password" type="password" value=""><br><br>
-        <label>Confirm Password:</label><br><br>
-        <input name="passwordcopy" type="password" value=""><br><br>
-        <label>Token:</label><br><br>
-        <input name="token" type="text" value=""><br><br>
-        <input type="submit" value="Enter">
-    </form>`
 
     ten_most_recent_string = `SELECT ROWID, Board, Id, Content, Time, Parent, COALESCE(File, '') AS File, 
             COALESCE(Filename, '') AS Filename,
@@ -147,13 +125,6 @@ func Entry_check(w http.ResponseWriter, req *http.Request, entry string, value s
 
 //listened to
 
-//account creation
-func Create_account(w http.ResponseWriter, req *http.Request) {
-    w.Header().Set("Content-Type", "text/html; charset=utf-8")
-    w.WriteHeader(http.StatusOK)
-    w.Write([]byte(html_head + html_def_head + create_form + html_foot))
-}
-
 func Token_check (w http.ResponseWriter, req *http.Request) {
 
     if Request_filter(w, req, "POST", 1 << 10) == 0 {return}
@@ -218,14 +189,6 @@ func Token_check (w http.ResponseWriter, req *http.Request) {
     new_user_stmt.Exec(username, hash, acc_type)
 
     w.Write([]byte(html_head + html_tologin_head + `<p>Account created.</p>` + html_foot))
-}
-
-
-//account enter
-func Console_enter(w http.ResponseWriter, req *http.Request) {
-    w.Header().Set("Content-Type", "text/html; charset=utf-8")
-    w.WriteHeader(http.StatusOK)
-    w.Write([]byte(html_head + html_def_head + entry_form + html_foot))
 }
 
 func Credential_check (w http.ResponseWriter, req *http.Request) {
@@ -322,7 +285,6 @@ func Logout(w http.ResponseWriter, req *http.Request) {
 
 //creating token(requires admin account)
 //
-
 
 //the console
 func Load_console(w http.ResponseWriter, req *http.Request) {

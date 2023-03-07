@@ -13,9 +13,7 @@ var barr = []int{30, 1, 1, 1, 10}
 var limiter = NewIPRateLimiter(rarr, barr)
 
 var admf_map = map[string]bool {
-    "adm": true, 
     "login": true,
-    "add": true,
     "verify": true,
     "logout": true,
     "console": true,
@@ -33,14 +31,21 @@ func Listen() {
     mux.HandleFunc("/im/ret/", Get_prev)
     mux.HandleFunc("/im/post/", New_post)
     mux.HandleFunc("/im/theme/", Switch_theme)
-    mux.HandleFunc("/im/adm/", Console_enter)
     mux.HandleFunc("/im/login/", Credential_check)
-    mux.HandleFunc("/im/add/", Create_account)
     mux.HandleFunc("/im/verify/", Token_check)
     mux.HandleFunc("/im/logout/", Logout)
     mux.HandleFunc("/im/console/", Load_console)
     mux.HandleFunc("/im/mod/", Admin_actions)
-    http.ListenAndServe(":1024", hongMeiling(mux))
+
+    srv := &http.Server {
+        Addr: ":1024",
+        IdleTimeout: 5 * time.Second,
+        ReadTimeout: 3 * time.Second,
+        ReadHeaderTimeout: 3 * time.Second,
+        WriteTimeout: 5 * time.Second,
+        Handler: hongMeiling(mux),
+    }
+    srv.ListenAndServe()
 }
 
 func hongMeiling(next http.Handler) http.Handler {

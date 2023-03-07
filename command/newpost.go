@@ -4,7 +4,6 @@ import (
     "net/http"
     "time"
     "html"
-    "context"
     "io"
     "os"
     "strings"
@@ -42,9 +41,7 @@ func generic_gen_info(size int64) string {
 }
 
 func New_post(w http.ResponseWriter, req *http.Request) {
-    //time out
-    ctx, cancel := context.WithTimeout(req.Context(), 10 * time.Second)
-    defer cancel()
+    ctx := req.Context()
 
     if Request_filter(w, req, "POST", max_upload_size) == 0 {return}
     if err := req.ParseMultipartForm(max_upload_size); err != nil {

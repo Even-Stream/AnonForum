@@ -10,8 +10,6 @@ import (
     "bytes"
     "net/http"
     "text/template"
-    "time"
-    "context"
 
     _ "github.com/mattn/go-sqlite3"
 )
@@ -26,9 +24,7 @@ type Prev struct {
 
 //retrieves post request
 func Get_prev(w http.ResponseWriter, req *http.Request) {
-    //time out
-    ctx, cancel := context.WithTimeout(req.Context(), 10 * time.Millisecond)
-    defer cancel()
+    ctx := req.Context()
 
     if Request_filter(w, req, "GET", 1 << 13) == 0 {return}
 
@@ -64,4 +60,5 @@ func Get_prev(w http.ResponseWriter, req *http.Request) {
     w.WriteHeader(http.StatusOK)
 
     w.Write([]byte(data))
+
 }
