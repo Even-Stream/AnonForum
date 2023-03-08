@@ -34,6 +34,8 @@ type Thread struct {
     Posts []*Post
     Header []string
     HeaderDescs []string
+    OmittedPosts int
+    OmittedImages int
 }
 
 type Board struct {
@@ -76,7 +78,7 @@ func Dir_check(path string) {
     }
 }
 
-func Get_subject(parent string, board string) string {
+func Get_subject(parent, board string) string {
     stmts := Checkout()
     defer Checkin(stmts)
 
@@ -87,6 +89,26 @@ func Get_subject(parent string, board string) string {
     Query_err_check(err)
 
     return subject
+}
+
+func Get_omitted(parent, board string) (int, int) {
+    stmts := Checkout()
+    defer Checkin(stmts)
+
+    var total_posts int
+    var total_images int
+    var shown_posts int
+    var shown_images int
+
+    total_countstmt := stmts["total_count"]
+    err := total_countstmt.QueryRow(board, parent).Scan(&total_posts, &total_images)
+    Query_err_check(err)
+
+    shown_countstmt := stmts["shown_count"]
+    err = shown_countstmt.QueryRow(board, parent).Scan(&shown_posts, &shown_images)
+    Query_err_check(err)
+
+    return (total_posts - shown_posts), (total_images - shown_images)
 }
 
 //for board pages
@@ -145,12 +167,16 @@ func get_threads(board string) []*Thread {
             rep_rows.Close()
         }
 
-        sub := Get_subject(strconv.Itoa(fstpst.Id), board)
+        fstpstid := strconv.Itoa(fstpst.Id)
+
+        sub := Get_subject(fstpstid, board)
+        omitted_posts, omitted_images := Get_omitted(fstpstid, board)
+
         var thr Thread
         if sub != "" {
-            thr = Thread{Posts: pst_coll, Subject: sub}
+            thr = Thread{Posts: pst_coll, Subject: sub, OmittedPosts: omitted_posts, OmittedImages: omitted_images}
         } else {
-            thr = Thread{Posts: pst_coll}
+            thr = Thread{Posts: pst_coll, OmittedPosts: omitted_posts, OmittedImages: omitted_images}
         }
 
         board_body = append(board_body, &thr)

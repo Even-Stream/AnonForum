@@ -33,6 +33,9 @@ const (
     thread_collstring = `SELECT Parent, MAX(Id) FROM posts WHERE (instr(Option, 'sage') = 0 OR Id = Parent) AND Board = ? 
         GROUP BY Parent ORDER BY MAX(Id) DESC`
     subject_lookstring = `SELECT Subject FROM subjects WHERE Parent = ? AND Board = ?`
+    shown_countstring = `Select COUNT(*), COUNT(Imgprev) FROM 
+      (SELECT *	FROM posts WHERE Board = ?1 AND Parent = ?2 AND Id <> ?2 ORDER BY Id DESC LIMIT 5)`
+    total_countstring = `Select COUNT(*), COUNT(Imgprev) FROM posts WHERE Board = ?1 AND Parent = ?2 AND Id <> ?2`
 
     //all inserts(and necessary queries) are preformed in one transaction 
     newpost_wfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, File, Filename, Fileinfo, Filemime, Imgprev, Option) 
@@ -165,12 +168,25 @@ func Make_Conns() {
         ht_collstmt, err := conn10b.Prepare("SELECT * FROM homethumb ORDER BY ROWID DESC")
         Err_check(err)
 
+        conn12, err := sql.Open("sqlite3", DB_uri)
+        Err_check(err)
+
+        shown_countstmt, err := conn12.Prepare(shown_countstring)
+        Err_check(err)
+
+        conn13, err := sql.Open("sqlite3", DB_uri)
+        Err_check(err)
+
+        total_countstmt, err := conn13.Prepare(total_countstring)
+        Err_check(err)
+
         
         read_stmts := map[string]*sql.Stmt{"prev": prev_stmt, "prev_parent": prev_parentstmt,
             "update": updatestmt, "update_rep": update_repstmt, "parent_coll": parent_collstmt,
             "thread_head": thread_headstmt, "thread_body": thread_bodystmt,
             "thread_coll": thread_collstmt,"subject_look": subject_lookstmt,
-            "hp_coll": hp_collstmt, "ht_coll": ht_collstmt}
+            "hp_coll": hp_collstmt, "ht_coll": ht_collstmt,
+            "shown_count": shown_countstmt, "total_count": total_countstmt}
 
         readConns <- read_stmts
     }
