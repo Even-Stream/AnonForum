@@ -36,6 +36,7 @@ type Thread struct {
     HeaderDescs []string
     OmittedPosts int
     OmittedImages int
+    SThemes []string
 }
 
 type Board struct {
@@ -268,10 +269,10 @@ func Build_thread(parent string, board string) { //will accept argument for boar
         if sub != "" {
             thr = Thread{BoardN: board, TId: parent, BoardDesc: Board_map[board],
                 Posts: posts, Subject: sub,
-                Header: Board_names, HeaderDescs: Board_descs}
+                Header: Board_names, HeaderDescs: Board_descs, SThemes: Themes}
         } else {
             thr = Thread{BoardN: board, TId: parent, BoardDesc: Board_map[board], Posts: posts, 
-            Header: Board_names, HeaderDescs: Board_descs}
+            Header: Board_names, HeaderDescs: Board_descs, SThemes: Themes}
         }
         threadtemp.Execute(f, thr)
     }

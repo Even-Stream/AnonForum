@@ -17,6 +17,7 @@ type Catalog struct {
     Subjects []string
     Header []string
     HeaderDescs []string
+    SThemes []string
 }
 
 type Hp struct {
@@ -43,6 +44,7 @@ type Home struct {
     FAQ string
     Rules string
     Board_info string
+    SThemes []string
 }
 
 //catalog template function for making new rows
@@ -146,7 +148,7 @@ func Build_catalog(board string) {
     posts, subjects := get_cat_posts(board)
 
     catalog := Catalog{Name: board, Desc: Board_map[board],Posts: posts, Subjects: subjects,
-        Header: Board_names, HeaderDescs: Board_descs}
+        Header: Board_names, HeaderDescs: Board_descs, SThemes: Themes}
 
     cattemp.Execute(f, catalog)
 }
@@ -165,6 +167,7 @@ func Build_home() {
 
     hps, hts := get_home()
 
-    home := Home{Latest: hps, Thumbs: hts, Header: Board_names, HeaderDescs: Board_descs}
+    home := Home{Latest: hps, Thumbs: hts, Header: Board_names, HeaderDescs: Board_descs, 
+        SThemes: Themes}
     hometemp.Execute(f, home)
 }

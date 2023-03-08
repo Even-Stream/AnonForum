@@ -7,8 +7,8 @@
 
     <link rel="stylesheet" href="/resources/base.css">
     <link rel="stylesheet" href="/resources/default.css">
-    <script src="/resources/htmx.js" defer></script>
-    <noscript><style> .prev { display: none !important} </style></noscript>
+    <script src="/resources/thread.js" defer></script>
+    <script src="/resources/dropdown.js" defer></script>
 
 </head>{{$name := .Name}}
 
@@ -33,5 +33,14 @@
 <a href="{{.Id}}.html"><img class="catimg" src={{if audiocheck .Filemime}}{{if eq .Imgprev "audio_image.webp"}}'/resources/audio_image.webp'{{else}}'/{{$name}}/Files/{{.Imgprev}}'{{end}}{{else}}"Files/{{.Imgprev}}"{{end}}></a><br>
 <p>{{.Content}}</p></catcon></td>{{end}}</tr>
 {{end}}</table>
+
+    <form id="thememenu" class="thememenu" action="/im/theme/" method="Get">
+        <select name="theme">
+            <option value="default">Styles</option>
+             <option value="default">default</option>{{range .SThemes}}
+              <option value="{{.}}">{{.}}</option>{{end}}
+        </select>
+        <noscript><input type="submit" value="Select"></noscript>
+    </form>
 </body>
 </html>

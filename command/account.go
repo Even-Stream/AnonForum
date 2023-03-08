@@ -192,7 +192,7 @@ func Token_check (w http.ResponseWriter, req *http.Request) {
 }
 
 func Account_refresh(w http.ResponseWriter, sessionToken string) {
-    expiresAt := time.Now().In(Loc).Add(2 * time.Minute)
+    expiresAt := time.Now().In(Loc).Add(10 * time.Minute)
     Sessions[sessionToken].expiry = expiresAt
 
     http.SetCookie(w, &http.Cookie{
@@ -248,7 +248,7 @@ func Credential_check (w http.ResponseWriter, req *http.Request) {
     }
 
     sessionToken := uuid.NewString()
-    expiresAt := time.Now().In(Loc).Add(2 * time.Minute)
+    expiresAt := time.Now().In(Loc).Add(10 * time.Minute)
 
     Sessions[sessionToken] = &session{
         username: username,

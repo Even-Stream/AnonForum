@@ -1,0 +1,1 @@
+document.getElementById("thememenu").addEventListener("change", ({ target }) => target.form.submit());

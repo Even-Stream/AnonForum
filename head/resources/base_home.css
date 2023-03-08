@@ -6,6 +6,10 @@
     font-display: block;
 }
 
+a {
+    text-decoration: none;
+}
+
 .hlogo {
     width: 21vw;
 }
@@ -15,39 +19,40 @@
 }
 
 .bmap > td {
-	padding: 10px;
+    padding: 10px;
 }
 
 .rpost > td {
-	border-bottom: thin solid;
+    border-bottom: thin solid;
 }
 
 .rpost p, .recpost p, .rlast, .blink {
-	font-family: MPlus, system-ui, Helvetica, Arial, sans-serif;
-        font-size: 15px;
+    font-family: MPlus, system-ui, Helvetica, Arial, sans-serif;
+    font-size: 15px;
 }
 
 .blink {
-	font-size: 17px;
-	text-decoration: none;
+    font-size: 17px;
+    text-decoration: none;
 }
 
 .recpost {
-	width: 70%;
-	margin-top: 10px;
-        margin-bottom: 10px;
+    width: 70%;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .hcon {
-	width: 70%;
+    width: 70%;
+    overflow: hidden;
 }
 
 .hop {
-	font-family: MPlus, Helvetica, Arial, sans-serif;
-        font-size: 17px;
-	text-align: center;
-	text-decoration: none;
-	user-select: none
+    font-family: MPlus, Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    text-align: center;
+    text-decoration: none;
+    user-select: none
 }
 
 .logo {
@@ -78,6 +83,7 @@
     float: right;
 }
 
-a {
-    text-decoration: none;
+.thememenu {
+    float: right;
+    margin: 10px;
 }

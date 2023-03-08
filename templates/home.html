@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="/resources/base_home.css">
     <link rel="stylesheet" href="/resources/default_home.css">
     <script src="/resources/home.js" defer></script>
+    <script src="/resources/dropdown.js" defer></script>
 </head>
 
 <body class="hbody">
@@ -93,6 +94,16 @@
 
 </tbody></table>
 </center>
+<br>
+
+    <form id="thememenu" class="thememenu" action="/im/theme/" method="Get">
+        <select name="theme">
+            <option value="default">Styles</option>
+             <option value="default">default</option>{{range .SThemes}}
+              <option value="{{.}}">{{.}}</option>{{end}}
+        </select>
+        <noscript><input type="submit" value="Select"></noscript>
+    </form>
 
 </body>
 </html>
