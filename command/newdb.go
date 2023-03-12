@@ -24,7 +24,9 @@ func create_table(db *sql.DB) {
         "Filemime" TEXT,
         "Imgprev" TEXT,
         "Phash" TEXT,
-        "Option" TEXT
+        "Option" TEXT,
+        "Calendar" INTEGER NOT NULL,
+        "Clock" INTEGER NOT NULL
     );`
 
     createRepliesTableSQL := `CREATE TABLE replies (

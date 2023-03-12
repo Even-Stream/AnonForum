@@ -4,7 +4,6 @@ import (
     "net/http"
     "database/sql"
     "time"
-    "text/template"
 
     "github.com/alexedwards/argon2id"
     _ "github.com/mattn/go-sqlite3"
@@ -51,16 +50,6 @@ const (
 
     html_foot = `</center></body>
     </html>`
-
-    ten_most_recent_string = `SELECT ROWID, Board, Id, Content, Time, Parent, COALESCE(File, '') AS File, 
-            COALESCE(Filename, '') AS Filename,
-            COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Filemime, '') AS Filemime, COALESCE(Imgprev, '') AS Imgprev, Option FROM posts
-            ORDER BY ROWID DESC LIMIT 10`
-
-    most_recent_string = `test: {{range .Posts}}
-        {{.Content}}
-
-    {{end}}`
 )
 
 var params = &argon2id.Params{
@@ -72,10 +61,6 @@ var params = &argon2id.Params{
 }
 
 var Loc, _ = time.LoadLocation("UTC")
-
-type Query_results struct {
-    Posts []*Post
-}
 
 type session struct {
     username string
@@ -293,67 +278,3 @@ func Logout(w http.ResponseWriter, req *http.Request) {
 
     w.Write([]byte(html_head + html_tohome_head + `<p>Logged out.</p>` + html_foot))
 }
-
-
-//creating token(requires admin account)
-//
-
-//the console
-func Load_console(w http.ResponseWriter, req *http.Request) {
-    c, err := req.Cookie("session_token")
-
-    if err != nil {
-        if err == http.ErrNoCookie {
-            http.Error(w, "Unauthorized.", http.StatusUnauthorized)
-            return
-        }
-        w.WriteHeader(http.StatusBadRequest)
-        return
-    }
-
-    sessionToken := c.Value
-    userSession, exists := Sessions[sessionToken]
-    if !exists {
-        http.Error(w, "Unauthorized.", http.StatusUnauthorized)
-        return
-    }
-
-    if userSession.IsExpired() {
-        delete(Sessions, sessionToken)
-        http.Error(w, "Session expired.", http.StatusUnauthorized)
-        return
-    }
-
-    //put this in a function, with the query string being an input. Every query will return an array of posts
-    conn, err := sql.Open("sqlite3", DB_uri)
-    Err_check(err)
-    defer conn.Close()
-    ten_most_recent_stmt, err := conn.Prepare(ten_most_recent_string)
-    Err_check(err)
-
-
-    rows, err := ten_most_recent_stmt.Query()
-    Err_check(err)
-    defer rows.Close()
-
-    var most_recent []*Post
-    var filler int
-
-    for rows.Next() {
-        var pst Post
-        err = rows.Scan(&filler, &pst.BoardN, &pst.Id, &pst.Content, &pst.Time, &pst.Parent, &pst.File,
-                        &pst.Filename, &pst.Fileinfo, &pst.Filemime, &pst.Imgprev, &pst.Option)
-        Err_check(err)
-        most_recent = append(most_recent, &pst)
-    }
-
-    if err == nil {
-        mostrecent_temp := template.New("console.html").Funcs(Filefuncmap)
-        mostrecent_temp, err := mostrecent_temp.ParseFiles(BP + "/templates/console.html")
-        Err_check(err)
-
-        results := Query_results{Posts: most_recent}
-	err = mostrecent_temp.Execute(w, results)
-	Err_check(err)
-    }
- }

@@ -27,7 +27,7 @@
 <hr>
 
 <a class="navi" href="/{{.Name}}/catalog.html">Catalog</a><br><br>
-{{if .Threads}}{{range .Threads}}{{$sub:= .Subject}}{{$op:= .OmittedPosts}}{{$oi:= .OmittedImages}}{{if .Posts}}{{range slice .Posts 0 1}}
+{{if .Threads}}{{range .Threads}}{{$sub:= .Subject}}{{$op:= .OmittedPosts}}{{$of:= .OmittedFiles}}{{if .Posts}}{{range slice .Posts 0 1}}
         <threadwrap>
             <div id="no{{.Id}}" class="thread">
 
@@ -36,7 +36,7 @@
                     {{if avcheck .Filemime}}<video controls poster={{if eq .Imgprev "audio_image.webp"}}'/resources/audio_image.webp'{{else}}'/{{$name}}/Files/{{.Imgprev}}'{{end}}><source src='/{{$name}}/Files/{{.File}}' type= '{{.Filemime}}'></video>{{else}}<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
                     <label class="{{.Option}}"><a href="{{.Parent}}.html"><subject>{{if $sub}}{{$sub}}{{else}}Reply{{end}}</subject></a> <time>{{.Time}}</time> <selfref><a href="/{{$name}}/{{.Parent}}.html#no{{.Id}}">No. </a><a class="plink" href="#newpost">{{.Id}}</a></selfref></label>
                     <div class="pcontent">{{.Content}}</div>
-                    {{if gt $op 0}}<p class="omitted">{{$op}} posts and {{$oi}} images omitted.</p>{{end}}
+                    {{if gt $op 0}}<p class="omitted">{{$op}} posts and {{$of}} files omitted.</p>{{end}}
             </div>
         </threadwrap>{{end}}
 {{range slice .Posts 1}}
@@ -55,9 +55,9 @@
 {{end}}{{end}}
 <hr class="split">
 {{end}}{{end}}
-    <form action="/im/post/?board={{.Name}}" enctype="multipart/form-data" method="Post">
+    <form action="/im/post/?board={{.Name}}" enctype="multipart/form-data" method="Post" autocomplete="on">
         <input name="subject" type="text" value=""><br>
-        <textarea id="newpost" name="newpost" rows="8" cols="78">I'm putting the new post box at the bottom.</textarea>
+        <textarea id="newpost" name="newpost" rows="8" cols="78"></textarea>
         <br>
         <input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp, image/avif,
             audio/mpeg, audio/ogg, audio/flac, video/webm, video/mp4, .opus, .m4a">

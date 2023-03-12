@@ -33,15 +33,16 @@ const (
     thread_collstring = `SELECT Parent, MAX(Id) FROM posts WHERE (instr(Option, 'sage') = 0 OR Id = Parent) AND Board = ? 
         GROUP BY Parent ORDER BY MAX(Id) DESC`
     subject_lookstring = `SELECT Subject FROM subjects WHERE Parent = ? AND Board = ?`
-    shown_countstring = `Select COUNT(*), COUNT(Imgprev) FROM 
+    shown_countstring = `Select COUNT(*), COUNT(File) FROM 
       (SELECT *	FROM posts WHERE Board = ?1 AND Parent = ?2 AND Id <> ?2 ORDER BY Id DESC LIMIT 5)`
-    total_countstring = `Select COUNT(*), COUNT(Imgprev) FROM posts WHERE Board = ?1 AND Parent = ?2 AND Id <> ?2`
+    total_countstring = `Select COUNT(*), COUNT(File) FROM posts WHERE Board = ?1 AND Parent = ?2 AND Id <> ?2`
 
     //all inserts(and necessary queries) are preformed in one transaction 
-    newpost_wfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, File, Filename, Fileinfo, Filemime, Imgprev, Option) 
-        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)`
-    newpost_nfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, Option) 
-        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6)`
+    newpost_wfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, File, Filename, Fileinfo, Filemime, Imgprev, 
+        Option, Calendar, Clock) 
+        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)`
+    newpost_nfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, Option, Calendar, Clock) 
+        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8)`
     repadd_string = `INSERT INTO replies(Board, Source, Replier) VALUES (?1, ?2, (SELECT Id FROM latest WHERE Board = ?1) - 1)`
     subadd_string = `INSERT INTO subjects(Board, Parent, Subject) VALUES (?, ?, ?)`
     hpadd_string = `INSERT INTO homepost(Board, Id, Content, TrunContent, Parent)

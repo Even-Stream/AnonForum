@@ -5,8 +5,24 @@ import (
     "os"
     "strings"
     "time"
-    "fmt"
+    "strconv"
+    //"fmt"
+    "database/sql"
+    "text/template"
 )
+
+const (
+    base_query_string = `SELECT ROWID, Board, Id, Content, Time, Parent, Identifier, COALESCE(File, '') AS File, 
+            COALESCE(Filename, '') AS Filename,
+            COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Filemime, '') AS Filemime, COALESCE(Imgprev, '') AS Imgprev, Option FROM posts 
+            WHERE Parent <> 0`
+    query_cap = ` ORDER BY ROWID DESC`
+)
+
+type Query_results struct {
+    Posts []*Post
+    Auth Acc_type
+}
 
 func Admin_actions(w http.ResponseWriter, req *http.Request) {
     ctx := req.Context()
@@ -54,7 +70,7 @@ func Admin_actions(w http.ResponseWriter, req *http.Request) {
     defer new_tx.Rollback()
 
         if strings.HasPrefix(actions, "Ban") {
-            fmt.Println("confirmation")
+            //fmt.Println("confirmation")
 
             duration := req.FormValue("duration")
             var ban_expiry time.Time
@@ -62,7 +78,7 @@ func Admin_actions(w http.ResponseWriter, req *http.Request) {
                 ban_expiry = time.Now().In(Loc).Add(time.Minute * 3) //.Hour * 24 * 5)
             }
 
-            fmt.Println(ban_expiry)
+            //fmt.Println(ban_expiry)
             ban_stmt := WriteStrings["ban"]
             _, err = new_tx.ExecContext(ctx, ban_stmt, ids, boards, ban_expiry.Format(time.UnixDate))
             Err_check(err)
@@ -115,4 +131,146 @@ func Admin_actions(w http.ResponseWriter, req *http.Request) {
         }
 
         http.Redirect(w, req, req.Header.Get("Referer"), 302)
+}
+
+//the console
+func Load_console(w http.ResponseWriter, req *http.Request) {
+    c, err := req.Cookie("session_token")
+
+    if err != nil {
+        if err == http.ErrNoCookie {
+            http.Error(w, "Unauthorized.", http.StatusUnauthorized)
+            return
+        }
+        w.WriteHeader(http.StatusBadRequest)
+        return
+    }
+
+    sessionToken := c.Value
+    userSession, exists := Sessions[sessionToken]
+    if !exists {
+        http.Error(w, "Unauthorized.", http.StatusUnauthorized)
+        return
+    }
+
+    if userSession.IsExpired() {
+        delete(Sessions, sessionToken)
+        http.Error(w, "Session expired.", http.StatusUnauthorized)
+        return
+    }
+
+    //put this in a function, with the query string being an input. Every query will return an array of posts
+    conn, err := sql.Open("sqlite3", DB_uri)
+    Err_check(err)
+    defer conn.Close()
+
+    query_string := base_query_string
+
+    //time control
+    sdate :=  strings.ReplaceAll(req.FormValue("sdate"), "-", "")
+    if sdate != "" {
+        _, err := strconv.Atoi(sdate)
+        if err != nil {
+            http.Error(w, "Invalid start date.", http.StatusBadRequest)
+            return
+        }
+
+        query_string += " AND Calendar >= " + sdate
+    }
+
+    edate :=  strings.ReplaceAll(req.FormValue("edate"), "-", "")
+    if edate != "" {
+        _, err := strconv.Atoi(edate)
+        if err != nil {
+            http.Error(w, "Invalid end date.", http.StatusBadRequest)
+            return
+        }
+
+        query_string += " AND Calendar <= " + edate
+    }
+
+    stime :=  strings.ReplaceAll(req.FormValue("stime"), ":", "")
+    if stime != "" {
+        _, err := strconv.Atoi(stime)
+        if err != nil {
+            http.Error(w, "Invalid start time.", http.StatusBadRequest)
+            return
+        }
+
+        query_string += " AND Clock >= " + stime
+    }
+
+    etime :=  strings.ReplaceAll(req.FormValue("etime"), ":", "")
+    if etime != "" {
+        _, err := strconv.Atoi(etime)
+        if err != nil {
+            http.Error(w, "Invalid end time.", http.StatusBadRequest)
+            return
+        }
+
+        query_string += " AND Clock <= " + etime
+    }
+
+    //location control
+    board :=  req.FormValue("board")
+    if board != "" {query_string += ` AND Board = "` + board + `"`}
+
+    parent :=  req.FormValue("parent")
+    if parent != "" {
+        _, err := strconv.Atoi(parent)
+        if err != nil {
+            http.Error(w, "Invalid parent.", http.StatusBadRequest)
+            return
+        }
+
+        query_string += " AND Parent = " + parent
+    }
+
+    //identifier
+    identifier :=  req.FormValue("identifier")
+    if identifier != "" {query_string += ` AND Identifier = "` + identifier + `"`}
+
+    query_string += query_cap
+
+    limit := req.FormValue("limit")
+    if limit == "" {
+        query_string += " LIMIT 10"
+    } else {
+        intval, err := strconv.Atoi(limit)
+        if err != nil {
+            http.Error(w, "Invalid limit.", http.StatusBadRequest)
+            return
+        }
+        
+        if intval > 0 {query_string += " LIMIT " + limit}
+    }
+
+    query_stmt, err := conn.Prepare(query_string)
+    Err_check(err)
+
+
+    rows, err := query_stmt.Query()
+    Err_check(err)
+    defer rows.Close()
+
+    var most_recent []*Post
+    var filler int
+
+    for rows.Next() {
+        var pst Post
+        err = rows.Scan(&filler, &pst.BoardN, &pst.Id, &pst.Content, &pst.Time, &pst.Parent, &pst.Identifier, &pst.File,
+                        &pst.Filename, &pst.Fileinfo, &pst.Filemime, &pst.Imgprev, &pst.Option)
+        Err_check(err)
+        most_recent = append(most_recent, &pst)
+    }
+
+    if err == nil {
+        mostrecent_temp := template.New("console.html").Funcs(Filefuncmap)
+        mostrecent_temp, err := mostrecent_temp.ParseFiles(BP + "/templates/console.html")
+        Err_check(err)
+
+        results := Query_results{Posts: most_recent, Auth: userSession.acc_type}
+	err = mostrecent_temp.Execute(w, results)
+	Err_check(err)
+    }
 }

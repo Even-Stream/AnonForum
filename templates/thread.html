@@ -56,9 +56,9 @@
         </div>
     </postwrap>
 {{end}}{{end}}
-    <form action="/im/post/?parent={{.TId}}&board={{.BoardN}}" enctype="multipart/form-data" method="Post">
+    <form action="/im/post/?parent={{.TId}}&board={{.BoardN}}" enctype="multipart/form-data" method="Post" autocomplete="on">
         <input type="checkbox" name="option" value="sage">
-        <textarea id="newpost" name="newpost" rows="8" cols="78">I'm putting the new post box at the bottom.</textarea>
+        <textarea id="newpost" name="newpost" rows="8" cols="78"></textarea>
         <br>
         <input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp, image/avif
             audio/mpeg, audio/ogg, audio/flac, audio/x-m4a, video/webm, video/mp4, .opus, .m4a">

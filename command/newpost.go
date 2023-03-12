@@ -177,6 +177,8 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 
     now := time.Now().In(nip)
     post_time := now.Format("1/2/06(Mon)15:04:05")
+    calendar := now.Format("20060102")
+    clock := now.Format("1504")
 
     hpadd_stmt := WriteStrings["hpadd"]
 
@@ -290,7 +292,8 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             }
             ffname := string(ofname[rem:])
 
-            _, err = new_tx.ExecContext(ctx, newpst_wfstmt, board, input, post_time, parent, identity, file_name, ffname, file_info, mime_type, file_pre, option)
+            _, err = new_tx.ExecContext(ctx, newpst_wfstmt, board, input, post_time, parent, identity, file_name, ffname, file_info, mime_type, file_pre, 
+                option, calendar, clock)
             Err_check(err)
         } else {
               http.Error(w, "Unsupported file type.", http.StatusBadRequest)
@@ -299,7 +302,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     //file not present 
     } else {
         newpost_nfstmt := WriteStrings["newpost_nf"]
-        _, err := new_tx.ExecContext(ctx, newpost_nfstmt, board, input, post_time, parent, identity, option)
+        _, err := new_tx.ExecContext(ctx, newpost_nfstmt, board, input, post_time, parent, identity, option, calendar, clock)
         Err_check(err)
     }
 

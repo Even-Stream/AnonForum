@@ -17,6 +17,7 @@ type Post struct {
     Content string
     Time string
     Parent int
+    Identifier string
     File string
     Filename string
     Fileinfo string
@@ -35,7 +36,7 @@ type Thread struct {
     Header []string
     HeaderDescs []string
     OmittedPosts int
-    OmittedImages int
+    OmittedFiles int
     SThemes []string
 }
 
@@ -97,19 +98,19 @@ func Get_omitted(parent, board string) (int, int) {
     defer Checkin(stmts)
 
     var total_posts int
-    var total_images int
+    var total_files int
     var shown_posts int
-    var shown_images int
+    var shown_files int
 
     total_countstmt := stmts["total_count"]
-    err := total_countstmt.QueryRow(board, parent).Scan(&total_posts, &total_images)
+    err := total_countstmt.QueryRow(board, parent).Scan(&total_posts, &total_files)
     Query_err_check(err)
 
     shown_countstmt := stmts["shown_count"]
-    err = shown_countstmt.QueryRow(board, parent).Scan(&shown_posts, &shown_images)
+    err = shown_countstmt.QueryRow(board, parent).Scan(&shown_posts, &shown_files)
     Query_err_check(err)
 
-    return (total_posts - shown_posts), (total_images - shown_images)
+    return (total_posts - shown_posts), (total_files - shown_files)
 }
 
 //for board pages
@@ -171,13 +172,13 @@ func get_threads(board string) []*Thread {
         fstpstid := strconv.Itoa(fstpst.Id)
 
         sub := Get_subject(fstpstid, board)
-        omitted_posts, omitted_images := Get_omitted(fstpstid, board)
+        omitted_posts, omitted_files := Get_omitted(fstpstid, board)
 
         var thr Thread
         if sub != "" {
-            thr = Thread{Posts: pst_coll, Subject: sub, OmittedPosts: omitted_posts, OmittedImages: omitted_images}
+            thr = Thread{Posts: pst_coll, Subject: sub, OmittedPosts: omitted_posts, OmittedFiles: omitted_files}
         } else {
-            thr = Thread{Posts: pst_coll, OmittedPosts: omitted_posts, OmittedImages: omitted_images}
+            thr = Thread{Posts: pst_coll, OmittedPosts: omitted_posts, OmittedFiles: omitted_files}
         }
 
         board_body = append(board_body, &thr)

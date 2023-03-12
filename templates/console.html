@@ -29,8 +29,24 @@ admbox threadwrap .post {
     <admbox>
         <threadwrap>
             <box class="controls">
-                Query<br>
-                test
+    <form action="/im/console/" enctype="multipart/form-data" method = "Post">
+      Start:
+      <input type="date" name="sdate">
+      <input type="time" name="stime">
+      End:
+      <input type="date" name="edate">
+      <input type="time" name="etime">
+      <input type="submit" name="query" value="Query">
+      <br><br>
+      Board:
+      <input type="text" name="board" style="width: 40px;">
+      Parent:
+      <input type="text" name="parent" style="width: 40px;">
+      Limit:
+      <input type="text" name="limit" style="width: 40px;" value="-1">
+      Identifier:
+      <input type="text" name="identifier">
+    </form>
             </box>
         </threadwrap>
     </admbox>
@@ -45,11 +61,13 @@ admbox threadwrap .post {
         </threadwrap>
     </admbox>
 
+{{$at := .Auth}}
 {{range .Posts}}
     <admbox>
         <threadwrap>
             <box class="controls">
                 {{.BoardN}}
+                {{if ne $at 2}}<div style="float: right;">{{.Identifier}}</div>{{end}}
                 <form action="/im/mod/" enctype="multipart/form-data" method = "Post">
                     <input type="hidden" name="parents" value="{{.Parent}}">
                     <input type="hidden" name="ids" value="{{.Id}}">
