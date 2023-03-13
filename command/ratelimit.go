@@ -18,8 +18,8 @@ type IPRateLimiter struct {
     themeB      int
     admR        rate.Limit
     admB        int
-    loginR        rate.Limit
-    loginB        int
+    loginR      rate.Limit
+    loginB      int
 }
 
 // NewIPRateLimiter .

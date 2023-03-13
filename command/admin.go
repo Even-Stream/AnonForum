@@ -72,16 +72,37 @@ func Admin_actions(w http.ResponseWriter, req *http.Request) {
         if strings.HasPrefix(actions, "Ban") {
             //fmt.Println("confirmation")
 
-            duration := req.FormValue("duration")
+            hours := req.FormValue("hours")
+            days := req.FormValue("days")
+             
+            duration := 0
+            dint, err := strconv.Atoi(days)
+            if err == nil {duration += (dint * 24)}
+            hint, err := strconv.Atoi(hours)
+            if err == nil {duration += hint}
+ 
             var ban_expiry time.Time
-            if duration == "" {
-                ban_expiry = time.Now().In(Loc).Add(time.Minute * 3) //.Hour * 24 * 5)
+            if duration == 0 {
+                ban_expiry = time.Now().In(Loc).Add(time.Hour * 96)
+            } else {
+                ban_expiry = time.Now().In(Loc).Add(time.Hour * time.Duration(duration))
             }
 
-            //fmt.Println(ban_expiry)
             ban_stmt := WriteStrings["ban"]
-            _, err = new_tx.ExecContext(ctx, ban_stmt, ids, boards, ban_expiry.Format(time.UnixDate))
+            if dint > 0 {
+                _, err = new_tx.ExecContext(ctx, ban_stmt, ids, boards, ban_expiry.Format(time.UnixDate))
+            } else { //permaban
+                _, err = new_tx.ExecContext(ctx, ban_stmt, ids, boards, -1)
+            }
             Err_check(err)
+
+            ban_message := req.FormValue("banmessage")
+            if ban_message != "" {
+                ban_message_stmt := WriteStrings["ban_message"]
+                _, err = new_tx.ExecContext(ctx, ban_message_stmt, ban_message, ids, boards)
+                Err_check(err)
+                update_posts = true
+            }
         }
 
         if strings.HasSuffix(actions, "Delete") {

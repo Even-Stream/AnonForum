@@ -66,6 +66,7 @@ const (
     get_files_string = `SELECT COALESCE(File, '') AS File, COALESCE(Imgprev, '') AS Imgprev FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`
     delete_post_string = `DELETE FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`
     ban_string = `INSERT INTO banned(Identifier, Expiry) VALUES ((SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2), ?3)`
+    ban_message_string = `UPDATE posts SET Content = Content || '<br><br><div class="banmessage">(' || ? || ')</div>' WHERE Id = ? AND Board = ?`
 )
 
 var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_nf": newpost_nfstring,
@@ -75,7 +76,7 @@ var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_n
         "add_token":  add_token_string, "search_token": search_token_string, 
         "ban_search": ban_search_string, "ban_remove": ban_remove_string, "delete_token": delete_token_string,
         "new_user": new_user_string, "search_user": search_user_string,
-        "get_files": get_files_string, "delete_post": delete_post_string, "ban": ban_string}
+        "get_files": get_files_string, "delete_post": delete_post_string, "ban": ban_string, "ban_message": ban_message_string}
 
 func Checkout() map[string]*sql.Stmt {
         return <-readConns

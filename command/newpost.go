@@ -122,6 +122,10 @@ func New_post(w http.ResponseWriter, req *http.Request) {
         var ban_result string
         err = ban_rows.Scan(&ban_result) 
 
+        if ban_result == "-1" {
+            http.Error(w, "You are permanently banned.", http.StatusBadRequest)
+            return
+        }
         ban_expiry, err := time.Parse(time.UnixDate, ban_result)
         Err_check(err)
 
@@ -328,7 +332,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     Build_thread(parent, board)
     http.Redirect(w, req, req.Header.Get("Referer"), 302)
 
-    Build_board(board)
-    Build_catalog(board)
-    Build_home()
+    go Build_board(board)
+    go Build_catalog(board)
+    go Build_home()
 }

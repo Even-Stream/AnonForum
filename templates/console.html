@@ -12,6 +12,7 @@
     <noscript><style> .prev { display: none !important} </style></noscript>
 
 <style>
+.identifier {float: right;}
 {{range .Posts}}{{if .File}}{{if imagecheck .Filemime}}
 .p{{.Id}}{{.BoardN}} {--mini: url('/{{.BoardN}}/Files/{{.Imgprev}}'); --maxi: url('/{{.BoardN}}/Files/{{.File}}');}{{end}}{{end}}{{end}}
 
@@ -52,14 +53,6 @@ admbox threadwrap .post {
     </admbox>
 
 {{if .Posts}}
-    <admbox>
-        <threadwrap>
-            <box class="controls">
-                Master Controls<br>
-                test
-            </box>
-        </threadwrap>
-    </admbox>
 
 {{$at := .Auth}}
 {{range .Posts}}
@@ -67,7 +60,7 @@ admbox threadwrap .post {
         <threadwrap>
             <box class="controls">
                 {{.BoardN}}
-                {{if ne $at 2}}<div style="float: right;">{{.Identifier}}</div>{{end}}
+                {{if ne $at 2}}<div class="identifier">{{.Identifier}}</div>{{end}}
                 <form action="/im/mod/" enctype="multipart/form-data" method = "Post">
                     <input type="hidden" name="parents" value="{{.Parent}}">
                     <input type="hidden" name="ids" value="{{.Id}}">
@@ -76,7 +69,7 @@ admbox threadwrap .post {
                     <input type="submit" name="actions" value="Delete File">
                     Days: <input type="text" name="days" size="1" value="4">
                     Hours: <input type="text" name="hours" size="1" value="0">
-                    Message: <input type="text" name="message" value="USER WAS BANNED FOR THIS POST">
+                    Message: <input type="text" name="banmessage" value="USER WAS BANNED FOR THIS POST">
                     <input type="submit" name="actions" value="Ban">
                     <input type="submit" name="actions" value="Ban and Delete">
                     <input type="submit" name="actions" value="Ban and Delete All by User">
@@ -102,7 +95,11 @@ admbox threadwrap .post {
             </div>
         </threadwrap>
     </admbox>
-{{end}}{{end}}
+{{end}}
+<form action="/im/mod/" enctype="multipart/form-data" method = "Post">
+    <input type="submit" name="actions" value="Delete All">
+</form>
+{{end}}
 
 </body>
 </html>
