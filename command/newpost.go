@@ -120,10 +120,11 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     for ban_rows.Next() {
     //user was banned
         var ban_result string
-        err = ban_rows.Scan(&ban_result) 
+        var ban_reason string
+        err = ban_rows.Scan(&ban_result, &ban_reason) 
 
         if ban_result == "-1" {
-            http.Error(w, "You are permanently banned.", http.StatusBadRequest)
+            http.Error(w, "You are permanently banned. Reason: " + ban_reason, http.StatusBadRequest)
             return
         }
         ban_expiry, err := time.Parse(time.UnixDate, ban_result)
@@ -131,7 +132,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 
         if time.Now().In(Loc).Before(ban_expiry) {
         //user is still banned
-            http.Error(w, "You are banned until: " + ban_result, http.StatusBadRequest)
+            http.Error(w, "You are banned until: " + ban_result + " Reason: " + ban_reason, http.StatusBadRequest)
             return
         } else {
             ban_removestmt := WriteStrings["ban_remove"]

@@ -8,6 +8,7 @@ import (
     ini "gopkg.in/ini.v1"
 )
 
+var SiteName string
 var BP string
 var boards []*ini.Key
 var Board_names []string
@@ -23,6 +24,7 @@ func Load_conf() {
     cfg, err := ini.Load(homedir +  "/.config/ogai.ini")
     Err_check(err)
 
+    SiteName = cfg.Section("").Key("site name").String()
     BP = cfg.Section("").Key("base path").String()
 
     Board_map = cfg.Section("boards").KeysHash()

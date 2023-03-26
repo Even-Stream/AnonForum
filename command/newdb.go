@@ -8,9 +8,8 @@ import (
     _ "github.com/mattn/go-sqlite3"
 )
 
-func create_table(db *sql.DB) {
-
-    createPostsTableSQL := `CREATE TABLE posts (
+const (
+    createPostsTableSQL = `CREATE TABLE posts (
         "Board" TEXT NOT NULL,
         "Id" INTEGER NOT NULL,
         "Content" TEXT,
@@ -29,25 +28,25 @@ func create_table(db *sql.DB) {
         "Clock" INTEGER NOT NULL
     );`
 
-    createRepliesTableSQL := `CREATE TABLE replies (
+    createRepliesTableSQL = `CREATE TABLE replies (
         "Board" TEXT NOT NULL,
         "Source" INTEGER NOT NULL,
         "Replier" INTEGER NOT NULL
     );`
 
 
-    createSubjectsTableSQL := `CREATE TABLE subjects (
+    createSubjectsTableSQL = `CREATE TABLE subjects (
         "Board" TEXT NOT NULL,
         "Parent" INTEGER NOT NULL,
         "Subject" TEXT NOT NULL
     );`
 
-    createLatestIdTableSQL := `CREATE TABLE latest (
+    createLatestIdTableSQL = `CREATE TABLE latest (
         "Board" TEXT NOT NULL,
         "Id" INTEGER NOT NULL
     );`
 
-    createHomePostTableSQL := `CREATE TABLE homepost (
+    createHomePostTableSQL = `CREATE TABLE homepost (
         "Board" TEXT NOT NULL,
         "Id" INTEGER NOT NULL,
         "Content" TEXT NOT NULL,
@@ -55,31 +54,42 @@ func create_table(db *sql.DB) {
         "Parent" INTEGER NOT NULL
     );`
 
-    createHomeThumbTableSQL := `CREATE TABLE homethumb (
+    createHomeThumbTableSQL = `CREATE TABLE homethumb (
         "Board" TEXT NOT NULL,
         "Id" INTEGER NOT NULL,
         "Parent" TEXT NOT NULL,
         "Imgprev" TEXT NOT NULL
     );`
 
-    createCredTableSQL := `CREATE TABLE credentials (
+    createCredTableSQL = `CREATE TABLE credentials (
         "Username" TEXT NOT NULL,
         "Hash" TEXT NOT NULL,
         "Type" INTEGER NOT NULL
     );`
 
-    createTokenTableSQL := `CREATE TABLE tokens (
+    createTokenTableSQL = `CREATE TABLE tokens (
         "Token" TEXT NOT NULL,
         "Type" TEXT NOT NULL
     );`
 
-    createBannedTableSQL := `CREATE TABLE banned (
+    createBannedTableSQL = `CREATE TABLE banned (
         "Identifier" TEXT NOT NULL,
-        "Expiry" TEXT NOT NULL
+        "Expiry" TEXT NOT NULL,
+        "Mod" TEXT NOT NULL,
+        "Content" TEXT,
+        "Reason" TEXT
+    );`
+
+    createDeletedTableSQL = `CREATE TABLE deleted (
+        "Identifier" TEXT NOT NULL,
+        "Time" TEXT NOT NULL,
+        "Mod" TEXT NOT NULL,
+        "Content" TEXT,
+        "Reason" TEXT
     );`
 
     //triggers
-    createLatestTriggerSQL := `CREATE TRIGGER latest_update
+    createLatestTriggerSQL = `CREATE TRIGGER latest_update
         AFTER INSERT ON posts
         BEGIN
             UPDATE latest 
@@ -87,7 +97,7 @@ func create_table(db *sql.DB) {
             WHERE Board = NEW.Board;
         END;`
         
-    trimHomePostStack := `CREATE TRIGGER homepost_trim
+    trimHomePostStack = `CREATE TRIGGER homepost_trim
         AFTER INSERT ON homepost
         BEGIN
             DELETE FROM homepost WHERE ROWID =
@@ -95,7 +105,7 @@ func create_table(db *sql.DB) {
                 (SELECT min(ROWID) from homepost), NULL);
         END;`
 
-    trimHomeThumbStack := `CREATE TRIGGER homethumb_trim
+    trimHomeThumbStack = `CREATE TRIGGER homethumb_trim
         AFTER INSERT ON homethumb
         BEGIN
             DELETE FROM homethumb WHERE ROWID =
@@ -103,7 +113,7 @@ func create_table(db *sql.DB) {
                 (SELECT min(ROWID) from homethumb), NULL);
         END;`
 
-    deleteFromHome := `CREATE TRIGGER deletefrom_home
+    deleteFromHome = `CREATE TRIGGER deletefrom_home
         AFTER DELETE ON posts
         FOR EACH ROW
         BEGIN
@@ -112,8 +122,10 @@ func create_table(db *sql.DB) {
         END`
         
     //how new posts know what their id is 
-    latestseedSQL := `INSERT INTO latest (Board, Id) VALUES (cb, 1);`
+    latestseedSQL = `INSERT INTO latest (Board, Id) VALUES (cb, 1);`
+)
 
+func create_table(db *sql.DB) {
 
     statement, err := db.Prepare(createPostsTableSQL)
     Err_check(err)
@@ -149,6 +161,10 @@ func create_table(db *sql.DB) {
     statement.Exec()
 
     statement, err = db.Prepare(createBannedTableSQL)
+        Err_check(err)
+    statement.Exec()
+
+    statement, err = db.Prepare(createDeletedTableSQL)
         Err_check(err)
     statement.Exec()
 

@@ -36,6 +36,7 @@ type Ht struct {
 }
 
 type Home struct {
+    Title string
     Latest []*Hp
     Thumbs []*Ht
     Header []string
@@ -167,7 +168,7 @@ func Build_home() {
 
     hps, hts := get_home()
 
-    home := Home{Latest: hps, Thumbs: hts, Header: Board_names, HeaderDescs: Board_descs, 
+    home := Home{Title: SiteName, Latest: hps, Thumbs: hts, Header: Board_names, HeaderDescs: Board_descs, 
         SThemes: Themes}
     hometemp.Execute(f, home)
 }

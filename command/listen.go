@@ -17,7 +17,9 @@ var admf_map = map[string]bool {
     "verify": true,
     "logout": true,
     "console": true,
-    "mod": true,}
+    "mod": true,
+    "log": true,
+}
 
 func Listen() {
 
@@ -35,7 +37,9 @@ func Listen() {
     mux.HandleFunc("/im/verify/", Token_check)
     mux.HandleFunc("/im/logout/", Logout)
     mux.HandleFunc("/im/console/", Load_console)
-    mux.HandleFunc("/im/mod/", Admin_actions)
+    mux.HandleFunc("/im/log/", Load_log)
+    mux.HandleFunc("/im/mod/", Moderation_actions)
+
 
     srv := &http.Server {
         Addr: ":1024",

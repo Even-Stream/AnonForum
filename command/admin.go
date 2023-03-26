@@ -17,6 +17,9 @@ const (
             COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Filemime, '') AS Filemime, COALESCE(Imgprev, '') AS Imgprev, Option FROM posts 
             WHERE Parent <> 0`
     query_cap = ` ORDER BY ROWID DESC`
+
+    ban_log_query_string = `SELECT * FROM banned`
+    delete_log_query_string = `SELECT * FROM deleted`
 )
 
 type Query_results struct {
@@ -24,7 +27,28 @@ type Query_results struct {
     Auth Acc_type
 }
 
-func Admin_actions(w http.ResponseWriter, req *http.Request) {
+type Ban_result struct {
+    Identifier string
+    Expiry string
+    Mod string
+    Content string
+    Reason string
+}
+
+type Delete_result struct {
+    Identifier string
+    DTime string
+    Mod string
+    Content string
+    Reason string
+}
+
+type Log_result struct {
+    BRS []*Ban_result
+    DRS []*Delete_result
+}
+
+func Moderation_actions(w http.ResponseWriter, req *http.Request) {
     ctx := req.Context()
 
     c, err := req.Cookie("session_token")
@@ -69,9 +93,10 @@ func Admin_actions(w http.ResponseWriter, req *http.Request) {
     Err_check(err)
     defer new_tx.Rollback()
 
-        if strings.HasPrefix(actions, "Ban") {
-            //fmt.Println("confirmation")
+    reason := req.FormValue("reason")
 
+        if strings.HasPrefix(actions, "Ban") {
+            reason := req.FormValue("reason")
             hours := req.FormValue("hours")
             days := req.FormValue("days")
              
@@ -89,10 +114,10 @@ func Admin_actions(w http.ResponseWriter, req *http.Request) {
             }
 
             ban_stmt := WriteStrings["ban"]
-            if dint > 0 {
-                _, err = new_tx.ExecContext(ctx, ban_stmt, ids, boards, ban_expiry.Format(time.UnixDate))
+            if duration >= 0 {
+                _, err = new_tx.ExecContext(ctx, ban_stmt, ids, boards, ban_expiry.Format(time.UnixDate), userSession.username, reason)
             } else { //permaban
-                _, err = new_tx.ExecContext(ctx, ban_stmt, ids, boards, -1)
+                _, err = new_tx.ExecContext(ctx, ban_stmt, ids, boards, -1, userSession.username, reason)
             }
             Err_check(err)
 
@@ -133,6 +158,9 @@ func Admin_actions(w http.ResponseWriter, req *http.Request) {
                         Err_check(err)
                     }
             }}
+
+            delete_log_stmt := WriteStrings["delete_log"]
+            _, err = new_tx.ExecContext(ctx, delete_log_stmt, ids, boards, time.Now().In(Loc), userSession.username, reason)
 
             delete_post_stmt := WriteStrings["delete_post"]
             _, err = new_tx.ExecContext(ctx, delete_post_stmt, ids, boards)
@@ -294,4 +322,76 @@ func Load_console(w http.ResponseWriter, req *http.Request) {
 	err = mostrecent_temp.Execute(w, results)
 	Err_check(err)
     }
+}
+
+func Deleted_clean() {
+    for range time.Tick(72 * time.Hour) {
+    
+    }
+}
+
+func Load_log(w http.ResponseWriter, req *http.Request) {
+    c, err := req.Cookie("session_token")
+
+    if err != nil {
+        if err == http.ErrNoCookie {
+            http.Error(w, "Unauthorized.", http.StatusUnauthorized)
+            return
+        }
+        w.WriteHeader(http.StatusBadRequest)
+        return
+    }
+
+    sessionToken := c.Value
+    userSession, exists := Sessions[sessionToken]
+    if !exists {
+        http.Error(w, "Unauthorized.", http.StatusUnauthorized)
+        return
+    }
+
+    if userSession.IsExpired() {
+        delete(Sessions, sessionToken)
+        http.Error(w, "Session expired.", http.StatusUnauthorized)
+        return
+    }
+
+    conn, err := sql.Open("sqlite3", DB_uri)
+    Err_check(err)
+    defer conn.Close()
+
+    var brs []*Ban_result
+    var drs []*Delete_result
+
+    ban_log_query_stmt, err := conn.Prepare(ban_log_query_string)
+    Err_check(err)
+    delete_log_query_stmt, err := conn.Prepare(delete_log_query_string)
+    Err_check(err)
+
+    ban_rows, err := ban_log_query_stmt.Query()
+    Err_check(err)
+
+    for ban_rows.Next() {
+        var br Ban_result
+        err = ban_rows.Scan(&br.Identifier, &br.Expiry, &br.Mod, &br.Content, &br.Mod)
+        Err_check(err)
+        brs = append(brs, &br)
+    }
+
+    delete_rows, err := delete_log_query_stmt.Query()
+    Err_check(err)
+
+    for delete_rows.Next() {
+        var dr Delete_result
+        err = delete_rows.Scan(&dr.Identifier, &dr.DTime, &dr.Mod, &dr.Content, &dr.Mod)
+        Err_check(err)
+        drs = append(drs, &dr)
+    }
+
+    log_temp := template.New("log.html")
+    log_temp, err = log_temp.ParseFiles(BP + "/templates/log.html")
+    Err_check(err)
+
+    results := Log_result{BRS: brs, DRS: drs}
+    err = log_temp.Execute(w, results)
+    Err_check(err)
 }

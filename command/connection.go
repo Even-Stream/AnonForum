@@ -5,7 +5,7 @@ import (
     _ "github.com/mattn/go-sqlite3"
 )
 
-var Max_conns = 5
+const Max_conns = 5
 var readConns = make(chan map[string]*sql.Stmt, Max_conns)
 var writeStrings = make(chan map[string]string, 1)
 var writeConn = make(chan *sql.DB, 1) 
@@ -60,12 +60,15 @@ const (
     new_user_string = `INSERT INTO credentials(Username, Hash, Type) VALUES (?, ?, ?)`
     search_user_string = `SELECT Hash, Type FROM credentials WHERE Username = ?`
 
-    ban_search_string = `SELECT Expiry FROM banned WHERE Identifier = ? ORDER BY ROWID ASC`
+    ban_search_string = `SELECT Expiry, Reason FROM banned WHERE Identifier = ? ORDER BY ROWID ASC`
     ban_remove_string = `DELETE FROM banned WHERE ROWID IN (SELECT ROWID FROM banned WHERE Identifier = ? ORDER BY ROWID ASC LIMIT 1)`
 
     get_files_string = `SELECT COALESCE(File, '') AS File, COALESCE(Imgprev, '') AS Imgprev FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`
     delete_post_string = `DELETE FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`
-    ban_string = `INSERT INTO banned(Identifier, Expiry) VALUES ((SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2), ?3)`
+    ban_string = `INSERT INTO banned(Identifier, Expiry, Mod, Content, Reason) VALUES ((SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2), 
+        ?3, ?4, (SELECT Content FROM posts WHERE Id = ?1 AND Board = ?2), ?5)`
+    delete_log_string = `INSERT INTO deleted(Identifier, Time, Mod, Content, Reason) VALUES ((SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2),
+        ?3, ?4, (SELECT Content FROM posts WHERE Id = ?1 AND Board = ?2), ?5)`
     ban_message_string = `UPDATE posts SET Content = Content || '<br><br><div class="banmessage">(' || ? || ')</div>' WHERE Id = ? AND Board = ?`
 )
 
@@ -76,7 +79,8 @@ var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_n
         "add_token":  add_token_string, "search_token": search_token_string, 
         "ban_search": ban_search_string, "ban_remove": ban_remove_string, "delete_token": delete_token_string,
         "new_user": new_user_string, "search_user": search_user_string,
-        "get_files": get_files_string, "delete_post": delete_post_string, "ban": ban_string, "ban_message": ban_message_string}
+        "get_files": get_files_string, "delete_post": delete_post_string, "ban": ban_string, "delete_log": delete_log_string, 
+        "ban_message": ban_message_string}
 
 func Checkout() map[string]*sql.Stmt {
         return <-readConns

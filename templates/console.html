@@ -66,18 +66,23 @@ admbox threadwrap .post {
                     <input type="hidden" name="ids" value="{{.Id}}">
                     <input type="hidden" name="boards" value="{{.BoardN}}">
                     <input type="submit" name="actions" value="Delete">
-                    <input type="submit" name="actions" value="Delete File">
-                    Days: <input type="text" name="days" size="1" value="4">
-                    Hours: <input type="text" name="hours" size="1" value="0">
-                    Message: <input type="text" name="banmessage" value="USER WAS BANNED FOR THIS POST">
+                    <input type="submit" name="actions" value="Delete File"> |
                     <input type="submit" name="actions" value="Ban">
                     <input type="submit" name="actions" value="Ban and Delete">
                     <input type="submit" name="actions" value="Ban and Delete All by User">
-                    {{if eq .Id .Parent}}<br><br>
+                    {{if eq .Id .Parent}} |
                     <input type="submit" name="actions" value="Lock">
                     <input type="submit" name="actions" value="Pin">
                     <input type="submit" name="actions" value="Unlock">
-                    <input type="submit" name="actions" value="Unpin">{{end}}
+                    <input type="submit" name="actions" value="Unpin"> |
+                    <input type="submit" name="actions" value="Move">
+                    {{end}}
+                    <br><br>
+                    Days: <input type="text" name="days" size="1" value="4">
+                    Hours: <input type="text" name="hours" size="1" value="0">
+                    Reason: <input type="text" name="reason" value="spam">
+                    Message: <input type="text" name="banmessage" value="USER WAS BANNED FOR THIS POST"> |
+                    New Board: <input type="text" name="newboard" style="width: 40px;">
                 </form>
             </box>
         </threadwrap>

@@ -53,7 +53,9 @@ func main() {
         New_db()
         Admin_init()
     }
-    Make_Conns() 
+    Make_Conns()
+    go Deleted_clean()
+ 
     for _, board := range Board_names{
         Build_home()
         Build_board(board)

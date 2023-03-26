@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Moderation Log</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="/resources/base.css">
+    <link rel="stylesheet" href="/resources/default.css">
+    <script async src="/resources/dropdown.js" defer></script>
+</head>
+
+<body>
+{{if .BRS}}{{range .BRS}}<p>{{.Content}}</p>
+{{end}}{{end}}
+
+{{if .DRS}}{{range .DRS}}<p>{{.Content}}</p>
+{{end}}{{end}}
+</body>
+
+</html>
