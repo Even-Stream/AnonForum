@@ -5,17 +5,106 @@
     <title>Moderation Log</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="/resources/base.css">
-    <link rel="stylesheet" href="/resources/default.css">
     <script async src="/resources/dropdown.js" defer></script>
+
+<style>
+    body {
+        background-color: #000c; 
+        color: #ffffffdb;
+    }
+
+    a {
+        color: #9dd1ff;
+    }
+
+    table {
+        width: 15vw;
+        border-collapse: collapse;
+
+    }
+    table, th, td {
+        border: 1px solid #ffffffdb;
+    }
+    .entry {
+        resize: both;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding-right: 40px;
+    }
+    .textentry {
+        width: 15vw;
+    }
+    .unban {
+        width: 5vw;
+        text-align: center;
+    }
+    .unban a {
+        text-decoration: none;
+    }
+
+    .bantbl, .deltbl {
+        display: none;
+    }
+
+    .bantbl:target, .deltbl:target {
+        display: table;
+    }
+</style>
 </head>
 
 <body>
-{{if .BRS}}{{range .BRS}}<p>{{.Content}}</p>
-{{end}}{{end}}
 
-{{if .DRS}}{{range .DRS}}<p>{{.Content}}</p>
-{{end}}{{end}}
+<center>
+<div style="right: 0;">
+    <a href="#bantbl">Ban Log</a>&nbsp&nbsp&nbsp
+    <a href="#deltbl">Deletion Log</a>
+</div><br><br>
+
+<table class="bantbl" id="bantbl">
+    <tr class="logheader">
+        <th>Mod</th>
+        <th>Identifer</th>
+        <th>Expiry</th>
+        <th>Content</th>
+        <th>Reason</th>
+        <th></th>
+    </tr>
+
+    {{if .BRS}}{{range .BRS}}<tr>
+       <td><div class="entry">{{.Mod}}</div></td>
+       <td><div class="entry">{{.Identifier}}</div></td>
+       <td><div class="entry textentry">{{.Expiry}}</div></td>
+       <td><div class="entry textentry">{{.Content}}</div></td>
+       <td><div class="entry textentry">{{.Reason}}</div></td>
+       <td><div class="unban">
+           <a href="/im/unban/?identifier={{.Identifier}}&expiry={{.Expiry}}">unban</a>
+       </div></td>
+    {{end}}{{end}}
+</table>
+</center>
+
+<center>
+<table class="deltbl" id="deltbl">
+    <tr class="logheader">
+        <th>Mod</th>
+        <th>Identifer</th>
+        <th>Time</th>
+        <th>Content</th>
+        <th>Reason</th>
+    </tr>
+
+
+    {{if .DRS}}{{range .DRS}}<tr>
+       <td><div class="entry">{{.Mod}}</div></td>
+       <td><div class="entry">{{.Identifier}}</div></td>
+       <td><div class="entry textentry">{{.DTime}}</div></td>
+       <td><div class="entry textentry">{{.Content}}</div></td>
+       <td><div class="entry textentry">{{.Reason}}</div></td>
+    {{end}}{{end}}
+</table>
+</center>
+
 </body>
 
 </html>

@@ -136,7 +136,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             return
         } else {
             ban_removestmt := WriteStrings["ban_remove"]
-            _, err = new_tx.ExecContext(ctx, ban_removestmt, identity)
+            _, err = new_tx.ExecContext(ctx, ban_removestmt, identity, ban_result)
             Err_check(err)
         }
 

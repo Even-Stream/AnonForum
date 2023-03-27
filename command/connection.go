@@ -61,7 +61,7 @@ const (
     search_user_string = `SELECT Hash, Type FROM credentials WHERE Username = ?`
 
     ban_search_string = `SELECT Expiry, Reason FROM banned WHERE Identifier = ? ORDER BY ROWID ASC`
-    ban_remove_string = `DELETE FROM banned WHERE ROWID IN (SELECT ROWID FROM banned WHERE Identifier = ? ORDER BY ROWID ASC LIMIT 1)`
+    ban_remove_string = `DELETE FROM banned WHERE Identifier = ? AND Expiry = ?`
 
     get_files_string = `SELECT COALESCE(File, '') AS File, COALESCE(Imgprev, '') AS Imgprev FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`
     delete_post_string = `DELETE FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`

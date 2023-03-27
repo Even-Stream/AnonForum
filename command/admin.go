@@ -18,8 +18,8 @@ const (
             WHERE Parent <> 0`
     query_cap = ` ORDER BY ROWID DESC`
 
-    ban_log_query_string = `SELECT * FROM banned`
-    delete_log_query_string = `SELECT * FROM deleted`
+    ban_log_query_string = `SELECT Identifier, Expiry, Mod, Content, Reason FROM banned`
+    delete_log_query_string = `SELECT Identifier, Time, Mod, Content, Reason FROM deleted`
 )
 
 type Query_results struct {
@@ -51,29 +51,8 @@ type Log_result struct {
 func Moderation_actions(w http.ResponseWriter, req *http.Request) {
     ctx := req.Context()
 
-    c, err := req.Cookie("session_token")
-
-    if err != nil {
-        if err == http.ErrNoCookie {
-            http.Error(w, "Unauthorized.", http.StatusUnauthorized)
-            return
-        }
-        w.WriteHeader(http.StatusBadRequest)
-        return
-    }
-
-    sessionToken := c.Value
-    userSession, exists := Sessions[sessionToken]
-    if !exists {
-        http.Error(w, "Unauthorized.", http.StatusUnauthorized)
-        return
-    }
-
-    if userSession.IsExpired() {
-        delete(Sessions, sessionToken)
-        http.Error(w, "Session expired.", http.StatusUnauthorized)
-        return
-    } else {Account_refresh(w, sessionToken)}
+    userSession := Logged_in_check(w, req)
+    if userSession == nil {return}
 
     //use maps for these(no duplicates)
     actions := req.FormValue("actions")
@@ -182,31 +161,35 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
         http.Redirect(w, req, req.Header.Get("Referer"), 302)
 }
 
+func Unban(w http.ResponseWriter, req *http.Request) {
+    userSession := Logged_in_check(w, req)
+    if userSession == nil {return}
+
+    ctx := req.Context()
+
+    identity := req.FormValue("identifier")
+    expiry := req.FormValue("expiry")
+
+    new_conn := WriteConnCheckout()
+    defer WriteConnCheckin(new_conn)
+    new_tx, err := new_conn.Begin()
+    Err_check(err)
+    defer new_tx.Rollback()
+    
+    ban_removestmt := WriteStrings["ban_remove"]
+    _, err = new_tx.ExecContext(ctx, ban_removestmt, identity, expiry)
+    Err_check(err)
+
+    err = new_tx.Commit()
+    Err_check(err)
+
+    http.Redirect(w, req, req.Header.Get("Referer"), 302)
+}
+
 //the console
 func Load_console(w http.ResponseWriter, req *http.Request) {
-    c, err := req.Cookie("session_token")
-
-    if err != nil {
-        if err == http.ErrNoCookie {
-            http.Error(w, "Unauthorized.", http.StatusUnauthorized)
-            return
-        }
-        w.WriteHeader(http.StatusBadRequest)
-        return
-    }
-
-    sessionToken := c.Value
-    userSession, exists := Sessions[sessionToken]
-    if !exists {
-        http.Error(w, "Unauthorized.", http.StatusUnauthorized)
-        return
-    }
-
-    if userSession.IsExpired() {
-        delete(Sessions, sessionToken)
-        http.Error(w, "Session expired.", http.StatusUnauthorized)
-        return
-    }
+    userSession := Logged_in_check(w, req)
+    if userSession == nil {return}
 
     //put this in a function, with the query string being an input. Every query will return an array of posts
     conn, err := sql.Open("sqlite3", DB_uri)
@@ -331,29 +314,8 @@ func Deleted_clean() {
 }
 
 func Load_log(w http.ResponseWriter, req *http.Request) {
-    c, err := req.Cookie("session_token")
-
-    if err != nil {
-        if err == http.ErrNoCookie {
-            http.Error(w, "Unauthorized.", http.StatusUnauthorized)
-            return
-        }
-        w.WriteHeader(http.StatusBadRequest)
-        return
-    }
-
-    sessionToken := c.Value
-    userSession, exists := Sessions[sessionToken]
-    if !exists {
-        http.Error(w, "Unauthorized.", http.StatusUnauthorized)
-        return
-    }
-
-    if userSession.IsExpired() {
-        delete(Sessions, sessionToken)
-        http.Error(w, "Session expired.", http.StatusUnauthorized)
-        return
-    }
+    userSession := Logged_in_check(w, req)
+    if userSession == nil {return}
 
     conn, err := sql.Open("sqlite3", DB_uri)
     Err_check(err)
@@ -372,7 +334,7 @@ func Load_log(w http.ResponseWriter, req *http.Request) {
 
     for ban_rows.Next() {
         var br Ban_result
-        err = ban_rows.Scan(&br.Identifier, &br.Expiry, &br.Mod, &br.Content, &br.Mod)
+        err = ban_rows.Scan(&br.Identifier, &br.Expiry, &br.Mod, &br.Content, &br.Reason)
         Err_check(err)
         brs = append(brs, &br)
     }
@@ -382,7 +344,7 @@ func Load_log(w http.ResponseWriter, req *http.Request) {
 
     for delete_rows.Next() {
         var dr Delete_result
-        err = delete_rows.Scan(&dr.Identifier, &dr.DTime, &dr.Mod, &dr.Content, &dr.Mod)
+        err = delete_rows.Scan(&dr.Identifier, &dr.DTime, &dr.Mod, &dr.Content, &dr.Reason)
         Err_check(err)
         drs = append(drs, &dr)
     }

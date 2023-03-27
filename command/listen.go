@@ -19,6 +19,7 @@ var admf_map = map[string]bool {
     "console": true,
     "mod": true,
     "log": true,
+    "unban": true,
 }
 
 func Listen() {
@@ -39,6 +40,7 @@ func Listen() {
     mux.HandleFunc("/im/console/", Load_console)
     mux.HandleFunc("/im/log/", Load_log)
     mux.HandleFunc("/im/mod/", Moderation_actions)
+    mux.HandleFunc("/im/unban/", Unban)
 
 
     srv := &http.Server {

@@ -251,6 +251,33 @@ func Credential_check (w http.ResponseWriter, req *http.Request) {
     w.Write([]byte(html_head + html_toconsole_head + `<p>Welcome.</p>` + html_foot))
 }
 
+func Logged_in_check(w http.ResponseWriter, req *http.Request) *session {
+    c, err := req.Cookie("session_token")
+
+    if err != nil {
+        if err == http.ErrNoCookie {
+            http.Error(w, "Unauthorized.", http.StatusUnauthorized)
+            return nil
+        }
+        w.WriteHeader(http.StatusBadRequest)
+        return nil
+    }
+
+    sessionToken := c.Value
+    userSession, exists := Sessions[sessionToken]
+    if !exists {
+        http.Error(w, "Unauthorized.", http.StatusUnauthorized)
+        return nil
+    }
+
+    if userSession.IsExpired() {
+        delete(Sessions, sessionToken)
+        http.Error(w, "Session expired.", http.StatusUnauthorized)
+        return nil
+    } else {Account_refresh(w, sessionToken)}
+
+    return userSession
+}
 
 //account exit 
 func Logout(w http.ResponseWriter, req *http.Request) {
