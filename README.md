@@ -53,6 +53,8 @@ git clone https://github.com/vision5/ngx_devel_kit
 
 git clone https://github.com/openresty/set-misc-nginx-module
 
+git clone https://github.com/yaoweibin/ngx_http_substitutions_filter_module
+
 cd nginx-(current version)
 
 sudo ./configure --with-http_sub_module --add-module=../ngx_devel_kit --add-module=../set-misc-nginx-module
