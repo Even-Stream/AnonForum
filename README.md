@@ -57,7 +57,7 @@ git clone https://github.com/yaoweibin/ngx_http_substitutions_filter_module
 
 cd nginx-(current version)
 
-sudo ./configure --with-http_sub_module --add-module=../ngx_devel_kit --add-module=../set-misc-nginx-module
+sudo ./configure --add-module=../ngx_devel_kit --add-module=../set-misc-nginx-module --add-module=../ngx_http_substitutions_filter_module
 
 sudo make & make install 
 
