@@ -29,11 +29,12 @@
         resize: both;
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: nowrap;
+        white-space: normal;
         padding-right: 40px;
     }
     .textentry {
         width: 15vw;
+        height: 10vh;
     }
     .unban {
         width: 5vw;
@@ -98,7 +99,7 @@
     {{if .DRS}}{{range .DRS}}<tr>
        <td><div class="entry">{{.Mod}}</div></td>
        <td><div class="entry">{{.Identifier}}</div></td>
-       <td><div class="entry textentry">{{.DTime}}</div></td>
+       <td><div class="textentry">{{.DTime}}</div></td>
        <td><div class="entry textentry">{{.Content}}</div></td>
        <td><div class="entry textentry">{{.Reason}}</div></td>
     {{end}}{{end}}
