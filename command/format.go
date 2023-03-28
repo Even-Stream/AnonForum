@@ -42,7 +42,7 @@ func Conf_dependent() {
 
     vidpost = `<details>
         <summary>$1$2$3 <a href="$1$2$3" rel="noopener noreferrer nofollow">[link]</a></summary>
-        <iframe src="/embed/$3?autoplay=0" allowfullscreen="" width="560" height="315" frameborder="0" loading="lazy" sandbox>
+        <iframe src="/im/vid/?id=$3" allowfullscreen="" loading="lazy" sandbox>
     </iframe></details>` 
 }
 

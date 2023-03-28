@@ -113,8 +113,9 @@ quo > * {
 }
 
 iframe {
-    margin-right: 30px;
-    margin-left: 30px;
+    border: 0;
+    width:560px;
+    height: 315px;
 }
 
 .imspec, video {

@@ -20,6 +20,8 @@ type IPRateLimiter struct {
     admB        int
     loginR      rate.Limit
     loginB      int
+    vidR      rate.Limit
+    vidB      int
 }
 
 // NewIPRateLimiter .
@@ -37,6 +39,8 @@ func NewIPRateLimiter(r []rate.Limit, b []int) *IPRateLimiter {
         admB:       b[3],
         loginR:     r[4],
         loginB:     b[4],
+        vidR:       r[5],
+        vidB:       b[5],
     }
 
     return i
@@ -53,7 +57,8 @@ func (i *IPRateLimiter) AddIP(ip string, sel int) *rate.Limiter {
     themeLimiter := rate.NewLimiter(i.themeR, i.themeB)
     admLimiter := rate.NewLimiter(i.admR, i.admB)
     loginLimiter := rate.NewLimiter(i.loginR, i.loginB)
-    limiters := []*rate.Limiter{retLimiter, postLimiter, themeLimiter, admLimiter, loginLimiter}
+    vidLimiter := rate.NewLimiter(i.vidR, i.vidB)
+    limiters := []*rate.Limiter{retLimiter, postLimiter, themeLimiter, admLimiter, loginLimiter, vidLimiter}
 
     i.ips[ip] = limiters
 
