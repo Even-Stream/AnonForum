@@ -22,7 +22,14 @@ const (
     <html>
     <head>
         <style>
-            body {background-color: #000000f0; color: #ffffffdb;}
+            body {
+                background-color: #000c; 
+                color: #ffffffdb;
+            }
+
+            a {
+                color: #9dd1ff;
+            }
         </style>`
     
     html_def_head = `
@@ -36,11 +43,12 @@ const (
     </head>
     <body><center><br>`	
 
-    html_toconsole_head = `
+    html_toentrance_head = `
         <title>Administration</title>
-        <meta http-equiv="refresh" content="1; url=/im/console/" />
+        <meta http-equiv="refresh" content="1; url=/entrance.html" />
     </head>
     <body><center><br>`
+
     
     html_tohome_head = `
         <title>Administration</title>
@@ -248,7 +256,7 @@ func Credential_check (w http.ResponseWriter, req *http.Request) {
         Path: "/",
     })
 
-    w.Write([]byte(html_head + html_toconsole_head + `<p>Welcome.</p>` + html_foot))
+    w.Write([]byte(html_head + html_toentrance_head + `<p>Welcome.</p>` + html_foot))
 }
 
 func Logged_in_check(w http.ResponseWriter, req *http.Request) *session {

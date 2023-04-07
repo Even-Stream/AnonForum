@@ -6,7 +6,7 @@ import (
     "strings"
     "time"
     "strconv"
-    //"fmt"
+    "fmt"
     "database/sql"
     "text/template"
 )
@@ -139,7 +139,7 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
             }}
 
             delete_log_stmt := WriteStrings["delete_log"]
-            _, err = new_tx.ExecContext(ctx, delete_log_stmt, ids, boards, time.Now().In(Loc), userSession.username, reason)
+            _, err = new_tx.ExecContext(ctx, delete_log_stmt, ids, boards, time.Now().In(Loc).Format(time.UnixDate), userSession.username, reason)
 
             delete_post_stmt := WriteStrings["delete_post"]
             _, err = new_tx.ExecContext(ctx, delete_post_stmt, ids, boards)
@@ -308,10 +308,36 @@ func Load_console(w http.ResponseWriter, req *http.Request) {
 }
 
 func Deleted_clean() {
-    for range time.Tick(72 * time.Hour) {
-    
-    }
-}
+    expiry := 1 * time.Minute //40 * time.Hour
+    for range time.Tick(expiry) {
+        func() {
+            new_conn := WriteConnCheckout()
+            defer WriteConnCheckin(new_conn)
+            new_tx, err := new_conn.Begin()
+            Err_check(err)
+            defer new_tx.Rollback()
+
+            get_deletedsmt := WriteStrings["get_deleted"]
+            deleted_rows, err := new_tx.Query(get_deletedsmt)
+            Err_check(err)
+            defer deleted_rows.Close()
+
+            for deleted_rows.Next() {
+                var deleted_identity string
+                var deleted_time string
+                err = deleted_rows.Scan(&deleted_identity, &deleted_time)
+                Err_check(err) 
+                deleted_actualt, err := time.Parse(time.UnixDate, deleted_time)
+                Err_check(err) 
+                
+fmt.Println(deleted_actualt)
+
+                if time.Now().In(Loc).Before(deleted_actualt.Add(expiry)) {	
+                    delete_removestmt := WriteStrings["delete_remove"]
+                    _, err = new_tx.Exec(delete_removestmt, deleted_identity, deleted_time)
+                    Err_check(err)
+        }}}()
+}}
 
 func Load_log(w http.ResponseWriter, req *http.Request) {
     userSession := Logged_in_check(w, req)

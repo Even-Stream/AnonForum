@@ -70,6 +70,8 @@ const (
     delete_log_string = `INSERT INTO deleted(Identifier, Time, Mod, Content, Reason) VALUES ((SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2),
         ?3, ?4, replace(replace((SELECT Content FROM posts WHERE Id = ?1 AND Board = ?2), '<', '&lt;'), '>', '&gt;'), ?5)`
     ban_message_string = `UPDATE posts SET Content = Content || '<br><br><div class="banmessage">(' || ? || ')</div>' WHERE Id = ? AND Board = ?`
+    get_deleted_string = `SELECT Identifier, Time FROM deleted`
+    delete_remove_string = `DELETE FROM deleted WHERE Identifier = ? AND TIME = ?`
 )
 
 var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_nf": newpost_nfstring,
@@ -80,7 +82,7 @@ var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_n
         "ban_search": ban_search_string, "ban_remove": ban_remove_string, "delete_token": delete_token_string,
         "new_user": new_user_string, "search_user": search_user_string,
         "get_files": get_files_string, "delete_post": delete_post_string, "ban": ban_string, "delete_log": delete_log_string, 
-        "ban_message": ban_message_string}
+        "ban_message": ban_message_string, "get_deleted": get_deleted_string, "delete_remove": delete_remove_string}
 
 func Checkout() map[string]*sql.Stmt {
         return <-readConns
