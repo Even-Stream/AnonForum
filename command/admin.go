@@ -6,7 +6,7 @@ import (
     "strings"
     "time"
     "strconv"
-    "fmt"
+    //"fmt"
     "database/sql"
     "text/template"
 )
@@ -308,7 +308,7 @@ func Load_console(w http.ResponseWriter, req *http.Request) {
 }
 
 func Deleted_clean() {
-    expiry := 1 * time.Minute //40 * time.Hour
+    expiry := 40 * time.Hour
     for range time.Tick(expiry) {
         func() {
             new_conn := WriteConnCheckout()
@@ -329,14 +329,15 @@ func Deleted_clean() {
                 Err_check(err) 
                 deleted_actualt, err := time.Parse(time.UnixDate, deleted_time)
                 Err_check(err) 
-                
-fmt.Println(deleted_actualt)
 
-                if time.Now().In(Loc).Before(deleted_actualt.Add(expiry)) {	
+                if deleted_actualt.Add(expiry).Before(time.Now().In(Loc)) {	
                     delete_removestmt := WriteStrings["delete_remove"]
                     _, err = new_tx.Exec(delete_removestmt, deleted_identity, deleted_time)
                     Err_check(err)
-        }}}()
+            }}
+            err = new_tx.Commit()
+            Err_check(err)
+        }()
 }}
 
 func Load_log(w http.ResponseWriter, req *http.Request) {
