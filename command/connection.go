@@ -54,7 +54,7 @@ const (
                 WHERE Parent = ? AND Board = ?`
     threadid_string = `SELECT Id FROM latest WHERE Board = ?`
 
-    add_token_string = `INSERT INTO tokens(Token, Type) VALUES (?, ?)`
+    Add_token_string = `INSERT INTO tokens(Token, Type) VALUES (?, ?)`
     search_token_string = `SELECT Type FROM tokens WHERE Token = ?`
     delete_token_string = `DELETE FROM tokens where Token = ?`
     new_user_string = `INSERT INTO credentials(Username, Hash, Type) VALUES (?, ?, ?)`
@@ -78,7 +78,7 @@ var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_n
         "repadd": repadd_string, "subadd": subadd_string, "hpadd": hpadd_string,
         "htadd": htadd_string, 
         "parent_check": parent_checkstring, "threadid" : threadid_string,
-        "add_token":  add_token_string, "search_token": search_token_string, 
+        "add_token":  Add_token_string, "search_token": search_token_string, 
         "ban_search": ban_search_string, "ban_remove": ban_remove_string, "delete_token": delete_token_string,
         "new_user": new_user_string, "search_user": search_user_string,
         "get_files": get_files_string, "delete_post": delete_post_string, "ban": ban_string, "delete_log": delete_log_string, 

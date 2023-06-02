@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Administration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        div {
+            left: 40%;
+            top: 30%;
+            position: absolute;
+        }
+    </style>
+</head>
+
+<body>
+
+<div>
+<form action="/im/mod/">
+    <input type="hidden" name="actiontype" value="on_site">
+    <label for="user select">Create a New User:</label>&ensp;
+    <select name="usertype" id="user select">
+        <option value="maid">Maid</option>
+        <option value="mod">Mod</option>
+    </select>&ensp;
+    <button value="newuser" name="actions" type="submit">Create</button>
+</form>
+<br>
+
+<form action="/im/mod/">
+    <input type="hidden" name="actiontype" value="on_site">
+    <label for="user remove">Remove a User:</label>&ensp;
+    <input type="text" name="username" id="user remove">&ensp;
+    <button value="removeuser" type="submit">Remove</button>
+</form>
+<br>
+
+<form action="/im/mod/">
+    <input type="hidden" name="actiontype" value="on_site">
+    <label for="update home">Update Home:</label>&ensp;
+    <select name="updatehome" id="update home">
+        <option value="every">Every</option>
+        <option value="rules">Rules</option>
+        <option value="about">About</option>
+        <option value="board">Board</option>
+        <option value="news">News</option>
+    </select>&ensp;
+    <button value="updatehome" type="submit">Update</button>
+</form>
+</div>
+
+</body>
+
+</html>

@@ -21,6 +21,7 @@ var nip, _ = time.LoadLocation("Asia/Tokyo")
 
 var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", 
     "image/gif": ".gif", "image/webp": ".webp", "image/avif": ".avif", "image/vnd.mozilla.apng": ".apng",
+    "image/svg+xml": ".svg",
     "audio/mpeg": ".mp3", "audio/ogg": ".ogg", "audio/flac": ".flac", "audio/opus": ".opus", "audio/x-m4a": ".m4a",
     "video/webm": ".webm", "video/mp4": ".mp4"}
 
@@ -98,7 +99,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
                 switch {
                     case userSession.acc_type == Admin:
                         option += " admin"
-                    case userSession.acc_type == Moderator:
+                    case userSession.acc_type == Mod:
                         option += " moderator"
                     case userSession.acc_type == Maid:
                         option += " maid"

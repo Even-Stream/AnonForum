@@ -9,6 +9,8 @@ import (
     //"fmt"
     "database/sql"
     "text/template"
+
+    "github.com/google/uuid"
 )
 
 const (
@@ -57,11 +59,6 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
     //use maps for these(no duplicates)
     actions := req.FormValue("actions")
     if Entry_check(w, req, "actions", actions) == 0 {return}
-    ids := req.FormValue("ids")
-    if Entry_check(w, req, "ids", ids) == 0 {return}
-    boards := req.FormValue("boards")	
-    if Entry_check(w, req, "boards", boards) == 0 {return}
-    parents := req.FormValue("parents")
 
     update_posts := false
 
@@ -72,13 +69,21 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
     Err_check(err)
     defer new_tx.Rollback()
 
-    reason := req.FormValue("reason")
+    actiontype := req.FormValue("actiontype")
+    if Entry_check(w, req, "actiontype", actiontype ) == 0 {return}
 
-        if strings.HasPrefix(actions, "Ban") {
-            reason := req.FormValue("reason")
-            hours := req.FormValue("hours")
-            days := req.FormValue("days")
-             
+    if actiontype == "on_posts" {
+        ids := req.FormValue("ids")
+        if Entry_check(w, req, "ids", ids) == 0 {return}
+        boards := req.FormValue("boards")	
+        if Entry_check(w, req, "boards", boards) == 0 {return}
+        parents := req.FormValue("parents")
+        if Entry_check(w, req, "parents", parents) == 0 {return}
+        reason := req.FormValue("reason")
+        hours := req.FormValue("hours")
+        days := req.FormValue("days")
+
+        if strings.HasPrefix(actions, "Ban") {             
             duration := 0
             dint, err := strconv.Atoi(days)
             if err == nil {duration += (dint * 24)}
@@ -148,17 +153,46 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
             update_posts = true
         }
 
-        err = new_tx.Commit()
-        Err_check(err)
-
         if update_posts {
-            Build_thread(parents, boards)
-            Build_board(boards)
-            Build_catalog(boards)
-            Build_home()
+                go Build_thread(parents, boards)
+                go Build_board(boards)
+                go Build_catalog(boards)
+                go Build_home()
         }
 
         http.Redirect(w, req, req.Header.Get("Referer"), 302)
+    } else if actiontype == "on_site" {
+        if userSession.acc_type != Admin {
+            http.Error(w, "Unauthorized.", http.StatusUnauthorized)
+            return
+        }
+
+        if actions == "newuser" {
+            usertype := req.FormValue("usertype")
+            if Entry_check(w, req, "usertype", usertype) == 0 {return}
+
+            var rusertype Acc_type
+            if usertype == "maid" {
+                rusertype = Maid
+            } else {rusertype = Mod}
+
+            conn, err := sql.Open("sqlite3", DB_uri)
+            Err_check(err)
+            defer conn.Close()
+            add_token_stmt, err := conn.Prepare(Add_token_string)
+            Err_check(err)
+
+            new_token := uuid.NewString()
+            add_token_stmt.Exec(new_token, rusertype)
+
+            w.Write([]byte(html_head +  `<title>User Token</title>
+                </head><body><center><br>
+                    <p>New Token: ` + new_token +`</p>` + html_foot))
+        }
+    }
+
+    err = new_tx.Commit()
+    Err_check(err)
 }
 
 func Unban(w http.ResponseWriter, req *http.Request) {

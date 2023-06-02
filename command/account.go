@@ -13,7 +13,7 @@ import (
 type Acc_type int64
 const (
     Admin     Acc_type = iota
-    Moderator
+    Mod
     Maid
 )
 
@@ -49,7 +49,12 @@ const (
     </head>
     <body><center><br>`
 
-    
+    html_toadministration_head = `        
+        <title>Administration</title>
+        <meta http-equiv="refresh" content="10; url=/entrance.html" />
+    </head>
+    <body><center><br>`    
+
     html_tohome_head = `
         <title>Administration</title>
         <meta http-equiv="refresh" content="1; url=/" />
@@ -86,7 +91,7 @@ func Admin_init() {
     conn, err := sql.Open("sqlite3", DB_uri)
     Err_check(err)
     defer conn.Close()
-    add_token_stmt, err := conn.Prepare(add_token_string)
+    add_token_stmt, err := conn.Prepare(Add_token_string)
     Err_check(err)
 
     add_token_stmt.Exec("500", Admin)

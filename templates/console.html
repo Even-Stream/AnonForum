@@ -62,6 +62,7 @@ admbox threadwrap .post {
                 {{.BoardN}}
                 {{if ne $at 2}}<div class="identifier">{{.Identifier}}</div>{{end}}
                 <form action="/im/mod/" enctype="multipart/form-data" method = "Post">
+                    <input type="hidden" name="actiontype" value="on_posts">
                     <input type="hidden" name="parents" value="{{.Parent}}">
                     <input type="hidden" name="ids" value="{{.Id}}">
                     <input type="hidden" name="boards" value="{{.BoardN}}">
