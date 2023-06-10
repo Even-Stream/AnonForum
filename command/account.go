@@ -159,6 +159,16 @@ func Token_check (w http.ResponseWriter, req *http.Request) {
         return
     }
 
+    //look in database for username
+    search_user_stmt, err := conn.Prepare(search_user_string)
+    Err_check(err)
+
+    err = search_user_stmt.QueryRow(username).Scan()
+    if err != sql.ErrNoRows {
+        http.Error(w, "Username already in use.", http.StatusBadRequest)
+        return
+    }
+
     //password length enforce
     pass_length := len([]rune(password))
     if pass_length > 30 || pass_length < 10 {

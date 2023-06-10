@@ -58,6 +58,7 @@ const (
     search_token_string = `SELECT Type FROM tokens WHERE Token = ?`
     delete_token_string = `DELETE FROM tokens where Token = ?`
     new_user_string = `INSERT INTO credentials(Username, Hash, Type) VALUES (?, ?, ?)`
+    remove_user_string = `DELETE FROM credentials WHERE Username = ? AND Type <> 0`
     search_user_string = `SELECT Hash, Type FROM credentials WHERE Username = ?`
 
     ban_search_string = `SELECT Expiry, Reason FROM banned WHERE Identifier = ? ORDER BY ROWID ASC`
@@ -80,7 +81,7 @@ var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_n
         "parent_check": parent_checkstring, "threadid" : threadid_string,
         "add_token":  Add_token_string, "search_token": search_token_string, 
         "ban_search": ban_search_string, "ban_remove": ban_remove_string, "delete_token": delete_token_string,
-        "new_user": new_user_string, "search_user": search_user_string,
+        "new_user": new_user_string, "remove_user": remove_user_string,"search_user": search_user_string,
         "get_files": get_files_string, "delete_post": delete_post_string, "ban": ban_string, "delete_log": delete_log_string, 
         "ban_message": ban_message_string, "get_deleted": get_deleted_string, "delete_remove": delete_remove_string}
 

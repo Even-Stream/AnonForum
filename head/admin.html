@@ -32,7 +32,14 @@
     <input type="hidden" name="actiontype" value="on_site">
     <label for="user remove">Remove a User:</label>&ensp;
     <input type="text" name="username" id="user remove">&ensp;
-    <button value="removeuser" type="submit">Remove</button>
+    <button value="removeuser" name="actions" type="submit">Remove</button>
+</form>
+<br>
+
+<form action="/im/mod/">
+    <input type="hidden" name="actiontype" value="on_site">
+    <label for="user remove">Remove All Users:</label>&ensp;
+    <button value="removeall" name="actions" type="submit">Remove</button>
 </form>
 <br>
 
@@ -46,7 +53,7 @@
         <option value="board">Board</option>
         <option value="news">News</option>
     </select>&ensp;
-    <button value="updatehome" type="submit">Update</button>
+    <button value="updatehome" name="actions" type="submit">Update</button>
 </form>
 </div>
 

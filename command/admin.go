@@ -176,18 +176,27 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
                 rusertype = Maid
             } else {rusertype = Mod}
 
-            conn, err := sql.Open("sqlite3", DB_uri)
-            Err_check(err)
-            defer conn.Close()
-            add_token_stmt, err := conn.Prepare(Add_token_string)
-            Err_check(err)
-
             new_token := uuid.NewString()
-            add_token_stmt.Exec(new_token, rusertype)
+            _, err = new_tx.ExecContext(ctx, Add_token_string, new_token, rusertype)
+            Err_check(err)
 
             w.Write([]byte(html_head +  `<title>User Token</title>
                 </head><body><center><br>
                     <p>New Token: ` + new_token +`</p>` + html_foot))
+        }
+
+        if actions == "removeuser" {
+            username := req.FormValue("username")
+            if Entry_check(w, req, "username", username) == 0 {return}
+
+            remove_user_stmt := WriteStrings["remove_user"]
+            _, err = new_tx.ExecContext(ctx, remove_user_stmt, username)
+            Err_check(err)
+
+
+            w.Write([]byte(html_head +  `<title>User Token</title>
+                </head><body><center><br>
+                    <p>User ` + username +  ` removed.</p>` + html_foot))
         }
     }
 
