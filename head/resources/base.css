@@ -101,6 +101,16 @@ admbox {
     margin-bottom: 20px;
 }
 
+input[type=text], input[type=password] {
+    border-style: solid;
+    border-width: 1px;
+}
+
+input[type=submit], input::file-selector-button {
+    border-style: solid;
+    border-width: 1px;
+}
+
 .controls {
     background-color: rosybrown;
     padding: 5px;
