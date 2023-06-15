@@ -6,7 +6,7 @@ a, summary {
     color: #99225c;
 }
 
-p, .pcontent, label, postwrap, .thread postwrap::before {
+p, .pcontent, label, postwrap, .thread postwrap::before, .ogdc, small, input[type=file] {
     color: #999999;
 }
 
@@ -43,7 +43,7 @@ hr {
     border-top: 1px solid #2e2e2e;
 }
 
-.post:target {
+.post:target, .ogdc {
     background-color: rgba(44,44,51);
 }
 

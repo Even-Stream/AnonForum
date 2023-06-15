@@ -40,7 +40,7 @@ hr {
     border-top: 1px solid #34345C;
 }
 
-.post:target {
+.post:target, .ogdc {
     background-color: #D6BAD0;
 }
 

@@ -49,7 +49,7 @@ postwrap::before, .prev {
     content: " | ";
 }
 
-p, label, postwrap, threadwrap, a, postwrap::before {
+p, label, postwrap, threadwrap, a, postwrap::before, .ogdc {
     font-family: MPlus, system-ui, Helvetica, Arial, sans-serif;
     font-size: 15px;
 }
@@ -83,10 +83,8 @@ input, video {
 }
 
 textarea {
-    margin: 2vw;
-    width: 45%;
-    height: 25%;
-    max-width: 98% !important;
+    width: 35vw;
+    height: 20vh;
     font-family: MPlus, Helvetica, Arial, sans-serif;
     font-size: 15px;
     outline: none;
@@ -284,4 +282,10 @@ iframe {
 
 .banmessage {
     color: rgb(209, 17, 65);
+}
+
+.ogdc {
+    vertical-align: middle;
+    text-align: center;
+    width: 4.5em;
 }

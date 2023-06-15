@@ -55,14 +55,33 @@
 {{end}}{{end}}
 <hr class="split">
 {{end}}{{end}}
+
+<hr>
+    <center>
     <form action="/im/post/?board={{.Name}}" enctype="multipart/form-data" method="Post" autocomplete="on">
-        <input name="subject" type="text" value=""><br>
-        <textarea id="newpost" name="newpost" rows="8" cols="78"></textarea>
-        <br>
-        <input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp, image/avif, image/svg+xml,
-            audio/mpeg, audio/ogg, audio/flac, video/webm, video/mp4, .opus, .m4a">
-        <input type="submit" value="Submit">
+        <table><tbody>
+        <tr>
+        <td class="ogdc">Subject</td>
+        <td><input name="subject" type="text" value=""></td>
+        </tr><tr>
+        <td class="ogdc">Message</td>
+        <td><textarea id="newpost" name="newpost" rows="8" cols="78"></textarea></td>
+        </tr><tr>
+        <td class="ogdc">File</td>
+        <td><input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp, image/avif, image/svg+xml,
+            audio/mpeg, audio/ogg, audio/flac, audio/x-m4a, video/webm, video/mp4, .opus, .m4a"></td>
+        </tr><tr>
+        <td class="ogdc">Password</td>
+        <td><input type="password" name="pwd" value="">
+        <small>(For editing and deleting posts)</small></td>
+        </tr><tr>
+        <td class="ogdc">Submit</td>
+        <td><input type="submit" value="Reply">
+        <input type="submit" name="option" value="Sage"></td>
+        </tr>
+        </tbody></table>
     </form>
+    </center>
 
     <form id="thememenu" class="thememenu" action="/im/theme/" method="Get">
         <select name="theme">

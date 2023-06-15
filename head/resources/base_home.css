@@ -10,6 +10,10 @@ a {
     text-decoration: none;
 }
 
+td {
+    border: none;
+}
+
 .hlogo {
     width: 21vw;
 }
@@ -38,8 +42,6 @@ a {
 
 .recpost {
     width: 70%;
-    margin-top: 10px;
-    margin-bottom: 10px;
 }
 
 .hcon {
@@ -70,8 +72,7 @@ a {
 }
 
 .mimg {
-    border: 1px solid;
-    border-right: none;
+    border: none;
     text-align: center;
     height: auto;
     width: 12vw;

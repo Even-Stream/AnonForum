@@ -17,7 +17,7 @@ import (
     "github.com/gabriel-vasile/mimetype" 
 )
 
-var nip, _ = time.LoadLocation("Asia/Tokyo")
+var Nip, _ = time.LoadLocation("Asia/Tokyo")
 
 var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", 
     "image/gif": ".gif", "image/webp": ".webp", "image/avif": ".avif", "image/vnd.mozilla.apng": ".apng",
@@ -181,7 +181,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     home_content, home_truncontent := HProcess_post(input)
     input, repmatches := Format_post(input, board, parent)
 
-    now := time.Now().In(nip)
+    now := time.Now().In(Nip)
     post_time := now.Format("1/2/06(Mon)15:04:05")
     calendar := now.Format("20060102")
     clock := now.Format("1504")

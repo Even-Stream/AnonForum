@@ -83,7 +83,12 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
         hours := req.FormValue("hours")
         days := req.FormValue("days")
 
-        if strings.HasPrefix(actions, "Ban") {             
+        if strings.HasPrefix(actions, "Ban") {     
+            if userSession.acc_type == Maid {
+                http.Error(w, "Unauthorized.", http.StatusUnauthorized)
+                return
+            }
+        
             duration := 0
             dint, err := strconv.Atoi(days)
             if err == nil {duration += (dint * 24)}
@@ -198,6 +203,17 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
                 </head><body><center><br>
                     <p>User ` + username +  ` removed.</p>` + html_foot))
         }
+
+
+        if actions == "removetokens" {
+            remove_tokens_stmt := WriteStrings["remove_tokens"]
+            _, err = new_tx.ExecContext(ctx, remove_tokens_stmt)
+            Err_check(err)
+
+            w.Write([]byte(html_head +  `<title>Token Removal</title>
+                </head><body><center><br>
+                    <p>Done.` + html_foot))
+        }
     }
 
     err = new_tx.Commit()
@@ -243,6 +259,12 @@ func Load_console(w http.ResponseWriter, req *http.Request) {
 
     //time control
     sdate :=  strings.ReplaceAll(req.FormValue("sdate"), "-", "")
+    if userSession.acc_type == Maid {
+	now := time.Now().In(Nip)
+	then := now.Add(time.Duration(-72) * time.Hour)
+        sdate = then.Format("20060102")
+    }
+    
     if sdate != "" {
         _, err := strconv.Atoi(sdate)
         if err != nil {
@@ -386,6 +408,11 @@ func Deleted_clean() {
 func Load_log(w http.ResponseWriter, req *http.Request) {
     userSession := Logged_in_check(w, req)
     if userSession == nil {return}
+
+    if userSession.acc_type == Maid {
+        http.Error(w, "Unauthorized.", http.StatusUnauthorized)
+        return
+    }
 
     conn, err := sql.Open("sqlite3", DB_uri)
     Err_check(err)

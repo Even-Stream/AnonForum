@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/resources/base.css">
     <link rel="stylesheet" href="/resources/console.css">
     <link rel="stylesheet" href="/resources/default.css">
-    <script async src="/resources/htmx.js" defer></script>
+    <script async src="/resources/thread.js" defer></script>
     <noscript><style> .prev { display: none !important} </style></noscript>
 
 <style>
@@ -31,14 +31,15 @@ admbox threadwrap .post {
         <threadwrap>
             <box class="controls">
     <form action="/im/console/" enctype="multipart/form-data" method = "Post">
+    {{if ne .Auth 2}}
       Start:
       <input type="date" name="sdate">
       <input type="time" name="stime">
       End:
       <input type="date" name="edate">
       <input type="time" name="etime">
-      <input type="submit" name="query" value="Query">
       <br><br>
+    {{end}}
       Board:
       <input type="text" name="board" style="width: 40px;">
       Parent:
@@ -47,6 +48,7 @@ admbox threadwrap .post {
       <input type="text" name="limit" style="width: 40px;" value="-1">
       Identifier:
       <input type="text" name="identifier">
+      <input type="submit" name="query" value="Query">
     </form>
             </box>
         </threadwrap>
@@ -60,14 +62,15 @@ admbox threadwrap .post {
         <threadwrap>
             <box class="controls">
                 {{.BoardN}}
-                {{if ne $at 2}}<div class="identifier">{{.Identifier}}</div>{{end}}
+                <div class="identifier">{{.Identifier}}</div>
                 <form action="/im/mod/" enctype="multipart/form-data" method = "Post">
                     <input type="hidden" name="actiontype" value="on_posts">
                     <input type="hidden" name="parents" value="{{.Parent}}">
                     <input type="hidden" name="ids" value="{{.Id}}">
                     <input type="hidden" name="boards" value="{{.BoardN}}">
                     <input type="submit" name="actions" value="Delete">
-                    <input type="submit" name="actions" value="Delete File"> |
+                    <input type="submit" name="actions" value="Delete File">
+                    {{if ne $at 2}} |
                     <input type="submit" name="actions" value="Ban">
                     <input type="submit" name="actions" value="Ban and Delete">
                     <input type="submit" name="actions" value="Ban and Delete All by User">
@@ -82,8 +85,10 @@ admbox threadwrap .post {
                     Days: <input type="text" name="days" size="1" value="4">
                     Hours: <input type="text" name="hours" size="1" value="0">
                     Reason: <input type="text" name="reason" value="spam">
-                    Message: <input type="text" name="banmessage" value="USER WAS BANNED FOR THIS POST"> |
+                    Message: <input type="text" name="banmessage" value="USER WAS BANNED FOR THIS POST">
+                    {{if eq .Id .Parent}} |
                     New Board: <input type="text" name="newboard" style="width: 40px;">
+                    {{end}}{{end}}
                 </form>
             </box>
         </threadwrap>
