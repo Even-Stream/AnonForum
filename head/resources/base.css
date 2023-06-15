@@ -101,14 +101,10 @@ admbox {
     margin-bottom: 20px;
 }
 
-input[type=text], input[type=password] {
+input[type=text], input[type=password], input[type=submit], input::file-selector-button {
     border-style: solid;
     border-width: 1px;
-}
-
-input[type=submit], input::file-selector-button {
-    border-style: solid;
-    border-width: 1px;
+    border-color: lightgray;
 }
 
 .controls {
@@ -274,7 +270,7 @@ iframe {
 }
 
 .moderator::after {
-    content: "✦moderator✦";
+    content: "✦mod✦";
 }
 
 .maid::after {

@@ -54,7 +54,7 @@ const (
                 WHERE Parent = ? AND Board = ?`
     threadid_string = `SELECT Id FROM latest WHERE Board = ?`
 
-    Add_token_string = `INSERT INTO tokens(Token, Type) VALUES (?, ?)`
+    Add_token_string = `INSERT INTO tokens(Token, Type, Time) VALUES (?, ?, ?)`
     search_token_string = `SELECT Type FROM tokens WHERE Token = ?`
     delete_token_string = `DELETE FROM tokens where Token = ?`
     remove_tokens_string = `DELETE FROM tokens`
@@ -74,6 +74,8 @@ const (
     ban_message_string = `UPDATE posts SET Content = Content || '<br><br><div class="banmessage">(' || ? || ')</div>' WHERE Id = ? AND Board = ?`
     get_deleted_string = `SELECT Identifier, Time FROM deleted`
     delete_remove_string = `DELETE FROM deleted WHERE Identifier = ? AND TIME = ?`
+    get_expired_tokens_string = `SELECT Token, Time FROM tokens`
+    delete_expired_token_string = `DELETE FROM tokens WHERE Token = ? AND TIME = ?`
 )
 
 var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_nf": newpost_nfstring,
@@ -84,7 +86,8 @@ var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_n
         "ban_search": ban_search_string, "ban_remove": ban_remove_string, "delete_token": delete_token_string, "remove_tokens": remove_tokens_string,
         "new_user": new_user_string, "remove_user": remove_user_string,"search_user": search_user_string,
         "get_files": get_files_string, "delete_post": delete_post_string, "ban": ban_string, "delete_log": delete_log_string, 
-        "ban_message": ban_message_string, "get_deleted": get_deleted_string, "delete_remove": delete_remove_string}
+        "ban_message": ban_message_string, "get_deleted": get_deleted_string, "delete_remove": delete_remove_string,
+        "get_expired_tokens": get_expired_tokens_string, "delete_expired_token": delete_expired_token_string}
 
 func Checkout() map[string]*sql.Stmt {
         return <-readConns

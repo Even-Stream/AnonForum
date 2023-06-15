@@ -69,7 +69,8 @@ const (
 
     createTokenTableSQL = `CREATE TABLE tokens (
         "Token" TEXT NOT NULL,
-        "Type" TEXT NOT NULL
+        "Type" TEXT NOT NULL,
+        "Time" TEXT NOT NULL
     );`
 
     createBannedTableSQL = `CREATE TABLE banned (

@@ -182,7 +182,8 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
             } else {rusertype = Mod}
 
             new_token := uuid.NewString()
-            _, err = new_tx.ExecContext(ctx, Add_token_string, new_token, rusertype)
+
+            _, err = new_tx.ExecContext(ctx, Add_token_string, new_token, rusertype, time.Now().In(Loc).Format(time.UnixDate))
             Err_check(err)
 
             w.Write([]byte(html_head +  `<title>User Token</title>
@@ -372,8 +373,7 @@ func Load_console(w http.ResponseWriter, req *http.Request) {
     }
 }
 
-func Deleted_clean() {
-    expiry := 40 * time.Hour
+func Clean(expiry time.Duration, get_string, remove_string string) {
     for range time.Tick(expiry) {
         func() {
             new_conn := WriteConnCheckout()
@@ -382,7 +382,7 @@ func Deleted_clean() {
             Err_check(err)
             defer new_tx.Rollback()
 
-            get_deletedsmt := WriteStrings["get_deleted"]
+            get_deletedsmt := WriteStrings[get_string]
             deleted_rows, err := new_tx.Query(get_deletedsmt)
             Err_check(err)
             defer deleted_rows.Close()
@@ -396,7 +396,7 @@ func Deleted_clean() {
                 Err_check(err) 
 
                 if deleted_actualt.Add(expiry).Before(time.Now().In(Loc)) {	
-                    delete_removestmt := WriteStrings["delete_remove"]
+                    delete_removestmt := WriteStrings[remove_string]
                     _, err = new_tx.Exec(delete_removestmt, deleted_identity, deleted_time)
                     Err_check(err)
             }}

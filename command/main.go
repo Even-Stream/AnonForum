@@ -54,7 +54,8 @@ func main() {
         Admin_init()
     }
     Make_Conns()
-    go Deleted_clean()
+    go Clean(40 * time.Hour, "get_deleted", "delete_remove")
+    go Clean(10 * time.Minute, "get_expired_tokens", "delete_expired_token")
  
     for _, board := range Board_names{
         Build_home()

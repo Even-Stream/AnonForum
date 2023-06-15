@@ -4,6 +4,7 @@ import (
     "net/http"
     "database/sql"
     "time"
+    //"fmt"
 
     "github.com/alexedwards/argon2id"
     _ "github.com/mattn/go-sqlite3"
@@ -65,7 +66,7 @@ const (
     </html>`
 )
 
-var params = &argon2id.Params{
+var Argon_params = &argon2id.Params{
 	Memory:      128 * 1024,
 	Iterations:  4,
 	Parallelism: 4,
@@ -94,7 +95,7 @@ func Admin_init() {
     add_token_stmt, err := conn.Prepare(Add_token_string)
     Err_check(err)
 
-    add_token_stmt.Exec("500", Admin)
+    add_token_stmt.Exec("500", Admin, time.Now().In(Loc).Add(time.Hour * 1).Format(time.UnixDate))
 }
 
 func Request_filter(w http.ResponseWriter, req *http.Request, method string, max_size int64) int {
@@ -191,7 +192,7 @@ func Token_check (w http.ResponseWriter, req *http.Request) {
     new_user_stmt, err := conn3.Prepare(new_user_string)
     Err_check(err)
 
-    hash, err := argon2id.CreateHash(password, params)
+    hash, err := argon2id.CreateHash(password, Argon_params)
     Err_check(err)
 
     new_user_stmt.Exec(username, hash, acc_type)
