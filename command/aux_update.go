@@ -84,7 +84,7 @@ func get_cat_posts(board string) ([]*Post, []string) {
         Err_check(err)
 
         err = thread_headstmt.QueryRow(cparent.Id, board).Scan(&cparent.Content, &cparent.Time, &cparent.Parent, &cparent.File,
-            &cparent.Filename, &cparent.Fileinfo, &cparent.Filemime, &cparent.Imgprev, &cparent.Option)
+            &cparent.Filename, &cparent.Fileinfo, &cparent.Filemime, &cparent.Imgprev, &cparent.Option, &cparent.Pinned, &cparent.Locked)
         Query_err_check(err)
 
         cat_body = append(cat_body, &cparent)

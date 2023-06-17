@@ -6,10 +6,6 @@
         background-image: url("burichan_hbg.png");
 }
 
-.hlogo {
-	content: url("burichan_logo.webp");
-}
-
 .hline .blink .hop {
         color: #34345C;
 }

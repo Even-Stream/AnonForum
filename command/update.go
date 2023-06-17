@@ -24,6 +24,8 @@ type Post struct {
     Filemime string
     Imgprev string
     Option string
+    Pinned bool
+    Locked bool
     Replies []int
 }
 
@@ -138,7 +140,7 @@ func get_threads(board string) []*Thread {
         err = parent_rows.Scan(&fstpst.Id, &filler)
         Err_check(err)
         err = thread_head_stmt.QueryRow(fstpst.Id, board).Scan(&fstpst.Content, &fstpst.Time, &fstpst.Parent, &fstpst.File,
-            &fstpst.Filename, &fstpst.Fileinfo, &fstpst.Filemime, &fstpst.Imgprev, &fstpst.Option)
+            &fstpst.Filename, &fstpst.Fileinfo, &fstpst.Filemime, &fstpst.Imgprev, &fstpst.Option, &fstpst.Pinned, &fstpst.Locked)
         Query_err_check(err)
 
         pst_coll = append(pst_coll, &fstpst)
@@ -205,7 +207,7 @@ func get_posts(parent string, board string) ([]*Post, error) {
     for rows.Next() {
         var pst Post
         err = rows.Scan(&pst.Id, &pst.Content, &pst.Time, &pst.File,
-            &pst.Filename, &pst.Fileinfo, &pst.Filemime, &pst.Imgprev, &pst.Option)
+            &pst.Filename, &pst.Fileinfo, &pst.Filemime, &pst.Imgprev, &pst.Option, &pst.Pinned, &pst.Locked)
         Err_check(err)
 
         rep_rows, err := update_rep_stmt.Query(pst.Id, board)

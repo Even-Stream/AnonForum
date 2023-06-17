@@ -157,6 +157,16 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             http.Error(w, "Parent thread is invalid.", http.StatusBadRequest)
             return
         }
+
+        var lock_result int
+        lock_checkstmt := WriteStrings["lock_check"]
+        err = new_tx.QueryRowContext(ctx, lock_checkstmt, parent, board).Scan(&lock_result)
+        Query_err_check(err)
+
+        if lock_result == 1 {
+            http.Error(w, "This thread is locked.", http.StatusBadRequest)
+            return
+        }
     } else {
     //new thread logic
         if file_err != nil {

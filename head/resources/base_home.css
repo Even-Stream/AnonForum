@@ -16,6 +16,7 @@ td {
 
 .hlogo {
     width: 21vw;
+    content: url("transparent_logo.webp");
 }
 
 .hline {

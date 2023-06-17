@@ -6,10 +6,6 @@
         background-image: url("peach_hbg.png");
 }
 
-.hlogo {
-	content: url("peach_logo.webp");
-}
-
 .hline .blink .hop {
         rgb(121, 85, 68);
 }

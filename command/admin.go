@@ -120,8 +120,6 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
         }
 
         if strings.HasSuffix(actions, "Delete") {
-            if Entry_check(w, req, "parents", parents) == 0 {return}
-
             get_files_stmt := WriteStrings["get_files"]
 
             //DO FOR ALL FILES
@@ -153,6 +151,19 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
 
             delete_post_stmt := WriteStrings["delete_post"]
             _, err = new_tx.ExecContext(ctx, delete_post_stmt, ids, boards)
+            Err_check(err)
+
+            update_posts = true
+        }
+
+        if _, present := WriteStrings[actions]; present  {
+            if userSession.acc_type == Maid {
+                http.Error(w, "Unauthorized.", http.StatusUnauthorized)
+                return
+            }
+
+            chain_stmt := WriteStrings[actions]
+            _, err = new_tx.ExecContext(ctx, chain_stmt, parents, boards)
             Err_check(err)
 
             update_posts = true

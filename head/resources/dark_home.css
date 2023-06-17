@@ -6,10 +6,6 @@
         background-image: url("dark_hbg.png");
 }
 
-.hlogo {
-	content: url("dark_logo.webp");
-}
-
 .hline .blink .hop {
         color: #99225c;
 }

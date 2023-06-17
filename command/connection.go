@@ -16,22 +16,27 @@ const (
             COALESCE(Imgprev, '') Imgprev, Option FROM posts WHERE Id = ? AND Board = ?`
     prev_parentstring = `SELECT Parent FROM posts WHERE Id = ? AND Board = ?`
     updatestring = `SELECT Id, Content, Time, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
-                COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Filemime, '') AS Filemime, COALESCE(Imgprev, '') Imgprev, Option FROM posts
-                WHERE Parent = ? AND Board = ?`
+                COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Filemime, '') AS Filemime, COALESCE(Imgprev, '') Imgprev, Option, 
+                Pinned, Locked 
+                FROM posts WHERE Parent = ? AND Board = ?`
     update_repstring = `SELECT Replier FROM replies WHERE Source = ? AND Board = ?`
-    parent_collstring = `SELECT Parent, MAX(Id) FROM posts WHERE (instr(Option, 'Sage') = 0 OR Id = Parent) AND Board = ? 
-        GROUP BY Parent ORDER BY MAX(Id) DESC LIMIT 15`
+    parent_collstring = `WITH temp (TParent, Id) AS (SELECT Parent, MAX(Id) FROM posts WHERE (instr(Option, 'Sage') = 0 OR Id = Parent) AND Board = ?1
+            GROUP BY Parent ORDER BY MAX(Id) DESC),
+        temp2(Parent, Pinned) AS (SELECT Parent, Pinned FROM posts WHERE Id = Parent AND Board = ?1)
+        SELECT Parent, Id FROM temp INNER JOIN temp2 ON temp.TParent = temp2.Parent ORDER BY Pinned DESC, Id DESC LIMIT 15`
     thread_headstring = `SELECT Content, Time, Parent, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
-                COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Filemime, '') AS Filemime, COALESCE(Imgprev, '') Imgprev, Option
-                FROM posts
-                WHERE Id = ? AND Board = ?`
+                COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Filemime, '') AS Filemime, COALESCE(Imgprev, '') Imgprev, Option,
+                Pinned, Locked 
+                FROM posts WHERE Id = ? AND Board = ?`
     thread_bodystring = `SELECT * FROM (
                 SELECT Id, Content, Time, Parent, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
                 COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Filemime, '') AS Filemime, COALESCE(Imgprev, '') Imgprev, Option FROM posts 
                 WHERE Parent = ? AND Board = ? AND Id != Parent ORDER BY Id DESC LIMIT 5)
                 ORDER BY Id ASC`
-    thread_collstring = `SELECT Parent, MAX(Id) FROM posts WHERE (instr(Option, 'Sage') = 0 OR Id = Parent) AND Board = ? 
-        GROUP BY Parent ORDER BY MAX(Id) DESC`
+    thread_collstring = `WITH temp (TParent, Id) AS (SELECT Parent, MAX(Id) FROM posts WHERE (instr(Option, 'Sage') = 0 OR Id = Parent) AND Board = ?1
+            GROUP BY Parent ORDER BY MAX(Id) DESC),
+        temp2(Parent, Pinned) AS (SELECT Parent, Pinned FROM posts WHERE Id = Parent AND Board = ?1)
+        SELECT Parent, Id FROM temp INNER JOIN temp2 ON temp.TParent = temp2.Parent ORDER BY Pinned DESC, Id DESC`
     subject_lookstring = `SELECT Subject FROM subjects WHERE Parent = ? AND Board = ?`
     shown_countstring = `Select COUNT(*), COUNT(File) FROM 
       (SELECT *	FROM posts WHERE Board = ?1 AND Parent = ?2 AND Id <> ?2 ORDER BY Id DESC LIMIT 5)`
@@ -39,10 +44,10 @@ const (
 
     //all inserts(and necessary queries) are preformed in one transaction 
     newpost_wfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, File, Filename, Fileinfo, Filemime, Imgprev, 
-        Option, Calendar, Clock) 
-        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)`
-    newpost_nfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, Option, Calendar, Clock) 
-        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8)`
+        Option, Calendar, Clock, Pinned, Locked) 
+        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, 0, 0)`
+    newpost_nfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, Option, Calendar, Clock, Pinned, Locked) 
+        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, 0, 0)`
     repadd_string = `INSERT INTO replies(Board, Source, Replier) VALUES (?1, ?2, (SELECT Id FROM latest WHERE Board = ?1) - 1)`
     subadd_string = `INSERT INTO subjects(Board, Parent, Subject) VALUES (?, ?, ?)`
     hpadd_string = `INSERT INTO homepost(Board, Id, Content, TrunContent, Parent)
@@ -76,6 +81,12 @@ const (
     delete_remove_string = `DELETE FROM deleted WHERE Identifier = ? AND TIME = ?`
     get_expired_tokens_string = `SELECT Token, Time FROM tokens`
     delete_expired_token_string = `DELETE FROM tokens WHERE Token = ? AND TIME = ?`
+
+    lock_check_string = `SELECT COALESCE(Locked, 0) AS Locked FROM posts WHERE Parent = ? AND Board = ?`
+    lock_string = `UPDATE posts SET Locked = 1 WHERE Id = ? AND Board = ?`
+    unlock_string = `UPDATE posts SET Locked = 0 WHERE Id = ? AND Board = ?`
+    pin_string = `UPDATE posts SET Pinned = 1 WHERE Id = ? AND Board = ?`
+    unpin_string = `UPDATE posts SET Pinned = 0 WHERE Id = ? AND Board = ?`
 )
 
 var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_nf": newpost_nfstring,
@@ -87,7 +98,8 @@ var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_n
         "new_user": new_user_string, "remove_user": remove_user_string,"search_user": search_user_string,
         "get_files": get_files_string, "delete_post": delete_post_string, "ban": ban_string, "delete_log": delete_log_string, 
         "ban_message": ban_message_string, "get_deleted": get_deleted_string, "delete_remove": delete_remove_string,
-        "get_expired_tokens": get_expired_tokens_string, "delete_expired_token": delete_expired_token_string}
+        "get_expired_tokens": get_expired_tokens_string, "delete_expired_token": delete_expired_token_string,
+        "lock_check": lock_check_string, "Lock": lock_string, "Unlock": unlock_string, "Pin": pin_string, "Unpin": unpin_string}
 
 func Checkout() map[string]*sql.Stmt {
         return <-readConns
@@ -192,7 +204,6 @@ func Make_Conns() {
 
         total_countstmt, err := conn13.Prepare(total_countstring)
         Err_check(err)
-
         
         read_stmts := map[string]*sql.Stmt{"prev": prev_stmt, "prev_parent": prev_parentstmt,
             "update": updatestmt, "update_rep": update_repstmt, "parent_coll": parent_collstmt,

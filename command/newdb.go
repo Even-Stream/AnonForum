@@ -25,7 +25,9 @@ const (
         "Phash" TEXT,
         "Option" TEXT,
         "Calendar" INTEGER NOT NULL,
-        "Clock" INTEGER NOT NULL
+        "Clock" INTEGER NOT NULL,
+        "Pinned" INTEGER NOT NULL,
+        "Locked" INTEGER NOT NULL
     );`
 
     createRepliesTableSQL = `CREATE TABLE replies (

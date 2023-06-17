@@ -6,10 +6,6 @@
         background-image: url("hbg.png");
 }
 
-.hlogo {
-	content: url("logo.webp");
-}
-
 .hline .blink .hop {
         color: rgb(216, 68, 36);
 }

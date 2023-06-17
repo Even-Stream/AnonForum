@@ -6,7 +6,7 @@ a, summary {
     color: rgb(121, 85, 68);
 }
 
-p, .pcontent, label, postwrap, .thread postwrap::before {
+p, .pcontent, label, postwrap, .thread postwrap::before, .pin, .lock {
     color: rgb(48, 34, 27);
 }
 

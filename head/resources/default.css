@@ -11,7 +11,7 @@ a, summary {
     color: rgb(216, 68, 36);
 }
 
-p, .pcontent, label, postwrap, .thread postwrap::before {
+p, .pcontent, label, postwrap, .thread postwrap::before, .pin, .lock {
     color: rgb(115, 13, 18);
 }
 
