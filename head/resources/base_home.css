@@ -10,7 +10,7 @@ a {
     text-decoration: none;
 }
 
-td {
+td, iframe {
     border: none;
 }
 

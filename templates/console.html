@@ -96,7 +96,8 @@ admbox threadwrap .post {
         <threadwrap>
             <div id="no{{.Id}}" class="post" {{if eq .Id .Parent}}style="background-color: inherit;"{{end}}>
 
-                    <label class="{{.Option}}"><time>{{.Time}}</time> <selfref><a href="/{{.BoardN}}/{{.Parent}}.html#no{{.Id}}">No. {{.Id}}</a></selfref></label>
+                    <label class="{{.Option}}"><time>{{.Time}}</time> <selfref><a href="/{{.BoardN}}/{{.Parent}}.html#no{{.Id}}">No. {{.Id}}</a></selfref>
+                        {{if .Pinned}}<div class="pin"></div>{{end}}{{if .Locked}}<div class="lock"></div>{{end}}</label>
                     <br>
                     {{if .File}}<label>File <a href="/{{.BoardN}}/Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
