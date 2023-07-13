@@ -31,7 +31,7 @@ td, iframe {
     border-bottom: thin solid;
 }
 
-.rpost p, .recpost p, .rlast, .blink {
+.rpost p, .recpost p, .rlast, .blink, .nojsmenu a {
     font-family: MPlus, system-ui, Helvetica, Arial, sans-serif;
     font-size: 15px;
 }
@@ -88,4 +88,12 @@ td, iframe {
 .thememenu {
     float: right;
     margin: 10px;
+}
+
+.nojsmenu {
+    padding-left: 15vw;
+}
+
+a+a::before {
+    content: " | ";
 }

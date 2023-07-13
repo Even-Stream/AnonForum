@@ -2,7 +2,13 @@ const selectedcolor = getComputedStyle(document.body).getPropertyValue('--sel-co
 
 const menubuttons = document.querySelectorAll('td.hop');
 
+const frames = document.querySelectorAll('iframe');
+
+
 menubuttons.forEach(menubutton => menubutton.addEventListener('click', SwitchToRow, false));
+
+frames.forEach(frame => frame.addEventListener('load', SizeAdjust));
+
 
 function SwitchToRow(e) {
     let visibleid = this.id + 'row';
@@ -18,4 +24,11 @@ function SwitchToRow(e) {
             menurow.style.visibility = 'collapse';
         } else {menurow.style.visibility = 'visible';}
     });
+}
+
+function SizeAdjust(e) {
+    this.style.height =
+        this.contentWindow.document.body.scrollHeight + 50 + 'px';
+    this.style.width =
+        this.contentWindow.document.body.scrollWidth + 50 + 'px';
 }

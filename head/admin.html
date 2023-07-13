@@ -19,7 +19,7 @@
 <div>
 <form action="/im/mod/">
     <input type="hidden" name="actiontype" value="on_site">
-    <label for="user select">Create a New User:</label>&ensp;
+    <label>Create a New User:</label>&ensp;
     <select name="usertype" id="user select">
         <option value="maid">Maid</option>
         <option value="mod">Mod</option>
@@ -30,7 +30,7 @@
 
 <form action="/im/mod/">
     <input type="hidden" name="actiontype" value="on_site">
-    <label for="user remove">Remove a User:</label>&ensp;
+    <label>Remove a User:</label>&ensp;
     <input type="text" name="username" id="user remove">&ensp;
     <button value="removeuser" name="actions" type="submit">Remove</button>
 </form>
@@ -38,8 +38,18 @@
 
 <form action="/im/mod/">
     <input type="hidden" name="actiontype" value="on_site">
-    <label for="user remove">Remove All Tokens:</label>&ensp;
+    <label>Remove All Tokens:</label>&ensp;
     <button value="removetokens" name="actions" type="submit">Remove</button>
+</form>
+<br>
+
+<form action="/im/mod/">
+    <input type="hidden" name="actiontype" value="on_site">
+    <label>Add a New Board:</label>&ensp;
+    <input type="text" name="boardname" id="board add">&ensp;
+        <input type="checkbox" id="hiddenop" name="hiddenop" value="hiddenop">
+        <label for="hiddenop">Hide From Home</label>&ensp;
+        <button value="addboard" name="actions" type="submit">Add</button>
 </form>
 <br>
 

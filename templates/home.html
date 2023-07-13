@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="/resources/default_home.css">
     <script src="/resources/home.js" defer></script>
     <script src="/resources/dropdown.js" defer></script>
+
+    <noscript>
+        <style>
+            .hoptions {display: none;}
+        </style>
+    </noscript>
 </head>
 
 <body class="hbody">
@@ -14,6 +20,15 @@
 <center>
 <img class="logo hlogo">
 </center>
+
+<noscript>
+<span class="nojsmenu">
+<a href="rules.html">Rules</a>
+<a href="about.html">About</a>
+<a href="boards.html">Boards</a>
+<a href="news.html">News</a>
+</span>
+</noscript>
 
 <hr class="hline"><br>
 
@@ -36,7 +51,7 @@
 <hr class="hline"><br>
 
 <table class="hcon tcon" border="0">
-<tbody><tr>
+<tbody><tr class="hoptions">
 <td class="hop fhop" id="Main">Main</td> 
 <td class="hop" id="Rules" style="background-color: transparent;">Rules</td> 
 <td class="hop" id="About" style="background-color: transparent;">About</td> 
