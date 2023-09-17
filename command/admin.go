@@ -9,6 +9,8 @@ import (
     //"fmt"
     "database/sql"
     "text/template"
+    "errors"
+    "io/fs"
 
     "github.com/google/uuid"
 )
@@ -138,11 +140,11 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
                 file_path := BP + "head/" + boards + "/Files/"
                 if file_name != "" {
                     err = os.Remove(file_path + file_name)
-                    Err_check(err)
+                    if !errors.Is(err, fs.ErrNotExist) {Err_check(err)}
                 
                     if !strings.HasSuffix(imgprev, "image.webp") {
                         err = os.Remove(file_path + imgprev)
-                        Err_check(err)
+                        if !errors.Is(err, fs.ErrNotExist) {Err_check(err)}
                     }
             }}
 
@@ -156,24 +158,49 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
             update_posts = true
         }
 
-        if _, present := WriteStrings[actions]; present  {
-            if userSession.acc_type == Maid {
-                http.Error(w, "Unauthorized.", http.StatusUnauthorized)
-                return
-            }
+        if strings.HasSuffix(actions, "Delete All by User") {
+            get_all_files_stmt := WriteStrings["get_all_files"]
 
-            chain_stmt := WriteStrings[actions]
-            _, err = new_tx.ExecContext(ctx, chain_stmt, parents, boards)
+            //DO FOR ALL FILES
+            file_rows, err := new_tx.QueryContext(ctx, get_all_files_stmt, ids, boards)
+            Err_check(err)
+            defer file_rows.Close()
+
+            for file_rows.Next() {
+                var file_name string
+                var file_board string
+                var imgprev string
+
+                err = file_rows.Scan(&file_name, &file_board, &imgprev)
+                Err_check(err)
+
+                file_path := BP + "head/" + file_board + "/Files/" //different files are in different folders you fuck
+                if file_name != "" {
+                    err = os.Remove(file_path + file_name)
+                    if !errors.Is(err, fs.ErrNotExist) {Err_check(err)}
+                
+                    if !strings.HasSuffix(imgprev, "image.webp") {
+                        err = os.Remove(file_path + imgprev)
+
+                        if !errors.Is(err, fs.ErrNotExist) {Err_check(err)}
+                    }
+            }}
+
+            delete_log_stmt := WriteStrings["delete_log"]
+            _, err = new_tx.ExecContext(ctx, delete_log_stmt, ids, boards, time.Now().In(Loc).Format(time.UnixDate), userSession.username, "All Removed.")
+
+            delete_all_posts_stmt := WriteStrings["delete_all_posts"]
+            _, err = new_tx.ExecContext(ctx, delete_all_posts_stmt, ids, boards)
             Err_check(err)
 
             update_posts = true
         }
 
         if update_posts {
-                go Build_thread(parents, boards)
-                go Build_board(boards)
-                go Build_catalog(boards)
-                go Build_home()
+            go Build_thread(parents, boards)
+            go Build_board(boards)
+            go Build_catalog(boards)
+            go Build_home()
         }
 
         http.Redirect(w, req, req.Header.Get("Referer"), 302)
@@ -226,6 +253,7 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
                 </head><body><center><br>
                     <p>Done.` + html_foot))
         }
+
     }
 
     err = new_tx.Commit()
