@@ -188,6 +188,10 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     }
 
     input := html.EscapeString(req.FormValue("newpost"))
+	//word filter
+    for re, replacement := range Word_filter {
+        input = re.ReplaceAllString(input, replacement)
+	}
     home_content, home_truncontent := HProcess_post(input)
     input, repmatches := Format_post(input, board, parent)
 

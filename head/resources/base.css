@@ -326,3 +326,9 @@ iframe {
     font-size: 15px;
     content: '\e801';
 }
+
+.anchor::before {
+    font-family: fontello;
+    font-size: 15px;
+    content: '\e802';
+}

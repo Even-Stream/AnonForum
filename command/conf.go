@@ -4,6 +4,7 @@ package main
 import (
     "log"
     "os"
+	"regexp"
 
     ini "gopkg.in/ini.v1"
 )
@@ -16,6 +17,7 @@ var Board_descs []string
 var Board_map map[string]string
 var Themes []string
 var INV_INST string
+var Word_filter = make(map[*regexp.Regexp]string)
 
 func Load_conf() {
     homedir, err := os.UserHomeDir()
@@ -26,6 +28,10 @@ func Load_conf() {
 
     SiteName = cfg.Section("").Key("site name").String()
     BP = cfg.Section("").Key("base path").String()
+
+	for word, replacement := range cfg.Section("filter").KeysHash() {
+	    Word_filter[regexp.MustCompile(`(?i)` + word)] = replacement
+	}
 
     Board_map = cfg.Section("boards").KeysHash()
     boards = cfg.Section("boards").Keys()
