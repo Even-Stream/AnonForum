@@ -27,7 +27,8 @@ const (
         "Calendar" INTEGER NOT NULL,
         "Clock" INTEGER NOT NULL,
         "Pinned" INTEGER NOT NULL,
-        "Locked" INTEGER NOT NULL
+        "Locked" INTEGER NOT NULL,
+		"Anchored" INTEGER NOT NULL
     );`
 
     createRepliesTableSQL = `CREATE TABLE replies (
@@ -99,6 +100,15 @@ const (
             SET Id = Id + 1
             WHERE Board = NEW.Board;
         END;`
+		
+	anchorCheckSQL = `CREATE TRIGGER anchor_check
+	    AFTER INSERT ON posts
+		BEGIN
+		    UPDATE posts
+			SET Anchored = IIF((SELECT COUNT(Id) FROM posts WHERE Parent = NEW.Parent AND Board = NEW.Board) > 200, 1, 0)
+			WHERE Id = NEW.Parent AND Board = NEW.Board;
+		END;
+	`
         
     trimHomePostStack = `CREATE TRIGGER homepost_trim
         AFTER INSERT ON homepost
@@ -172,6 +182,10 @@ func create_table(db *sql.DB) {
     statement.Exec()
 
     statement, err = db.Prepare(createLatestTriggerSQL)
+        Err_check(err)
+    statement.Exec()
+	
+	statement, err = db.Prepare(anchorCheckSQL)
         Err_check(err)
     statement.Exec()
 

@@ -17,23 +17,23 @@ const (
     prev_parentstring = `SELECT Parent FROM posts WHERE Id = ? AND Board = ?`
     updatestring = `SELECT Id, Content, Time, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
                 COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Filemime, '') AS Filemime, COALESCE(Imgprev, '') Imgprev, Option, 
-                Pinned, Locked 
+                Pinned, Locked, Anchored
                 FROM posts WHERE Parent = ? AND Board = ?`
     update_repstring = `SELECT Replier FROM replies WHERE Source = ? AND Board = ?`
-    parent_collstring = `WITH temp (TParent, Id) AS (SELECT Parent, MAX(Id) FROM posts WHERE (instr(Option, 'Sage') = 0 OR Id = Parent) AND Board = ?1
+    parent_collstring = `WITH temp (TParent, Id) AS (SELECT Parent, MAX(Id) FROM posts WHERE ((instr(Option, 'Sage') = 0 AND Anchored <> 1) OR Id = Parent) AND Board = ?1
             GROUP BY Parent ORDER BY MAX(Id) DESC),
         temp2(Parent, Pinned) AS (SELECT Parent, Pinned FROM posts WHERE Id = Parent AND Board = ?1)
         SELECT Parent, Id FROM temp INNER JOIN temp2 ON temp.TParent = temp2.Parent ORDER BY Pinned DESC, Id DESC LIMIT 15`
     thread_headstring = `SELECT Content, Time, Parent, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
                 COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Filemime, '') AS Filemime, COALESCE(Imgprev, '') Imgprev, Option,
-                Pinned, Locked 
+                Pinned, Locked, Anchored
                 FROM posts WHERE Id = ? AND Board = ?`
     thread_bodystring = `SELECT * FROM (
                 SELECT Id, Content, Time, Parent, COALESCE(File, '') AS File, COALESCE(Filename, '') AS Filename, 
                 COALESCE(Fileinfo, '') AS Fileinfo, COALESCE(Filemime, '') AS Filemime, COALESCE(Imgprev, '') Imgprev, Option FROM posts 
                 WHERE Parent = ? AND Board = ? AND Id != Parent ORDER BY Id DESC LIMIT 5)
                 ORDER BY Id ASC`
-    thread_collstring = `WITH temp (TParent, Id) AS (SELECT Parent, MAX(Id) FROM posts WHERE (instr(Option, 'Sage') = 0 OR Id = Parent) AND Board = ?1
+    thread_collstring = `WITH temp (TParent, Id) AS (SELECT Parent, MAX(Id) FROM posts WHERE ((instr(Option, 'Sage') = 0 AND Anchored <> 1) OR Id = Parent) AND Board = ?1
             GROUP BY Parent ORDER BY MAX(Id) DESC),
         temp2(Parent, Pinned) AS (SELECT Parent, Pinned FROM posts WHERE Id = Parent AND Board = ?1)
         SELECT Parent, Id FROM temp INNER JOIN temp2 ON temp.TParent = temp2.Parent ORDER BY Pinned DESC, Id DESC`
@@ -44,10 +44,12 @@ const (
 
     //all inserts(and necessary queries) are preformed in one transaction 
     newpost_wfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, File, Filename, Fileinfo, Filemime, Imgprev, 
-        Option, Calendar, Clock, Pinned, Locked) 
-        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, 0, 0)`
-    newpost_nfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, Option, Calendar, Clock, Pinned, Locked) 
-        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, 0, 0)`
+        Option, Calendar, Clock, Pinned, Locked, Anchored) 
+        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, 0, 0, 
+		COALESCE((SELECT Anchored FROM posts WHERE Id = ?4), 0))`
+    newpost_nfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, Option, Calendar, Clock, Pinned, Locked, Anchored)
+        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, 0, 0, 
+		COALESCE((SELECT Anchored FROM posts WHERE Id = ?4), 0))`
     repadd_string = `INSERT INTO replies(Board, Source, Replier) VALUES (?1, ?2, (SELECT Id FROM latest WHERE Board = ?1) - 1)`
     subadd_string = `INSERT INTO subjects(Board, Parent, Subject) VALUES (?, ?, ?)`
     hpadd_string = `INSERT INTO homepost(Board, Id, Content, TrunContent, Parent)

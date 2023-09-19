@@ -310,7 +310,7 @@ iframe {
     width: 4.5em;
 }
 
-.pin, .lock {
+.pin, .lock, .anchor {
     padding-left: 10px;
     display:inline-block;
 }

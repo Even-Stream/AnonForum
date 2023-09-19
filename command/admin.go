@@ -26,6 +26,8 @@ const (
     delete_log_query_string = `SELECT Identifier, Time, Mod, Content, Reason FROM deleted`
 )
 
+var thread_map = map[string]int{"Pin": 1, "Unpin": 1, "Lock": 1, "Unlock": 1}
+
 type Query_results struct {
     Posts []*Post
     Auth Acc_type
@@ -195,6 +197,21 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
 
             update_posts = true
         }
+
+		//for pinning and locking
+        if _, present := thread_map[actions]; present  {
+            if userSession.acc_type == Maid {
+                http.Error(w, "Unauthorized.", http.StatusUnauthorized)
+                return
+            }
+
+            chain_stmt := WriteStrings[actions]
+            _, err = new_tx.ExecContext(ctx, chain_stmt, parents, boards)
+            Err_check(err)
+
+            update_posts = true
+        }
+
 
         if update_posts {
             go Build_thread(parents, boards)
