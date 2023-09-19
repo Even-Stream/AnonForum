@@ -201,6 +201,8 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     clock := now.Format("1504")
 
     hpadd_stmt := WriteStrings["hpadd"]
+	
+	post_pass := Rand_gen()
 
     //file present
     if file_err == nil {
@@ -313,7 +315,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             ffname := string(ofname[rem:])
 
             _, err = new_tx.ExecContext(ctx, newpst_wfstmt, board, input, post_time, parent, identity, file_name, ffname, file_info, mime_type, file_pre, 
-                option, calendar, clock)
+                option, calendar, clock, post_pass)
             Err_check(err)
         } else {
               http.Error(w, "Unsupported file type.", http.StatusBadRequest)
@@ -322,7 +324,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     //file not present 
     } else {
         newpost_nfstmt := WriteStrings["newpost_nf"]
-        _, err := new_tx.ExecContext(ctx, newpost_nfstmt, board, input, post_time, parent, identity, option, calendar, clock)
+        _, err := new_tx.ExecContext(ctx, newpost_nfstmt, board, input, post_time, parent, identity, option, calendar, clock, post_pass)
         Err_check(err)
     }
 
@@ -344,6 +346,12 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 
     err = new_tx.Commit()
     Err_check(err)
+	
+	http.SetCookie(w, &http.Cookie{
+        Name:    "post_pass",
+        Value:   post_pass,
+        Path: "/",
+    })
 
     Build_thread(parent, board)
     http.Redirect(w, req, req.Header.Get("Referer"), 302)

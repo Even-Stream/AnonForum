@@ -44,12 +44,15 @@ const (
 
     //all inserts(and necessary queries) are preformed in one transaction 
     newpost_wfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, File, Filename, Fileinfo, Filemime, Imgprev, 
-        Option, Calendar, Clock, Pinned, Locked, Anchored) 
-        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, 0, 0, 
+        Option, Calendar, Clock, Password, Pinned, Locked, Anchored) 
+        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, 0, 0, 
 		COALESCE((SELECT Anchored FROM posts WHERE Id = ?4), 0))`
-    newpost_nfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, Option, Calendar, Clock, Pinned, Locked, Anchored)
-        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, 0, 0, 
+    newpost_nfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, Option, Calendar, Clock, Password, Pinned, Locked, Anchored)
+        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, 0, 0, 
 		COALESCE((SELECT Anchored FROM posts WHERE Id = ?4), 0))`
+	user_edit_poststring = `UPDATE posts SET Content = ?1 || '<br><br><div class="editmessage">(' || ?2 || ')</div>' 
+	    WHERE Calendar >= ?3 AND Password = ?4 AND Id = ?5 AND Board = ?6`	
+		
     repadd_string = `INSERT INTO replies(Board, Source, Replier) VALUES (?1, ?2, (SELECT Id FROM latest WHERE Board = ?1) - 1)`
     subadd_string = `INSERT INTO subjects(Board, Parent, Subject) VALUES (?, ?, ?)`
     hpadd_string = `INSERT INTO homepost(Board, Id, Content, TrunContent, Parent)
@@ -75,13 +78,17 @@ const (
     get_files_string = `SELECT COALESCE(File, '') AS File, COALESCE(Imgprev, '') AS Imgprev FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`
     get_all_files_string = `SELECT COALESCE(File, '') AS File, Board, COALESCE(Imgprev, '') AS Imgprev FROM posts WHERE (Identifier = (SELECT Identifier FROM posts 
         WHERE Id = ?1 AND Board = ?2))`
+		
     delete_post_string = `DELETE FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`
+	user_delete_post_string = `DELETE FROM posts WHERE Calendar >= ?1 AND Password = ?2 AND Board = ?3 AND 
+	    Id = IIF((SELECT COUNT(Id) FROM posts WHERE Parent = ?4 AND Board = ?3) > 1, 0, ?4)`    //threads with more than one post cannot be deleted by users
     delete_all_posts_string = `DELETE FROM posts WHERE (Identifier = (SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2))`
     ban_string = `INSERT INTO banned(Identifier, Expiry, Mod, Content, Reason) VALUES ((SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2), 
         ?3, ?4, (SELECT Content FROM posts WHERE Id = ?1 AND Board = ?2), ?5)`
     delete_log_string = `INSERT INTO deleted(Identifier, Time, Mod, Content, Reason) VALUES ((SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2),
         ?3, ?4, replace(replace((SELECT Content FROM posts WHERE Id = ?1 AND Board = ?2), '<', '&lt;'), '>', '&gt;'), ?5)`
     ban_message_string = `UPDATE posts SET Content = Content || '<br><br><div class="banmessage">(' || ? || ')</div>' WHERE Id = ? AND Board = ?`
+	
     get_deleted_string = `SELECT Identifier, Time FROM deleted`
     delete_remove_string = `DELETE FROM deleted WHERE Identifier = ? AND TIME = ?`
     get_expired_tokens_string = `SELECT Token, Time FROM tokens`

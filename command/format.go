@@ -4,6 +4,7 @@ import (
     "strings"
     "bufio"
     "regexp"
+	"math/rand"
 )
 
 var nlreg = regexp.MustCompile("\n")
@@ -21,6 +22,8 @@ var linkreg = regexp.MustCompile(`([^>"]|\A)(http|ftp|https):\/\/(\S+)`)
 
 var vidreg *regexp.Regexp
 
+const rand_charset = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_`~!@#$%^&*?"
+
 const (    
     nlpost = "\n<br>"
     tagpost = "$1\n$2"
@@ -35,6 +38,18 @@ const (
     italicpost = `<i>$1</i>`
     linkpost = `$1<a href="$2://$3" rel="noopener noreferrer nofollow">$2://$3</a>`
 )
+
+func Rand_gen() string {
+    result := ""
+
+    for i := 0; i < 8; i++ {
+        c := rand_charset[rand.Intn(len(rand_charset))]
+    result += string(c)
+    }
+
+    return result
+}
+
 
 func Conf_dependent() {
     vidreg = regexp.MustCompile(`(https:\/\/|https:\/\/www\.)` +
