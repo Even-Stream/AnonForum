@@ -82,6 +82,14 @@
     </form>
     </center>
 
+<hr>
+
+    <form class="deletemenu" action="/im/user/?board={{.Name}}" method="Post">
+	    <input type="hidden" name="actiontype" value="delete">
+		Delete Post: [<input type="checkbox" name="onlyimgdel" value="on">File Only] 
+		<input type="submit" value="Delete">
+	</form>
+
     <form id="thememenu" class="thememenu" action="/im/theme/" method="Get">
         <select name="theme">
             <option value="default">Styles</option>

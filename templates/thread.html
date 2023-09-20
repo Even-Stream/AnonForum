@@ -70,16 +70,26 @@
             audio/mpeg, audio/ogg, audio/flac, audio/x-m4a, video/webm, video/mp4, .opus, .m4a"></td>
         </tr><tr>
         <td class="ogdc">Password</td>
-        <td><input type="password" name="pwd" value="">
+        <td><input type="password" name="pwd" value="password">
         <small>(For editing and deleting posts)</small></td>
         </tr><tr>
         <td class="ogdc">Submit</td>
         <td><input type="submit" value="Reply">
-        <input type="submit" name="option" value="Sage"></td>
+        <input type="submit" name="option" value="Sage">
+		<input type="submit" value="Edit"></td>
         </tr>
         </tbody></table>
     </form>
     </center>
+
+<hr>
+
+	<form class="deletemenu" action="/im/user/?board={{.BoardN}}" method="Post">
+	    <input type="hidden" name="actiontype" value="delete">
+		Delete Post: [<input type="checkbox" name="onlyimgdel" value="on">File Only] 
+		<input type="submit" value="Delete">
+		
+	</form>
 
     <form id="thememenu" class="thememenu" action="/im/theme/" method="Get">
         <select name="theme">
@@ -89,5 +99,6 @@
         </select>
         <noscript><input type="submit" value="Select"></noscript>
     </form>
+	
 </body>
 </html>

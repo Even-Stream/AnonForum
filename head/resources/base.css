@@ -113,6 +113,10 @@ input[type=text], input[type=password], input[type=submit], input::file-selector
     border-color: lightgray;
 }
 
+input[type=submit] {
+    padding: 3px;
+}
+
 .controls {
     background-color: rosybrown;
     padding: 5px;
@@ -227,6 +231,11 @@ iframe {
 
 .thememenu {
     float: right;
+    margin: 10px;
+}
+
+.deletemenu {
+    float: left;
     margin: 10px;
 }
 

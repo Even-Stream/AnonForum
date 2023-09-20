@@ -105,7 +105,7 @@ const (
 	    AFTER INSERT ON posts
 		BEGIN
 		    UPDATE posts
-			SET Anchored = IIF((SELECT COUNT(Id) FROM posts WHERE Parent = NEW.Parent AND Board = NEW.Board) > 200, 1, 0)
+			SET Anchored = IIF((SELECT COUNT(Id) FROM posts WHERE Parent = NEW.Parent AND Board = NEW.Board AND Pinned <> 1) > 200, 1, 0)
 			WHERE Id = NEW.Parent AND Board = NEW.Board;
 		END;
 	`
