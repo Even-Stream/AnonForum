@@ -51,7 +51,7 @@ const (
         VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, 0, 0, 
 		COALESCE((SELECT Anchored FROM posts WHERE Id = ?4), 0))`
 	user_edit_poststring = `UPDATE posts SET Content = ?1 || '<br><br><div class="editmessage">(' || ?2 || ')</div>' 
-	    WHERE Calendar >= ?3 AND Password = ?4 AND Id = ?5 AND Board = ?6`	
+	    WHERE Calendar >= ?3 AND Password = ?4 AND Board = ?5`	
 		
     repadd_string = `INSERT INTO replies(Board, Source, Replier) VALUES (?1, ?2, (SELECT Id FROM latest WHERE Board = ?1) - 1)`
     subadd_string = `INSERT INTO subjects(Board, Parent, Subject) VALUES (?, ?, ?)`
@@ -78,10 +78,12 @@ const (
     get_files_string = `SELECT COALESCE(File, '') AS File, COALESCE(Imgprev, '') AS Imgprev FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`
     get_all_files_string = `SELECT COALESCE(File, '') AS File, Board, COALESCE(Imgprev, '') AS Imgprev FROM posts WHERE (Identifier = (SELECT Identifier FROM posts 
         WHERE Id = ?1 AND Board = ?2))`
+	user_get_file_string = `SELECT COALESCE(File, '') AS File, COALESCE(Imgprev, '') AS Imgprev FROM posts WHERE Password = ? AND Board = ? LIMIT 1`
 		
     delete_post_string = `DELETE FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`
-	user_delete_post_string = `DELETE FROM posts WHERE Calendar >= ?1 AND Password = ?2 AND Board = ?3 AND 
-	    Id = IIF((SELECT COUNT(Id) FROM posts WHERE Parent = ?4 AND Board = ?3) > 1, 0, ?4)`    //threads with more than one post cannot be deleted by users
+	user_delete_string = `DELETE FROM posts WHERE Calendar >= ?1 AND Password = ?2 AND Board = ?3 AND 
+	    ((SELECT COUNT(Id) FROM posts WHERE Parent = (SELECT Id FROM posts WHERE Password = ?2 AND Board = ?3 LIMIT 1) 
+		AND Board = ?3) <= 1)`    //threads with more than one post cannot be deleted by users
     delete_all_posts_string = `DELETE FROM posts WHERE (Identifier = (SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2))`
     ban_string = `INSERT INTO banned(Identifier, Expiry, Mod, Content, Reason) VALUES ((SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2), 
         ?3, ?4, (SELECT Content FROM posts WHERE Id = ?1 AND Board = ?2), ?5)`
@@ -108,7 +110,8 @@ var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_n
         "add_token":  Add_token_string, "search_token": search_token_string, 
         "ban_search": ban_search_string, "ban_remove": ban_remove_string, "delete_token": delete_token_string, "remove_tokens": remove_tokens_string,
         "new_user": new_user_string, "remove_user": remove_user_string,"search_user": search_user_string,
-        "get_files": get_files_string, "get_all_files": get_all_files_string,"delete_post": delete_post_string, "delete_all_posts": delete_all_posts_string, 
+        "get_files": get_files_string, "get_all_files": get_all_files_string, "user_get_file": user_get_file_string, 
+		"delete_post": delete_post_string, "user_delete": user_delete_string, "delete_all_posts": delete_all_posts_string, 
         "ban": ban_string, "delete_log": delete_log_string, 
         "ban_message": ban_message_string, "get_deleted": get_deleted_string, "delete_remove": delete_remove_string,
         "get_expired_tokens": get_expired_tokens_string, "delete_expired_token": delete_expired_token_string,

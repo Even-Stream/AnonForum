@@ -68,7 +68,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     parent := req.FormValue("parent")
     board := req.FormValue("board")
     subject := req.FormValue("subject")
-    option := req.FormValue("option")
+	option := req.FormValue("option")
     identity := req.Header.Get("X-Real-IP")
 
     if identity == "" {

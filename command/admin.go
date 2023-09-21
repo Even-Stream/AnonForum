@@ -152,6 +152,7 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
 
             delete_log_stmt := WriteStrings["delete_log"]
             _, err = new_tx.ExecContext(ctx, delete_log_stmt, ids, boards, time.Now().In(Loc).Format(time.UnixDate), userSession.username, reason)
+			Err_check(err)
 
             delete_post_stmt := WriteStrings["delete_post"]
             _, err = new_tx.ExecContext(ctx, delete_post_stmt, ids, boards)

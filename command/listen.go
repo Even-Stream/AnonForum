@@ -8,8 +8,8 @@ import (
     "golang.org/x/time/rate"
 )
 
-var rarr = []rate.Limit{20, .04, .5, 1, 20, 10}
-var barr = []int{30, 1, 1, 1, 10, 50}
+var rarr = []rate.Limit{20, .04, .5, 1, 20, 10, .04}
+var barr = []int{30, 1, 1, 1, 10, 50, 2}
 var limiter = NewIPRateLimiter(rarr, barr)
 
 var admf_map = map[string]bool {
@@ -42,6 +42,7 @@ func Listen() {
     mux.HandleFunc("/im/mod/", Moderation_actions)
     mux.HandleFunc("/im/unban/", Unban)
     mux.HandleFunc("/im/vid/", Vidget)
+	mux.HandleFunc("/im/user/", User_actions)
 
 
     srv := &http.Server {
@@ -75,6 +76,8 @@ func hongMeiling(next http.Handler) http.Handler {
                 sel = 4
             case url == "vid":
                 sel = 5
+		    case url == "user":
+                sel = 6
         }
 
         climiter := limiter.GetLimiter(r.Header.Get("X-Real-IP"), sel)
