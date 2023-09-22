@@ -5,6 +5,8 @@ import (
 	"os"
 	"errors"
 	"strings"
+	"strconv"
+	"html"
 	"net/http"
 	"database/sql"
 	"io/fs"
@@ -32,7 +34,14 @@ func User_actions(w http.ResponseWriter, req *http.Request) {
 	}
 	
 	option := req.FormValue("option")
+	if Entry_check(w, req, "option", option) == 0 {return}
 	board := req.FormValue("board")
+	if Entry_check(w, req, "board", board) == 0 {return}
+	
+	if _, board_check := Board_map[board]; !board_check {
+        http.Error(w, "Board is invalid.", http.StatusBadRequest)
+        return
+    }
 	
 	now := time.Now().In(Nip)
 	then := now.Add(time.Duration(-30) * time.Hour)
@@ -90,7 +99,65 @@ func User_actions(w http.ResponseWriter, req *http.Request) {
 	} 
 	
 	if option == "Edit" {
-	
+	    if Request_filter(w, req, "POST", max_upload_size) == 0 {return}
+	   
+	    no_text := (strings.TrimSpace(req.FormValue("newpost")) == "")
+        if no_text {
+            http.Error(w, "Empty post.", http.StatusBadRequest)
+            return
+        }
+	   
+	    post_length := len([]rune(req.FormValue("newpost")))
+        if post_length > max_post_length {
+            http.Error(w, "Post exceeds character limit(10000). Post length: " + strconv.Itoa(post_length), http.StatusBadRequest)
+            return 
+        }
+		
+		identity := req.Header.Get("X-Real-IP")
+        if Entry_check(w, req, "IP", identity) == 0 {return}
+		
+		//cleaning
+		input := html.EscapeString(req.FormValue("newpost"))
+	    //word filter
+        for re, replacement := range Word_filter {
+            input = re.ReplaceAllString(input, replacement)
+	    }
+		
+        home_content, home_truncontent := HProcess_post(input)
+        input, repmatches := Format_post(input, board, parent)
+		
+		//updating
+		user_edit_stmt := WriteStrings["user_edit"]
+		edit_message := `Post edited on ` + now.Format(time.RFC1123) 
+		
+	    res, err := new_tx.ExecContext(ctx, user_edit_stmt, input, edit_message, sdate, post_pass, board)
+		Err_check(err)
+		
+		rowsaffected, err := res.RowsAffected()
+		Err_check(err)
+		
+		if rowsaffected == 0 {
+		    http.Error(w, "This post is too old or doesn't exist.", http.StatusUnauthorized)
+            return
+		}
+		
+		repremove_stmt := WriteStrings["repremove"]
+	    _, err = new_tx.ExecContext(ctx, repremove_stmt, post_pass, board)
+		Err_check(err)
+		
+		if len(repmatches) > 0 {
+            repupdate_stmt := WriteStrings["repupdate"]
+            for _, match := range repmatches {
+                match_id, err := strconv.ParseUint(match, 10, 64)
+                Err_check(err)
+                _, err = new_tx.ExecContext(ctx, repupdate_stmt, board, match_id, post_pass)
+                Err_check(err)
+            }    
+        }
+		
+		hpupdate_stmt := WriteStrings["hpupdate"]
+        _, err = new_tx.ExecContext(ctx, hpupdate_stmt, board, home_content, home_truncontent, parent)
+        Err_check(err)
 	}
 	
 	err = new_tx.Commit()

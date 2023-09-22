@@ -253,7 +253,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 
                 file_info = image_gen_info(handler.Size, width, height)
                 file_pre += "s.webp"
-                _, err = new_tx.ExecContext(ctx, htadd_stmt, board, parent, file_pre)
+                _, err = new_tx.ExecContext(ctx, htadd_stmt, board, parent, file_pre, post_pass)
                 Err_check(err)
                 io.Copy(f, file_buffer)
             } else { 
@@ -329,7 +329,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     }
 
     if !no_text { 
-        _, err = new_tx.ExecContext(ctx, hpadd_stmt, board, home_content, home_truncontent, parent)
+        _, err = new_tx.ExecContext(ctx, hpadd_stmt, board, home_content, home_truncontent, parent, post_pass)
         Err_check(err)
     }
 
@@ -339,7 +339,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
         for _, match := range repmatches {
             match_id, err := strconv.ParseUint(match, 10, 64)
             Err_check(err)
-            _, err = new_tx.ExecContext(ctx, repadd_stmt, board, match_id)
+            _, err = new_tx.ExecContext(ctx, repadd_stmt, board, match_id, post_pass)
             Err_check(err)
         }    
     }

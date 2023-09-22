@@ -15,7 +15,7 @@ const (
         "Content" TEXT,
         "Time" TEXT,
         "Parent" INTEGER,
-        "Password" TEXT,
+        "Password" TEXT NOT NULL,
         "Identifier" TEXT,
         "File" TEXT,
         "Filename" TEXT,
@@ -34,7 +34,8 @@ const (
     createRepliesTableSQL = `CREATE TABLE replies (
         "Board" TEXT NOT NULL,
         "Source" INTEGER NOT NULL,
-        "Replier" INTEGER NOT NULL
+        "Replier" INTEGER NOT NULL,
+		"Password" TEXT NOT NULL
     );`
 
 
@@ -54,14 +55,16 @@ const (
         "Id" INTEGER NOT NULL,
         "Content" TEXT NOT NULL,
         "TrunContent" TEXT NOT NULL,
-        "Parent" INTEGER NOT NULL
+        "Parent" INTEGER NOT NULL,
+		"Password" TEXT NOT NULL
     );`
 
     createHomeThumbTableSQL = `CREATE TABLE homethumb (
         "Board" TEXT NOT NULL,
         "Id" INTEGER NOT NULL,
         "Parent" TEXT NOT NULL,
-        "Imgprev" TEXT NOT NULL
+        "Imgprev" TEXT NOT NULL,
+		"Password" TEXT NOT NULL
     );`
 
     createCredTableSQL = `CREATE TABLE credentials (

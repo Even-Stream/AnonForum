@@ -50,15 +50,21 @@ const (
     newpost_nfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, Option, Calendar, Clock, Password, Pinned, Locked, Anchored)
         VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, 0, 0, 
 		COALESCE((SELECT Anchored FROM posts WHERE Id = ?4), 0))`
-	user_edit_poststring = `UPDATE posts SET Content = ?1 || '<br><br><div class="editmessage">(' || ?2 || ')</div>' 
-	    WHERE Calendar >= ?3 AND Password = ?4 AND Board = ?5`	
+	user_edit_string = `UPDATE posts SET Content = ? || '<br><br><div class="editmessage">' || ? || '</div>' 
+	    WHERE Calendar >= ? AND Password = ? AND Board = ?`	
 		
-    repadd_string = `INSERT INTO replies(Board, Source, Replier) VALUES (?1, ?2, (SELECT Id FROM latest WHERE Board = ?1) - 1)`
+    repadd_string = `INSERT INTO replies(Board, Source, Replier, Password) VALUES (?1, ?2, (SELECT Id FROM latest WHERE Board = ?1) - 1, ?3)`
+	repupdate_string = `INSERT INTO replies(Board, Source, Replier, Password) VALUES 
+	    (?1, ?2, (SELECT Id FROM posts WHERE Password = ?3 AND Board = ?1 LIMIT 1), ?3)`
+	repremove_string = `DELETE FROM replies WHERE Password = ? AND Board = ?`
     subadd_string = `INSERT INTO subjects(Board, Parent, Subject) VALUES (?, ?, ?)`
-    hpadd_string = `INSERT INTO homepost(Board, Id, Content, TrunContent, Parent)
-        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1) - 1, ?2, ?3, ?4)`
-    htadd_string = `INSERT into homethumb(Board, Id, Parent, Imgprev)
-        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3)`
+    hpadd_string = `INSERT INTO homepost(Board, Id, Content, TrunContent, Parent, Password)
+        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1) - 1, ?2, ?3, ?4, ?5)`
+    htadd_string = `INSERT into homethumb(Board, Id, Parent, Imgprev, Password)
+        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4)`
+	hpupdate_string = `UPDATE homepost SET Content = ?, TrunContent = ? WHERE Password = ? AND Board = ?`	
+	htdelete_string = `DELETE FROM homethumb WHERE Password = ? and Board = ?`
+		
     parent_checkstring = `SELECT COUNT(*)
                 FROM posts
                 WHERE Parent = ? AND Board = ?`
@@ -66,7 +72,7 @@ const (
 
     Add_token_string = `INSERT INTO tokens(Token, Type, Time) VALUES (?, ?, ?)`
     search_token_string = `SELECT Type FROM tokens WHERE Token = ?`
-    delete_token_string = `DELETE FROM tokens where Token = ?`
+    delete_token_string = `DELETE FROM tokens WHERE Token = ?`
     remove_tokens_string = `DELETE FROM tokens`
     new_user_string = `INSERT INTO credentials(Username, Hash, Type) VALUES (?, ?, ?)`
     remove_user_string = `DELETE FROM credentials WHERE Username = ? AND Type <> 0`
@@ -82,8 +88,8 @@ const (
 		
     delete_post_string = `DELETE FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`
 	user_delete_string = `DELETE FROM posts WHERE Calendar >= ?1 AND Password = ?2 AND Board = ?3 AND 
-	    ((SELECT COUNT(Id) FROM posts WHERE Parent = (SELECT Id FROM posts WHERE Password = ?2 AND Board = ?3 LIMIT 1) 
-		AND Board = ?3) <= 1)`    //threads with more than one post cannot be deleted by users
+	    ((SELECT COUNT(Id) FROM posts WHERE Parent = (SELECT Id FROM posts WHERE Password = ?2 AND Board = ?3 LIMIT 1) AND Board = ?3) <= 1) LIMIT 1`    
+		//threads with more than one post cannot be deleted by users
     delete_all_posts_string = `DELETE FROM posts WHERE (Identifier = (SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2))`
     ban_string = `INSERT INTO banned(Identifier, Expiry, Mod, Content, Reason) VALUES ((SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2), 
         ?3, ?4, (SELECT Content FROM posts WHERE Id = ?1 AND Board = ?2), ?5)`
@@ -103,9 +109,9 @@ const (
     unpin_string = `UPDATE posts SET Pinned = 0 WHERE Id = ? AND Board = ?`
 )
 
-var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_nf": newpost_nfstring,
-        "repadd": repadd_string, "subadd": subadd_string, "hpadd": hpadd_string,
-        "htadd": htadd_string, 
+var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_nf": newpost_nfstring, "user_edit": user_edit_string,
+        "repadd": repadd_string, "repupdate": repupdate_string, "repremove": repremove_string, "subadd": subadd_string, 
+		"hpadd": hpadd_string, "htadd": htadd_string, "hpupdate": hpupdate_string, "htdelete": htdelete_string,
         "parent_check": parent_checkstring, "threadid" : threadid_string,
         "add_token":  Add_token_string, "search_token": search_token_string, 
         "ban_search": ban_search_string, "ban_remove": ban_remove_string, "delete_token": delete_token_string, "remove_tokens": remove_tokens_string,

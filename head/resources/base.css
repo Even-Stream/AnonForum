@@ -313,6 +313,10 @@ iframe {
     color: rgb(209, 17, 65);
 }
 
+.editmessage {
+    font-size: 7pt;
+}
+
 .ogdc {
     vertical-align: middle;
     text-align: center;

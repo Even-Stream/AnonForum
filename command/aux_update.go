@@ -26,6 +26,7 @@ type Hp struct {
     Content string
     ContentFull string
     Parent string
+	Password string
 }
 
 type Ht struct {
@@ -33,6 +34,7 @@ type Ht struct {
     Id int
     Parent string
     Imgprev string
+	Password string
 }
 
 type Home struct {
@@ -111,7 +113,7 @@ func get_home() ([]*Hp, []*Ht) {
     for hp_rows.Next() {
         var chp Hp
         
-        err = hp_rows.Scan(&chp.BoardN, &chp.Id, &chp.ContentFull, &chp.Content, &chp.Parent)
+        err = hp_rows.Scan(&chp.BoardN, &chp.Id, &chp.ContentFull, &chp.Content, &chp.Parent, &chp.Password)
         Err_check(err)
 
         home_posts = append(home_posts, &chp)
@@ -124,7 +126,7 @@ func get_home() ([]*Hp, []*Ht) {
     for ht_rows.Next() {
         var cht Ht
         
-        err = ht_rows.Scan(&cht.BoardN, &cht.Id, &cht.Parent, &cht.Imgprev)
+        err = ht_rows.Scan(&cht.BoardN, &cht.Id, &cht.Parent, &cht.Imgprev, &cht.Password)
         Err_check(err)
 
         home_thumbs = append(home_thumbs, &cht)
