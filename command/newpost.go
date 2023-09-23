@@ -13,7 +13,7 @@ import (
 
     "github.com/zergon321/reisen"
     _ "github.com/mattn/go-sqlite3"
-    units "github.com/docker/go-units"
+    "github.com/dustin/go-humanize"
     "github.com/gabriel-vasile/mimetype" 
 )
 
@@ -31,13 +31,13 @@ const (
 )
 
 func image_gen_info(size int64, width int, height int) string {
-    file_info := units.HumanSize(float64(size))
+    file_info := humanize.Bytes(uint64(size))
     file_info = file_info + ", " + strconv.Itoa(width) + "x" + strconv.Itoa(height)
     return file_info
 }
 
 func generic_gen_info(size int64) string {
-    file_info := units.HumanSize(float64(size))
+    file_info := humanize.Bytes(uint64(size))
     return file_info
 }
 
@@ -112,12 +112,12 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     new_tx, err := new_conn.Begin()
     Err_check(err)
     defer new_tx.Rollback()
-    
+	
     ban_searchstmt := WriteStrings["ban_search"]
     ban_rows, err := new_tx.QueryContext(ctx, ban_searchstmt, identity)
     Err_check(err)
     defer ban_rows.Close()
-
+	
     for ban_rows.Next() {
     //user was banned
         var ban_result string
@@ -222,7 +222,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 
         _, err = file.Seek(0, io.SeekStart)
         Err_check(err)
-
+		
         if supported_file {
 
             file_pre := strconv.FormatInt(time.Now().UnixNano(), 10)
@@ -261,15 +261,14 @@ func New_post(w http.ResponseWriter, req *http.Request) {
                 file_info = generic_gen_info(handler.Size)
 
                 media, err := reisen.NewMedia(file_path + file_name)
-	        Err_check(err)
-	        defer media.Close()
+	            Err_check(err)
+	            defer media.Close()
                 err = media.OpenDecode()
                 Err_check(err)
-
+				
                 vss := media.VideoStreams()
-                if len(vss) > 0 {
-                    videoStream := media.VideoStreams()[0]
-	            err = videoStream.Open()
+                if len(vss) == 1 {
+	                err = vss[0].Open()
                     Err_check(err)
 
                     for {
@@ -278,31 +277,33 @@ func New_post(w http.ResponseWriter, req *http.Request) {
                         if !gotPacket {break}
                             
                         if packet.Type() == reisen.StreamVideo {
-                            s := media.Streams()[packet.StreamIndex()].(*reisen.VideoStream)
-                            videoFrame, gotFrame, err := s.ReadVideoFrame()
+						    cstream := vss[packet.StreamIndex()]
+                            videoFrame, gotFrame, err := cstream.ReadVideoFrame()
                             Err_check(err)
                             if !gotFrame {break}
                             if videoFrame == nil{continue}
-
+							
                             frimg := videoFrame.Image()
                               
                             cover_buffer := new(bytes.Buffer)
                             err = png.Encode(cover_buffer, frimg.SubImage(frimg.Rect))
                             Err_check(err)
-                                
+
                             _, _, cerr := Make_thumb(file_path, file_pre, cover_buffer.Bytes(), 300)
                             if cerr != nil {
                                 file_pre = "audio_image.webp"
                             } else {
                                 file_pre += "s.webp"
-                                _, err = new_tx.ExecContext(ctx, htadd_stmt, board, parent, file_pre)
+                                _, err = new_tx.ExecContext(ctx, htadd_stmt, board, parent, file_pre, post_pass)
                                 Err_check(err)
                             }
                             break
                         }
                     }
-
-                } else {file_pre = "audio_image.webp"}
+                } else if len(vss) > 1 {
+				    http.Error(w, "Multiple video streams detected. File could not be processed.", http.StatusBadRequest)
+                    return
+				} else {file_pre = "audio_image.webp"}
             }
 
             newpst_wfstmt := WriteStrings["newpost_wf"]

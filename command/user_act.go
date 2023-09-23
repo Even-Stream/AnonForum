@@ -75,18 +75,8 @@ func User_actions(w http.ResponseWriter, req *http.Request) {
 	
 	//setup done
 	if option == "Delete" {
-	    user_delete_stmt := WriteStrings["user_delete"]
-		res, err := new_tx.ExecContext(ctx, user_delete_stmt, sdate, post_pass, board)
-		Err_check(err)
-		
-		rowsaffected, err := res.RowsAffected()
-		Err_check(err)
-		
-		if rowsaffected == 0 {
-		    http.Error(w, "This post is too old, has replies, or doesn't exist.", http.StatusUnauthorized)
-            return
-		} else {
-            file_path := BP + "head/" + board + "/Files/"
+	    file_deletion := func() {
+		    file_path := BP + "head/" + board + "/Files/"
 			if file_name != "" {
                 err = os.Remove(file_path + file_name)
                 if !errors.Is(err, fs.ErrNotExist) {Err_check(err)}
@@ -96,7 +86,27 @@ func User_actions(w http.ResponseWriter, req *http.Request) {
                     if !errors.Is(err, fs.ErrNotExist) {Err_check(err)}
                 }
         }}
-	} 
+		
+		if req.FormValue("onlyimgdel") == "on" {
+		    file_deletion()
+			user_filedelete_stmt := WriteStrings["user_filedelete"]
+			_, err := new_tx.ExecContext(ctx, user_filedelete_stmt, post_pass, board)
+			Err_check(err)
+		} else {
+	        user_delete_stmt := WriteStrings["user_delete"]
+		    res, err := new_tx.ExecContext(ctx, user_delete_stmt, sdate, post_pass, board)
+		    Err_check(err)
+		
+		    rowsaffected, err := res.RowsAffected()
+		    Err_check(err)
+		
+		    if rowsaffected == 0 {
+		        http.Error(w, "This post is too old, has replies, or doesn't exist.", http.StatusUnauthorized)
+                return
+		    } else {
+                file_deletion()
+		    }
+	}}
 	
 	if option == "Edit" {
 	    if Request_filter(w, req, "POST", max_upload_size) == 0 {return}
@@ -128,7 +138,7 @@ func User_actions(w http.ResponseWriter, req *http.Request) {
 		
 		//updating
 		user_edit_stmt := WriteStrings["user_edit"]
-		edit_message := `Post edited on ` + now.Format(time.RFC1123) 
+		edit_message := `Post edited on ` + now.Format("2 Jan 2006, 3:04pm") 
 		
 	    res, err := new_tx.ExecContext(ctx, user_edit_stmt, input, edit_message, sdate, post_pass, board)
 		Err_check(err)

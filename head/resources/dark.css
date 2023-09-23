@@ -6,7 +6,7 @@ a, summary {
     color: #99225c;
 }
 
-p, .pcontent, label, postwrap, .thread postwrap::before, .ogdc, small, input[type=file], .pin, .lock, .anchor {
+p, .pcontent, label, postwrap, .thread postwrap::before, .ogdc, small, input[type=file], .pin, .lock, .anchor, .deletetext {
     color: #999999;
 }
 

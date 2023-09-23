@@ -88,8 +88,9 @@ const (
 		
     delete_post_string = `DELETE FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`
 	user_delete_string = `DELETE FROM posts WHERE Calendar >= ?1 AND Password = ?2 AND Board = ?3 AND 
-	    ((SELECT COUNT(Id) FROM posts WHERE Parent = (SELECT Id FROM posts WHERE Password = ?2 AND Board = ?3 LIMIT 1) AND Board = ?3) <= 1) LIMIT 1`    
+	    ((SELECT COUNT(Id) FROM posts WHERE Parent = (SELECT Id FROM posts WHERE Password = ?2 AND Board = ?3 LIMIT 1) AND Board = ?3) <= 1)`    
 		//threads with more than one post cannot be deleted by users
+	user_filedelete_string = `UPDATE posts SET Imgprev = 'deleted', File = 'deleted', Filemime = 'image/webp' WHERE Password = ? and Board = ?`
     delete_all_posts_string = `DELETE FROM posts WHERE (Identifier = (SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2))`
     ban_string = `INSERT INTO banned(Identifier, Expiry, Mod, Content, Reason) VALUES ((SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2), 
         ?3, ?4, (SELECT Content FROM posts WHERE Id = ?1 AND Board = ?2), ?5)`
@@ -117,7 +118,8 @@ var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_n
         "ban_search": ban_search_string, "ban_remove": ban_remove_string, "delete_token": delete_token_string, "remove_tokens": remove_tokens_string,
         "new_user": new_user_string, "remove_user": remove_user_string,"search_user": search_user_string,
         "get_files": get_files_string, "get_all_files": get_all_files_string, "user_get_file": user_get_file_string, 
-		"delete_post": delete_post_string, "user_delete": user_delete_string, "delete_all_posts": delete_all_posts_string, 
+		"delete_post": delete_post_string, "user_delete": user_delete_string, "user_filedelete": user_filedelete_string, 
+		"delete_all_posts": delete_all_posts_string, 
         "ban": ban_string, "delete_log": delete_log_string, 
         "ban_message": ban_message_string, "get_deleted": get_deleted_string, "delete_remove": delete_remove_string,
         "get_expired_tokens": get_expired_tokens_string, "delete_expired_token": delete_expired_token_string,

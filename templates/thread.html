@@ -10,13 +10,13 @@
     <script async src="/resources/thread.js" defer></script>
     <script async src="/resources/dropdown.js" defer></script>
 <style>{{$name := .BoardN}}
-{{range .Posts}}{{if .File}}{{if imagecheck .Filemime}}
-.p{{.Id}} {--mini: url('/{{$name}}/Files/{{.Imgprev}}'); --maxi: url('/{{$name}}/Files/{{.File}}');}{{end}}{{end}}{{end}}
+{{range .Posts}}{{if .File}}{{if imagecheck .Filemime}}{{if ne .Imgprev "deleted"}}
+.p{{.Id}} {--mini: url('/{{$name}}/Files/{{.Imgprev}}'); --maxi: url('/{{$name}}/Files/{{.File}}');}{{else}}
+.p{{.Id}} {--mini: url('/resources/deleted_image.webp'); --maxi: url('/resources/deleted_image.webp');}{{end}}{{end}}{{end}}{{end}}
 </style>
 </head>
 
-<body>
-{{$Descs := .HeaderDescs}}
+<body>{{$Descs := .HeaderDescs}}
 <p class="headerblock">{{range $index, $name := .Header}}
     <a class="header" href="/{{$name}}" title="{{index $Descs $index}}">/{{$name}}/</a> {{end}}
     <a class="header" href="/" title="front page">home</a>
@@ -86,8 +86,8 @@
 
 	<form class="deletemenu" action="/im/user/?board={{.BoardN}}" method="Post">
 	    <input type="hidden" name="actiontype" value="delete">
-		Delete Post: [<input type="checkbox" name="onlyimgdel" value="on">File Only] 
-		<input type="submit" name="option" value="Delete">
+		<div class="deletetext">Delete Post: [<input type="checkbox" name="onlyimgdel" value="on">File Only] 
+		<input type="submit" name="option" value="Delete"></div>
 		
 	</form>
 
