@@ -43,18 +43,7 @@
             </div>
         </threadwrap>{{end}}
 {{range slice .Posts 1}}
-    <postwrap>
-        <div id="no{{.Id}}" class="post">
-
-                    <label class="{{.Option}}"><time>{{.Time}}</time> <selfref><a href="#no{{.Id}}">No. </a><a class="plink" href="#newpost">{{.Id}}</a></selfref>{{if .Replies}}{{range .Replies}}<ref class="reply"><a href="#no{{.}}">&gt;&gt;{{.}}</a></ref>{{end}}{{end}}</label>
-                    <br>
-                    {{if .File}}<label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
-                    <br>
-                    {{if avcheck .Filemime}}<video controls poster={{if eq .Imgprev "audio_image.webp"}}'/resources/audio_image.webp'{{else}}'/{{$name}}/Files/{{.Imgprev}}'{{end}}><source src='/{{$name}}/Files/{{.File}}' type= '{{.Filemime}}'></video>{{else}}<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}{{end}}
-                    {{if .Content}}<div class="pcontent">{{.Content}}</div>{{end}}
-
-        </div>
-    </postwrap>
+    {{template "postwrap" . }}
 {{end}}{{end}}
 
 <hr>
@@ -62,20 +51,9 @@
     <form action="/im/post/?parent={{.TId}}&board={{.BoardN}}" enctype="multipart/form-data" method="Post" autocomplete="on">
         <table><tbody>
         <tr>
-        <td class="ogdc">Message</td>
-        <td><textarea id="newpost" name="newpost" rows="8" cols="78"></textarea></td>
-        </tr><tr>
-        <td class="ogdc">File</td>
-        <td><input type="file" name="file" accept="image/png, image/jpeg, image/gif, image/webp, image/avif, image/svg+xml,
-            audio/mpeg, audio/ogg, audio/flac, audio/x-m4a, video/webm, video/mp4, .opus, .m4a"></td>
-        </tr><tr>
-        <td class="ogdc">Password</td>
-        <td><input type="password" name="pwd" value="<password>">
-        <small>(for post editing)</small></td>
-        </tr><tr>
-        <td class="ogdc">Submit</td>
-        <td><input type="submit" value="Reply">
-        <input type="submit" name="option" value="Sage">
+        {{template "newform"}}
+		<td><input type="submit" value="Reply">
+		<input type="submit" name="option" value="Sage">
 		<input type="submit" name="option" value="Edit" formaction="/im/user/?board={{.BoardN}}"></td>
         </tr>
         </tbody></table>
@@ -83,22 +61,8 @@
     </center>
 
 <hr>
-
-	<form class="deletemenu" action="/im/user/?board={{.BoardN}}" method="Post">
-	    <input type="hidden" name="actiontype" value="delete">
-		<div class="deletetext">Delete Post: [<input type="checkbox" name="onlyimgdel" value="on">File Only] 
-		<input type="submit" name="option" value="Delete"></div>
-		
-	</form>
-
-    <form id="thememenu" class="thememenu" action="/im/theme/" method="Get">
-        <select name="theme">
-            <option value="default">Styles</option>
-             <option value="default">default</option>{{range .SThemes}}
-              <option value="{{.}}">{{.}}</option>{{end}}
-        </select>
-        <noscript><input type="submit" value="Select"></noscript>
-    </form>
-	
+    <form class="deletemenu" action="/im/user/?board={{$name}}" method="Post">
+        {{template "bottomforms" .}}
+    
 </body>
 </html>

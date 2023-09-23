@@ -152,6 +152,7 @@ func get_threads(board string) []*Thread {
 
         for thread_rows.Next() {
             var cpst Post
+			cpst.BoardN = board
 
             err = thread_rows.Scan(&cpst.Id, &cpst.Content, &cpst.Time, &cpst.Parent, &cpst.File,
                 &cpst.Filename, &cpst.Fileinfo, &cpst.Filemime, &cpst.Imgprev, &cpst.Option)
@@ -207,6 +208,8 @@ func get_posts(parent string, board string) ([]*Post, error) {
 
     for rows.Next() {
         var pst Post
+		pst.BoardN = board
+		
         err = rows.Scan(&pst.Id, &pst.Content, &pst.Time, &pst.File,
             &pst.Filename, &pst.Fileinfo, &pst.Filemime, &pst.Imgprev, &pst.Option, &pst.Pinned, &pst.Locked, &pst.Anchored)
         Err_check(err)
@@ -229,7 +232,7 @@ func get_posts(parent string, board string) ([]*Post, error) {
 
 func Build_board(board string) {
     boardtemp := template.New("board.html").Funcs(Filefuncmap)
-    boardtemp, err := boardtemp.ParseFiles(BP + "/templates/board.html")
+    boardtemp, err := boardtemp.ParseFiles(BP + "/templates/board.html", BP + "/templates/snippet.html")
     Err_check(err)
 
     path := BP + "head/" + board + "/"
@@ -249,7 +252,7 @@ func Build_board(board string) {
 
 func Build_thread(parent string, board string) { //will accept argument for board and thread number
     threadtemp := template.New("thread.html").Funcs(Filefuncmap)
-    threadtemp, err := threadtemp.ParseFiles(BP + "/templates/thread.html")
+    threadtemp, err := threadtemp.ParseFiles(BP + "/templates/thread.html", BP + "/templates/snippet.html")
     Err_check(err)
 
 
