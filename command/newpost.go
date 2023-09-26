@@ -233,10 +233,6 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             Err_check(err)
             defer f.Close()
 
-            //maybe put this at the end?, or add separate decoder for detection
-
-            htadd_stmt := WriteStrings["htadd"]
-
             //test type
             var file_info string
 
@@ -253,8 +249,6 @@ func New_post(w http.ResponseWriter, req *http.Request) {
 
                 file_info = image_gen_info(handler.Size, width, height)
                 file_pre += "s.webp"
-                _, err = new_tx.ExecContext(ctx, htadd_stmt, board, parent, file_pre, post_pass)
-                Err_check(err)
                 io.Copy(f, file_buffer)
             } else { 
                 io.Copy(f, file)
@@ -294,8 +288,6 @@ func New_post(w http.ResponseWriter, req *http.Request) {
                                 file_pre = "audio_image.webp"
                             } else {
                                 file_pre += "s.webp"
-                                _, err = new_tx.ExecContext(ctx, htadd_stmt, board, parent, file_pre, post_pass)
-                                Err_check(err)
                             }
                             break
                         }
@@ -318,6 +310,11 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             _, err = new_tx.ExecContext(ctx, newpst_wfstmt, board, input, post_time, parent, identity, file_name, ffname, file_info, mime_type, file_pre, 
                 option, calendar, clock, post_pass)
             Err_check(err)
+			
+			htadd_stmt := WriteStrings["htadd"]
+            _, err = new_tx.ExecContext(ctx, htadd_stmt, board, parent, file_pre, post_pass)
+            Err_check(err)
+			
         } else {
               http.Error(w, "Unsupported file type.", http.StatusBadRequest)
               return

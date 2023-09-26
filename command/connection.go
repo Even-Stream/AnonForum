@@ -56,14 +56,12 @@ const (
     repadd_string = `INSERT INTO replies(Board, Source, Replier, Password) VALUES (?1, ?2, (SELECT Id FROM latest WHERE Board = ?1) - 1, ?3)`
 	repupdate_string = `INSERT INTO replies(Board, Source, Replier, Password) VALUES 
 	    (?1, ?2, (SELECT Id FROM posts WHERE Password = ?3 AND Board = ?1 LIMIT 1), ?3)`
-	repremove_string = `DELETE FROM replies WHERE Password = ? AND Board = ?`
     subadd_string = `INSERT INTO subjects(Board, Parent, Subject) VALUES (?, ?, ?)`
     hpadd_string = `INSERT INTO homepost(Board, Id, Content, TrunContent, Parent, Password)
         VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1) - 1, ?2, ?3, ?4, ?5)`
     htadd_string = `INSERT into homethumb(Board, Id, Parent, Imgprev, Password)
-        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4)`
-	hpupdate_string = `UPDATE homepost SET Content = ?, TrunContent = ? WHERE Password = ? AND Board = ?`	
-	htdelete_string = `DELETE FROM homethumb WHERE Password = ? and Board = ?`
+        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1) - 1, ?2, ?3, ?4)`
+	hpupdate_string = `UPDATE homepost SET Content = ?, TrunContent = ? WHERE Password = ? AND Board = ?`
 		
     parent_checkstring = `SELECT COUNT(*)
                 FROM posts
@@ -111,8 +109,8 @@ const (
 )
 
 var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_nf": newpost_nfstring, "user_edit": user_edit_string,
-        "repadd": repadd_string, "repupdate": repupdate_string, "repremove": repremove_string, "subadd": subadd_string, 
-		"hpadd": hpadd_string, "htadd": htadd_string, "hpupdate": hpupdate_string, "htdelete": htdelete_string,
+        "repadd": repadd_string, "repupdate": repupdate_string, "subadd": subadd_string, 
+		"hpadd": hpadd_string, "htadd": htadd_string, "hpupdate": hpupdate_string,
         "parent_check": parent_checkstring, "threadid" : threadid_string,
         "add_token":  Add_token_string, "search_token": search_token_string, 
         "ban_search": ban_search_string, "ban_remove": ban_remove_string, "delete_token": delete_token_string, "remove_tokens": remove_tokens_string,

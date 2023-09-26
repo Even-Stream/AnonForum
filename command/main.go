@@ -48,7 +48,7 @@ func main() {
     rand.Seed(time.Now().UnixNano())
 
     DB_path = BP + "command/post-coll.db"
-    DB_uri = "file://" + DB_path + "?cache=private&_synchronous=NORMAL&_journal_mode=WAL"
+    DB_uri = "file://" + DB_path + "?_foreign_keys=on&cache=private&_synchronous=NORMAL&_journal_mode=WAL"
     if _, err = os.Stat(DB_path); err != nil {
         New_db()
         Admin_init()

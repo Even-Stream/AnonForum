@@ -151,10 +151,6 @@ func User_actions(w http.ResponseWriter, req *http.Request) {
             return
 		}
 		
-		repremove_stmt := WriteStrings["repremove"]
-	    _, err = new_tx.ExecContext(ctx, repremove_stmt, post_pass, board)
-		Err_check(err)
-		
 		if len(repmatches) > 0 {
             repupdate_stmt := WriteStrings["repupdate"]
             for _, match := range repmatches {
@@ -166,7 +162,7 @@ func User_actions(w http.ResponseWriter, req *http.Request) {
         }
 		
 		hpupdate_stmt := WriteStrings["hpupdate"]
-        _, err = new_tx.ExecContext(ctx, hpupdate_stmt, board, home_content, home_truncontent, parent)
+        _, err = new_tx.ExecContext(ctx, hpupdate_stmt, home_content, home_truncontent, post_pass, board)
         Err_check(err)
 	}
 	
