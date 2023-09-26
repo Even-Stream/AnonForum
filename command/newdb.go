@@ -28,16 +28,16 @@ const (
         "Clock" INTEGER NOT NULL,
         "Pinned" INTEGER NOT NULL,
         "Locked" INTEGER NOT NULL,
-		"Anchored" INTEGER NOT NULL,
-		PRIMARY KEY (Board, Id)
+        "Anchored" INTEGER NOT NULL,
+        PRIMARY KEY (Board, Id)
     );`
 
     createRepliesTableSQL = `CREATE TABLE replies (
         "Board" TEXT NOT NULL,
         "Source" INTEGER NOT NULL,
         "Replier" INTEGER NOT NULL,
-		"Password" TEXT NOT NULL,
-		FOREIGN KEY ("Board", "Replier") REFERENCES posts("Board", "Id") ON DELETE CASCADE
+        "Password" TEXT NOT NULL,
+        FOREIGN KEY ("Board", "Replier") REFERENCES posts("Board", "Id") ON DELETE CASCADE
     );`
 
 
@@ -58,8 +58,8 @@ const (
         "Content" TEXT NOT NULL,
         "TrunContent" TEXT NOT NULL,
         "Parent" INTEGER NOT NULL,
-		"Password" TEXT NOT NULL,
-		FOREIGN KEY ("Board", "Id") REFERENCES posts("Board", "Id") ON DELETE CASCADE
+        "Password" TEXT NOT NULL,
+        FOREIGN KEY ("Board", "Id") REFERENCES posts("Board", "Id") ON DELETE CASCADE
     );`
 
     createHomeThumbTableSQL = `CREATE TABLE homethumb (
@@ -67,8 +67,8 @@ const (
         "Id" INTEGER NOT NULL,
         "Parent" TEXT NOT NULL,
         "Imgprev" TEXT NOT NULL,
-		"Password" TEXT NOT NULL,
-		FOREIGN KEY ("Board", "Id") REFERENCES posts("Board", "Id") ON DELETE CASCADE
+        "Password" TEXT NOT NULL,
+        FOREIGN KEY ("Board", "Id") REFERENCES posts("Board", "Id") ON DELETE CASCADE
     );`
 
     createCredTableSQL = `CREATE TABLE credentials (
@@ -107,22 +107,22 @@ const (
             SET Id = Id + 1
             WHERE Board = NEW.Board;
         END;`
-		
-	clearRepsTriggerSQL = `CREATE TRIGGER rep_clear
-	    AFTER UPDATE ON posts
-		BEGIN
-		    DELETE FROM replies WHERE Replier = OLD.Id AND Board = OLD.Board;
-		END;
-	`
-		
-	anchorCheckSQL = `CREATE TRIGGER anchor_check
-	    AFTER INSERT ON posts
-		BEGIN
-		    UPDATE posts
-			SET Anchored = IIF((SELECT COUNT(Id) FROM posts WHERE Parent = NEW.Parent AND Board = NEW.Board AND Pinned <> 1) > 200, 1, 0)
-			WHERE Id = NEW.Parent AND Board = NEW.Board;
-		END;
-	`
+        
+    clearRepsTriggerSQL = `CREATE TRIGGER rep_clear
+        AFTER UPDATE ON posts
+        BEGIN
+            DELETE FROM replies WHERE Replier = OLD.Id AND Board = OLD.Board;
+        END;
+    `
+        
+    anchorCheckSQL = `CREATE TRIGGER anchor_check
+        AFTER INSERT ON posts
+        BEGIN
+            UPDATE posts
+            SET Anchored = IIF((SELECT COUNT(Id) FROM posts WHERE Parent = NEW.Parent AND Board = NEW.Board AND Pinned <> 1) > 200, 1, 0)
+            WHERE Id = NEW.Parent AND Board = NEW.Board;
+        END;
+    `
         
     trimHomePostStack = `CREATE TRIGGER homepost_trim
         AFTER INSERT ON homepost
@@ -139,7 +139,7 @@ const (
                 IIF((SELECT COUNT(Id) FROM homethumb) > 6,
                 (SELECT min(ROWID) from homethumb), NULL);
         END;`
-		
+        
         
     //how new posts know what their id is 
     latestseedSQL = `INSERT INTO latest (Board, Id) VALUES (cb, 1);`
@@ -191,12 +191,12 @@ func create_table(db *sql.DB) {
     statement, err = db.Prepare(createLatestTriggerSQL)
         Err_check(err)
     statement.Exec()
-	
-	statement, err = db.Prepare(clearRepsTriggerSQL)
+    
+    statement, err = db.Prepare(clearRepsTriggerSQL)
         Err_check(err)
     statement.Exec()
-	
-	statement, err = db.Prepare(anchorCheckSQL)
+    
+    statement, err = db.Prepare(anchorCheckSQL)
         Err_check(err)
     statement.Exec()
 

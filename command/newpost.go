@@ -297,7 +297,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
                     return
 				} else {file_pre = "audio_image.webp"}
             }
-
+            
             newpst_wfstmt := WriteStrings["newpost_wf"]
 
             ofname := []rune(handler.Filename)

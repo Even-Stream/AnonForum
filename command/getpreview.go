@@ -9,18 +9,22 @@ import (
 )
 
 type Prev struct {
-    Id int
+    Id string
     Board string
     Content string
     Time string
+    Filename string
+    Fileinfo string
     Filemime string
     Imgprev string 
     Option string
 }
 
 const (
-    prev_body = `<label class="{{.Option}}"><time>{{.Time}}</time></label>
-        <br> <div class="prevcontent">
+    prev_body = `<label class="{{.Option}}"><time>{{.Time}}</time></label> <selfref>No. {{.Id}}</selfref>
+        <br>
+        {{if .Filemime}}<label>File <a href="/">{{.Filename}}</a> - ({{.Fileinfo}})</label><br>{{end}}
+        <div class="prevcontent">
         {{if .Imgprev}}{{if audiocheck .Filemime}}
         <img class="imspec" src="/resources/audio_image.webp">
         {{else}}<img class="imspec" src="/{{.Board}}/Files/{{.Imgprev}}">{{end}}{{end}}
@@ -49,10 +53,11 @@ func Get_prev(w http.ResponseWriter, req *http.Request) {
     var temp bytes.Buffer
     var prv Prev
     prv.Board = board
+    prv.Id = id
 
     row := stmt.QueryRowContext(ctx, id, board)
 
-    err := row.Scan(&prv.Content, &prv.Time, &prv.Filemime, &prv.Imgprev, &prv.Option)
+    err := row.Scan(&prv.Content, &prv.Time, &prv.Filename, &prv.Fileinfo, &prv.Filemime, &prv.Imgprev, &prv.Option)
     Query_err_check(err)
 
     Prev_body, err := template.New("todos").Funcs(Filefuncmap).Parse(prev_body)
