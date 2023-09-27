@@ -2,15 +2,12 @@ package main
 
 import (
     "net/http"
-    "os"
     "strings"
     "time"
     "strconv"
     //"fmt"
     "database/sql"
     "text/template"
-    "errors"
-    "io/fs"
 
     "github.com/google/uuid"
 )
@@ -77,10 +74,10 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
     if Entry_check(w, req, "actiontype", actiontype ) == 0 {return}
 
     if actiontype == "on_posts" {
-        ids := req.FormValue("ids")
-        if Entry_check(w, req, "ids", ids) == 0 {return}
-        boards := req.FormValue("boards")	
-        if Entry_check(w, req, "boards", boards) == 0 {return}
+        id := req.FormValue("id")
+        if Entry_check(w, req, "id", id) == 0 {return}
+        board := req.FormValue("board")	
+        if Entry_check(w, req, "board", board) == 0 {return}
         parents := req.FormValue("parents")
         if Entry_check(w, req, "parents", parents) == 0 {return}
         reason := req.FormValue("reason")
@@ -108,16 +105,16 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
 
             ban_stmt := WriteStrings["ban"]
             if duration >= 0 {
-                _, err = new_tx.ExecContext(ctx, ban_stmt, ids, boards, ban_expiry.Format(time.UnixDate), userSession.username, reason)
+                _, err = new_tx.ExecContext(ctx, ban_stmt, id, board, ban_expiry.Format(time.UnixDate), userSession.username, reason)
             } else { //permaban
-                _, err = new_tx.ExecContext(ctx, ban_stmt, ids, boards, -1, userSession.username, reason)
+                _, err = new_tx.ExecContext(ctx, ban_stmt, id, board, -1, userSession.username, reason)
             }
             Err_check(err)
 
             ban_message := req.FormValue("banmessage")
             if ban_message != "" {
                 ban_message_stmt := WriteStrings["ban_message"]
-                _, err = new_tx.ExecContext(ctx, ban_message_stmt, ban_message, ids, boards)
+                _, err = new_tx.ExecContext(ctx, ban_message_stmt, ban_message, id, board)
                 Err_check(err)
                 update_posts = true
             }
@@ -127,7 +124,7 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
             get_files_stmt := WriteStrings["get_files"]
 
             //DO FOR ALL FILES
-            file_rows, err := new_tx.QueryContext(ctx, get_files_stmt, ids, boards)
+            file_rows, err := new_tx.QueryContext(ctx, get_files_stmt, id, board)
             Err_check(err)
 
             defer file_rows.Close()
@@ -139,23 +136,17 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
                 err = file_rows.Scan(&file_name, &imgprev)
                 Err_check(err)
 
-                file_path := BP + "head/" + boards + "/Files/"
                 if file_name != "" {
-                    err = os.Remove(file_path + file_name)
-                    if !errors.Is(err, fs.ErrNotExist) {Err_check(err)}
-                
-                    if !strings.HasSuffix(imgprev, "image.webp") {
-                        err = os.Remove(file_path + imgprev)
-                        if !errors.Is(err, fs.ErrNotExist) {Err_check(err)}
-                    }
+                    file_path := BP + "head/" + board + "/Files/"
+                    Delete_file(file_path, file_name, imgprev)
             }}
 
             delete_log_stmt := WriteStrings["delete_log"]
-            _, err = new_tx.ExecContext(ctx, delete_log_stmt, ids, boards, time.Now().In(Loc).Format(time.UnixDate), userSession.username, reason)
+            _, err = new_tx.ExecContext(ctx, delete_log_stmt, id, board, time.Now().In(Loc).Format(time.UnixDate), userSession.username, reason)
 			Err_check(err)
 
             delete_post_stmt := WriteStrings["delete_post"]
-            _, err = new_tx.ExecContext(ctx, delete_post_stmt, ids, boards)
+            _, err = new_tx.ExecContext(ctx, delete_post_stmt, id, board)
             Err_check(err)
 
             update_posts = true
@@ -165,7 +156,7 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
             get_all_files_stmt := WriteStrings["get_all_files"]
 
             //DO FOR ALL FILES
-            file_rows, err := new_tx.QueryContext(ctx, get_all_files_stmt, ids, boards)
+            file_rows, err := new_tx.QueryContext(ctx, get_all_files_stmt, id, board)
             Err_check(err)
             defer file_rows.Close()
 
@@ -177,26 +168,40 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
                 err = file_rows.Scan(&file_name, &file_board, &imgprev)
                 Err_check(err)
 
-                file_path := BP + "head/" + file_board + "/Files/" //different files are in different folders you fuck
                 if file_name != "" {
-                    err = os.Remove(file_path + file_name)
-                    if !errors.Is(err, fs.ErrNotExist) {Err_check(err)}
-                
-                    if !strings.HasSuffix(imgprev, "image.webp") {
-                        err = os.Remove(file_path + imgprev)
-
-                        if !errors.Is(err, fs.ErrNotExist) {Err_check(err)}
-                    }
+                    file_path := BP + "head/" + file_board + "/Files/"
+                    Delete_file(file_path, file_name, imgprev)
             }}
 
             delete_log_stmt := WriteStrings["delete_log"]
-            _, err = new_tx.ExecContext(ctx, delete_log_stmt, ids, boards, time.Now().In(Loc).Format(time.UnixDate), userSession.username, "All Removed.")
+            _, err = new_tx.ExecContext(ctx, delete_log_stmt, id, board, time.Now().In(Loc).Format(time.UnixDate), userSession.username, "All Removed.")
 
             delete_all_posts_stmt := WriteStrings["delete_all_posts"]
-            _, err = new_tx.ExecContext(ctx, delete_all_posts_stmt, ids, boards)
+            _, err = new_tx.ExecContext(ctx, delete_all_posts_stmt, id, board)
             Err_check(err)
 
             update_posts = true
+        }
+        
+        if strings.HasSuffix(actions, "Delete File") {
+            filedelete_stmt := WriteStrings["filedelete"]
+        
+            file_row := new_tx.QueryRowContext(ctx, `SELECT COALESCE(File, '') File, COALESCE(Imgprev, '') Imgprev 
+                FROM posts WHERE Id = ? AND Board = ?`, id, board)
+            
+            var file_name string
+            var imgprev string
+            file_row.Scan(&file_name, &imgprev)
+            
+            if file_name != "" {
+                file_path := BP + "head/" + board + "/Files/"
+                Delete_file(file_path, file_name, imgprev)
+                
+                _, err = new_tx.ExecContext(ctx, filedelete_stmt, id, board)
+                Err_check(err)
+                
+                update_posts = true
+            }
         }
 
 		//for pinning and locking
@@ -207,7 +212,7 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
             }
 
             chain_stmt := WriteStrings[actions]
-            _, err = new_tx.ExecContext(ctx, chain_stmt, parents, boards)
+            _, err = new_tx.ExecContext(ctx, chain_stmt, parents, board)
             Err_check(err)
 
             update_posts = true
@@ -215,9 +220,9 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
 
 
         if update_posts {
-            go Build_thread(parents, boards)
-            go Build_board(boards)
-            go Build_catalog(boards)
+            go Build_thread(parents, board)
+            go Build_board(board)
+            go Build_catalog(board)
             go Build_home()
         }
 

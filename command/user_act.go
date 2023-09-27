@@ -2,14 +2,11 @@ package main
 
 import (
     "time"
-    "os"
-    "errors"
     "strings"
     "strconv"
     "html"
     "net/http"
     "database/sql"
-    "io/fs"
     //"fmt"
 )
 
@@ -76,15 +73,9 @@ func User_actions(w http.ResponseWriter, req *http.Request) {
     //setup done
     if option == "Delete" {
         file_deletion := func() {
-            file_path := BP + "head/" + board + "/Files/"
             if file_name != "" {
-                err = os.Remove(file_path + file_name)
-                if !errors.Is(err, fs.ErrNotExist) {Err_check(err)}
-                
-                if !strings.HasSuffix(imgprev, "image.webp") {
-                    err = os.Remove(file_path + imgprev)
-                    if !errors.Is(err, fs.ErrNotExist) {Err_check(err)}
-                }
+                file_path := BP + "head/" + board + "/Files/"
+                Delete_file(file_path, file_name, imgprev)
         }}
         
         if req.FormValue("onlyimgdel") == "on" {

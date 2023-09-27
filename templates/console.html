@@ -66,8 +66,8 @@ admbox threadwrap .post {
                 <form action="/im/mod/" enctype="multipart/form-data" method = "Post">
                     <input type="hidden" name="actiontype" value="on_posts">
                     <input type="hidden" name="parents" value="{{.Parent}}">
-                    <input type="hidden" name="ids" value="{{.Id}}">
-                    <input type="hidden" name="boards" value="{{.BoardN}}">
+                    <input type="hidden" name="id" value="{{.Id}}">
+                    <input type="hidden" name="board" value="{{.BoardN}}">
                     <input type="submit" name="actions" value="Delete">
                     <input type="submit" name="actions" value="Delete File">
                     {{if ne $at 2}} |
