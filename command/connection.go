@@ -82,6 +82,8 @@ const (
     get_files_string = `SELECT COALESCE(File, '') AS File, COALESCE(Imgprev, '') AS Imgprev FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`
     get_all_files_string = `SELECT COALESCE(File, '') AS File, Board, COALESCE(Imgprev, '') AS Imgprev FROM posts WHERE (Identifier = (SELECT Identifier FROM posts 
         WHERE Id = ?1 AND Board = ?2))`
+    get_all_parents_string = `SELECT Id, Board FROM posts WHERE (Identifier = (SELECT Identifier FROM posts 
+        WHERE Id = ?1 AND Board = ?2)) AND Id = Parent`
 	user_get_file_string = `SELECT COALESCE(File, '') AS File, COALESCE(Imgprev, '') AS Imgprev FROM posts WHERE Password = ? AND Board = ? LIMIT 1`
 		
     delete_post_string = `DELETE FROM posts WHERE (Id = ?1 OR Parent = ?1) AND Board = ?2`
@@ -91,6 +93,8 @@ const (
     filedelete_string = `UPDATE posts SET Imgprev = 'deleted', File = 'deleted', Filemime = 'image/webp' WHERE Id = ? and Board = ?`
 	user_filedelete_string = `UPDATE posts SET Imgprev = 'deleted', File = 'deleted', Filemime = 'image/webp' WHERE Password = ? and Board = ?`
     delete_all_posts_string = `DELETE FROM posts WHERE (Identifier = (SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2))`
+    isparent_string = `SELECT IIF(Parent = Id, 1, 0) FROM posts WHERE Id = ? AND Board = ?`
+    isparent_string2 = `SELECT IIF(Parent = Id, 1, 0), Id FROM posts WHERE Password = ? AND Board = ?`
     ban_string = `INSERT INTO banned(Identifier, Expiry, Mod, Content, Reason) VALUES ((SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2), 
         ?3, ?4, (SELECT Content FROM posts WHERE Id = ?1 AND Board = ?2), ?5)`
     delete_log_string = `INSERT INTO deleted(Identifier, Time, Mod, Content, Reason) VALUES ((SELECT Identifier FROM posts WHERE Id = ?1 AND Board = ?2),
@@ -116,9 +120,9 @@ var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_n
         "add_token":  Add_token_string, "search_token": search_token_string, 
         "ban_search": ban_search_string, "ban_remove": ban_remove_string, "delete_token": delete_token_string, "remove_tokens": remove_tokens_string,
         "new_user": new_user_string, "remove_user": remove_user_string,"search_user": search_user_string,
-        "get_files": get_files_string, "get_all_files": get_all_files_string, "user_get_file": user_get_file_string, 
+        "get_files": get_files_string, "get_all_files": get_all_files_string, "get_all_parents": get_all_parents_string, "user_get_file": user_get_file_string, 
 		"delete_post": delete_post_string, "user_delete": user_delete_string, "filedelete": filedelete_string, "user_filedelete": user_filedelete_string, 
-		"delete_all_posts": delete_all_posts_string, 
+		"delete_all_posts": delete_all_posts_string, "isparent": isparent_string, "isparent2": isparent_string2,
         "ban": ban_string, "delete_log": delete_log_string, 
         "ban_message": ban_message_string, "get_deleted": get_deleted_string, "delete_remove": delete_remove_string,
         "get_expired_tokens": get_expired_tokens_string, "delete_expired_token": delete_expired_token_string,

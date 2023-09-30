@@ -40,9 +40,9 @@ func Time_report(entry string) {
 
 func Delete_file(file_path, file_name, imgprev string) {
     err := os.Remove(file_path + file_name)
-    if !errors.Is(err, fs.ErrNotExist) {Err_check(err)}
+    if !errors.Is(err, fs.ErrNotExist) {Err_check(err)} 
                 
-    if !strings.HasSuffix(imgprev, "image.webp") {
+    if imgprev != "" && !strings.HasSuffix(imgprev, "image.webp") {
         err = os.Remove(file_path + imgprev)
         if !errors.Is(err, fs.ErrNotExist) {Err_check(err)}
     }

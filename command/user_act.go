@@ -85,6 +85,18 @@ func User_actions(w http.ResponseWriter, req *http.Request) {
             Err_check(err)
         } else {
             user_delete_stmt := WriteStrings["user_delete"]
+            isparent_stmt := WriteStrings["isparent2"]
+            
+            var pcheck bool
+            var id string
+            pcheck_row := new_tx.QueryRowContext(ctx, isparent_stmt, post_pass, board)
+            pcheck_row.Scan(&pcheck, &id)
+            
+            if pcheck {
+                file_path := BP + "head/" + board + "/"
+                Delete_file(file_path, id + ".html", "")
+            }
+            
             res, err := new_tx.ExecContext(ctx, user_delete_stmt, sdate, post_pass, board)
             Err_check(err)
         

@@ -21,7 +21,7 @@ type Prev struct {
 }
 
 const (
-    prev_body = `<label class="{{.Option}}"><time>{{.Time}}</time></label> <selfref>No. {{.Id}}</selfref>
+    prev_body = `<label class="{{.Option}}"><time>{{.Time}}</time> <selfref>No. {{.Id}}</selfref></label>
         <br>
         {{if .Filemime}}<label>File <a href="/">{{.Filename}}</a> - ({{.Fileinfo}})</label><br>{{end}}
         <div class="prevcontent">

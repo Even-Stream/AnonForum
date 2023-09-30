@@ -5,7 +5,6 @@ import (
     "strings"
     "time"
     "strconv"
-    //"fmt"
     "database/sql"
     "text/template"
 
@@ -122,6 +121,7 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
 
         if strings.HasSuffix(actions, "Delete") {
             get_files_stmt := WriteStrings["get_files"]
+            isparent_stmt := WriteStrings["isparent"]
 
             //DO FOR ALL FILES
             file_rows, err := new_tx.QueryContext(ctx, get_files_stmt, id, board)
@@ -144,6 +144,15 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
             delete_log_stmt := WriteStrings["delete_log"]
             _, err = new_tx.ExecContext(ctx, delete_log_stmt, id, board, time.Now().In(Loc).Format(time.UnixDate), userSession.username, reason)
 			Err_check(err)
+            
+            var pcheck bool
+            pcheck_row := new_tx.QueryRowContext(ctx, isparent_stmt, id, board)
+            pcheck_row.Scan(&pcheck)
+            
+            if pcheck {
+                file_path := BP + "head/" + board + "/"
+                Delete_file(file_path, id + ".html", "")
+            }
 
             delete_post_stmt := WriteStrings["delete_post"]
             _, err = new_tx.ExecContext(ctx, delete_post_stmt, id, board)
@@ -154,6 +163,7 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
 
         if strings.HasSuffix(actions, "Delete All by User") {
             get_all_files_stmt := WriteStrings["get_all_files"]
+            get_all_parents_stmt := WriteStrings["get_all_parents"]
 
             //DO FOR ALL FILES
             file_rows, err := new_tx.QueryContext(ctx, get_all_files_stmt, id, board)
@@ -172,6 +182,29 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
                     file_path := BP + "head/" + file_board + "/Files/"
                     Delete_file(file_path, file_name, imgprev)
             }}
+            
+            thread_rows, err := new_tx.QueryContext(ctx, get_all_parents_stmt, id, board)
+            Err_check(err)
+            defer thread_rows.Close()
+            
+            other_boards := make(map[string]bool)
+            for thread_rows.Next() {
+                var PID string
+                var PBoard string
+                
+                err = thread_rows.Scan(&PID, &PBoard)
+                Err_check(err)
+                
+                file_path := BP + "head/" + PBoard + "/"
+                Delete_file(file_path, PID + ".html", "")
+                
+                if PBoard != board {other_boards[PBoard] = true}
+            }
+            
+            for b, _ := range other_boards {
+                defer Build_board(b)
+                defer Build_catalog(b)
+            }
 
             delete_log_stmt := WriteStrings["delete_log"]
             _, err = new_tx.ExecContext(ctx, delete_log_stmt, id, board, time.Now().In(Loc).Format(time.UnixDate), userSession.username, "All Removed.")
@@ -218,6 +251,8 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
             update_posts = true
         }
 
+        err = new_tx.Commit()
+        Err_check(err)
 
         if update_posts {
             go Build_thread(parents, board)
@@ -276,11 +311,11 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
                 </head><body><center><br>
                     <p>Done.` + html_foot))
         }
-
+        
+        err = new_tx.Commit()
+        Err_check(err)
     }
 
-    err = new_tx.Commit()
-    Err_check(err)
 }
 
 func Unban(w http.ResponseWriter, req *http.Request) {
