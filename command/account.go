@@ -74,8 +74,6 @@ var Argon_params = &argon2id.Params{
 	KeyLength:   32,
 }
 
-var Loc, _ = time.LoadLocation("UTC")
-
 type session struct {
     username string
     expiry   time.Time
@@ -85,7 +83,7 @@ type session struct {
 var Sessions = map[string]*session{}
 
 func (s session) IsExpired() bool {
-    return s.expiry.Before(time.Now().In(Loc))
+    return s.expiry.Before(time.Now().In(Nip))
 }
 
 func Admin_init() {
@@ -95,7 +93,7 @@ func Admin_init() {
     add_token_stmt, err := conn.Prepare(Add_token_string)
     Err_check(err)
 
-    add_token_stmt.Exec("500", Admin, time.Now().In(Loc).Add(time.Hour * 1).Format(time.UnixDate))
+    add_token_stmt.Exec("500", Admin, time.Now().In(Nip).Add(time.Hour * 1).Format(time.UnixDate))
 }
 
 func Request_filter(w http.ResponseWriter, req *http.Request, method string, max_size int64) int {
@@ -201,7 +199,7 @@ func Token_check (w http.ResponseWriter, req *http.Request) {
 }
 
 func Account_refresh(w http.ResponseWriter, sessionToken string) {
-    expiresAt := time.Now().In(Loc).Add(10 * time.Minute)
+    expiresAt := time.Now().In(Nip).Add(10 * time.Minute)
     Sessions[sessionToken].expiry = expiresAt
 
     http.SetCookie(w, &http.Cookie{
@@ -257,7 +255,7 @@ func Credential_check (w http.ResponseWriter, req *http.Request) {
     }
 
     sessionToken := uuid.NewString()
-    expiresAt := time.Now().In(Loc).Add(10 * time.Minute)
+    expiresAt := time.Now().In(Nip).Add(10 * time.Minute)
 
     Sessions[sessionToken] = &session{
         username: username,

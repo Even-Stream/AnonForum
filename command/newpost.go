@@ -9,7 +9,9 @@ import (
     "strings"
     "strconv"
     "bytes"
+    "context"
     "image/png"
+    "database/sql"
 
     "github.com/zergon321/reisen"
     _ "github.com/mattn/go-sqlite3"
@@ -39,6 +41,41 @@ func image_gen_info(size int64, width int, height int) string {
 func generic_gen_info(size int64) string {
     file_info := humanize.Bytes(uint64(size))
     return file_info
+}
+
+func Ban_check(w http.ResponseWriter, req *http.Request, new_tx *sql.Tx, ctx context.Context, identity string) bool {
+    ban_searchstmt := WriteStrings["ban_search"]
+    ban_rows, err := new_tx.QueryContext(ctx, ban_searchstmt, identity)
+    Err_check(err)
+    defer ban_rows.Close()
+	
+    for ban_rows.Next() {
+    //user was banned
+        var ban_result string
+        var ban_reason string
+        err = ban_rows.Scan(&ban_result, &ban_reason) 
+
+        if ban_result == "-1" {
+            http.Error(w, "You are permanently banned. Reason: " + ban_reason, http.StatusBadRequest)
+            return true
+        }
+        ban_expiry, err := time.Parse(time.RFC1123, ban_result)
+        Err_check(err)
+
+        if time.Now().In(Nip).Before(ban_expiry) {
+        //user is still banned
+            http.Error(w, "You are banned until: " + ban_result + " Reason: " + ban_reason, http.StatusBadRequest)
+            return true
+        } else {
+            ban_removestmt := WriteStrings["ban_remove"]
+            _, err = new_tx.ExecContext(ctx, ban_removestmt, identity, ban_result)
+            Err_check(err)
+        }
+
+        err = new_tx.QueryRowContext(ctx, ban_searchstmt, identity).Scan(&ban_result)
+        Query_err_check(err)
+    }
+    return false
 }
 
 func New_post(w http.ResponseWriter, req *http.Request) {
@@ -112,38 +149,8 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     new_tx, err := new_conn.Begin()
     Err_check(err)
     defer new_tx.Rollback()
-	
-    ban_searchstmt := WriteStrings["ban_search"]
-    ban_rows, err := new_tx.QueryContext(ctx, ban_searchstmt, identity)
-    Err_check(err)
-    defer ban_rows.Close()
-	
-    for ban_rows.Next() {
-    //user was banned
-        var ban_result string
-        var ban_reason string
-        err = ban_rows.Scan(&ban_result, &ban_reason) 
-
-        if ban_result == "-1" {
-            http.Error(w, "You are permanently banned. Reason: " + ban_reason, http.StatusBadRequest)
-            return
-        }
-        ban_expiry, err := time.Parse(time.UnixDate, ban_result)
-        Err_check(err)
-
-        if time.Now().In(Loc).Before(ban_expiry) {
-        //user is still banned
-            http.Error(w, "You are banned until: " + ban_result + " Reason: " + ban_reason, http.StatusBadRequest)
-            return
-        } else {
-            ban_removestmt := WriteStrings["ban_remove"]
-            _, err = new_tx.ExecContext(ctx, ban_removestmt, identity, ban_result)
-            Err_check(err)
-        }
-
-        err = new_tx.QueryRowContext(ctx, ban_searchstmt, identity).Scan(&ban_result)
-        Query_err_check(err)
-    }
+    
+    if Ban_check(w, req, new_tx, ctx, identity) {return}
 
     //new thread if no parent is specified
     if parent != "" {

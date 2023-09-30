@@ -317,6 +317,10 @@ iframe {
     font-size: 7pt;
 }
 
+.editmessage ~ br {
+    display: none;
+}
+
 .ogdc {
     vertical-align: middle;
     text-align: center;

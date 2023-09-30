@@ -97,14 +97,14 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
  
             var ban_expiry time.Time
             if duration == 0 {
-                ban_expiry = time.Now().In(Loc).Add(time.Hour * 96)
+                ban_expiry = time.Now().In(Nip).Add(time.Hour * 96)
             } else {
-                ban_expiry = time.Now().In(Loc).Add(time.Hour * time.Duration(duration))
+                ban_expiry = time.Now().In(Nip).Add(time.Hour * time.Duration(duration))
             }
 
             ban_stmt := WriteStrings["ban"]
             if duration >= 0 {
-                _, err = new_tx.ExecContext(ctx, ban_stmt, id, board, ban_expiry.Format(time.UnixDate), userSession.username, reason)
+                _, err = new_tx.ExecContext(ctx, ban_stmt, id, board, ban_expiry.Format(time.RFC1123), userSession.username, reason)
             } else { //permaban
                 _, err = new_tx.ExecContext(ctx, ban_stmt, id, board, -1, userSession.username, reason)
             }
@@ -142,7 +142,7 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
             }}
 
             delete_log_stmt := WriteStrings["delete_log"]
-            _, err = new_tx.ExecContext(ctx, delete_log_stmt, id, board, time.Now().In(Loc).Format(time.UnixDate), userSession.username, reason)
+            _, err = new_tx.ExecContext(ctx, delete_log_stmt, id, board, time.Now().In(Nip).Format(time.UnixDate), userSession.username, reason)
 			Err_check(err)
             
             var pcheck bool
@@ -207,7 +207,7 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
             }
 
             delete_log_stmt := WriteStrings["delete_log"]
-            _, err = new_tx.ExecContext(ctx, delete_log_stmt, id, board, time.Now().In(Loc).Format(time.UnixDate), userSession.username, "All Removed.")
+            _, err = new_tx.ExecContext(ctx, delete_log_stmt, id, board, time.Now().In(Nip).Format(time.UnixDate), userSession.username, "All Removed.")
 
             delete_all_posts_stmt := WriteStrings["delete_all_posts"]
             _, err = new_tx.ExecContext(ctx, delete_all_posts_stmt, id, board)
@@ -279,7 +279,7 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
 
             new_token := uuid.NewString()
 
-            _, err = new_tx.ExecContext(ctx, Add_token_string, new_token, rusertype, time.Now().In(Loc).Format(time.UnixDate))
+            _, err = new_tx.ExecContext(ctx, Add_token_string, new_token, rusertype, time.Now().In(Nip).Format(time.UnixDate))
             Err_check(err)
 
             w.Write([]byte(html_head +  `<title>User Token</title>
@@ -492,7 +492,7 @@ func Clean(expiry time.Duration, get_string, remove_string string) {
                 deleted_actualt, err := time.Parse(time.UnixDate, deleted_time)
                 Err_check(err) 
 
-                if deleted_actualt.Add(expiry).Before(time.Now().In(Loc)) {	
+                if deleted_actualt.Add(expiry).Before(time.Now().In(Nip)) {	
                     delete_removestmt := WriteStrings[remove_string]
                     _, err = new_tx.Exec(delete_removestmt, deleted_identity, deleted_time)
                     Err_check(err)

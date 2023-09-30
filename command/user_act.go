@@ -40,6 +40,9 @@ func User_actions(w http.ResponseWriter, req *http.Request) {
         return
     }
     
+    identity := req.Header.Get("X-Real-IP")
+    if Entry_check(w, req, "IP", identity) == 0 {return}
+    
     now := time.Now().In(Nip)
     then := now.Add(time.Duration(-30) * time.Hour)
     sdate := then.Format("20060102")
@@ -50,6 +53,8 @@ func User_actions(w http.ResponseWriter, req *http.Request) {
     new_tx, err := new_conn.Begin()
     Err_check(err)
     defer new_tx.Rollback()
+    
+    if Ban_check(w, req, new_tx, ctx, identity) {return}
     
     var parent string
     parent_row := new_tx.QueryRowContext(ctx, `SELECT Parent FROM posts WHERE Password = ? AND Board = ? LIMIT 1`, post_pass, board)
@@ -125,9 +130,6 @@ func User_actions(w http.ResponseWriter, req *http.Request) {
             http.Error(w, "Post exceeds character limit(10000). Post length: " + strconv.Itoa(post_length), http.StatusBadRequest)
             return 
         }
-        
-        identity := req.Header.Get("X-Real-IP")
-        if Entry_check(w, req, "IP", identity) == 0 {return}
         
         //cleaning
         input := html.EscapeString(req.FormValue("newpost"))
