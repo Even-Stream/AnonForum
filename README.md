@@ -31,9 +31,12 @@ Other
 - No PHP or Perl
 
 ## Compile Instructions
-sudo apt install build-essential cmake libvips-dev git yt-dlp
+sudo apt install build-essential cmake git libvips-dev libavformat-dev libswresample-dev libavcodec-dev libavutil-dev libavformat-dev libswscale-dev
 
-`Compile the latest version of Go`
+sudo apt install golang-1.21/bookworm-backports
+`Or compile the latest version of Go`
+
+sudo apt install yt-dlp/bookworm-backports
 
 git clone https://gitgud.io/nvtelen/ogai
 
