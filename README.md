@@ -12,17 +12,17 @@ Uses CSS instead of JS for some common features
 
 Takes advantage of Nginx capabilities
 
-- Banners with no JS
+- Banners without JS
 
-- Theme picker with no JS
+- Theme picker without JS
 
 Other
 
-- Editing or deleting your last post with no JS
+- Editing or deleting your last post without JS
 
 - Files keep their original name when downloaded 
 
-- Video embedding with no JS(uses ytp-dl) 
+- Video embedding without JS(uses ytp-dl) 
 
 - Webp thumbnails 
 
