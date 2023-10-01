@@ -18,6 +18,8 @@ Takes advantage of Nginx capabilities
 
 Other
 
+- Editing or deleting your last post with no js
+
 - Files keep their original name when downloaded 
 
 - Video embedding with no js(uses ytp-dl) 
