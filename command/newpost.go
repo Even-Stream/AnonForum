@@ -318,10 +318,11 @@ func New_post(w http.ResponseWriter, req *http.Request) {
                 option, calendar, clock, post_pass)
             Err_check(err)
 			
-			htadd_stmt := WriteStrings["htadd"]
-            _, err = new_tx.ExecContext(ctx, htadd_stmt, board, parent, file_pre, post_pass)
-            Err_check(err)
-			
+            if !HBoard_map[board] {
+                htadd_stmt := WriteStrings["htadd"]
+                _, err = new_tx.ExecContext(ctx, htadd_stmt, board, parent, file_pre, post_pass)
+                Err_check(err)
+			}
         } else {
               http.Error(w, "Unsupported file type.", http.StatusBadRequest)
               return
@@ -334,9 +335,10 @@ func New_post(w http.ResponseWriter, req *http.Request) {
     }
 
     if !no_text { 
-        _, err = new_tx.ExecContext(ctx, hpadd_stmt, board, home_content, home_truncontent, parent, post_pass)
-        Err_check(err)
-    }
+        if !HBoard_map[board] {
+            _, err = new_tx.ExecContext(ctx, hpadd_stmt, board, home_content, home_truncontent, parent, post_pass)
+            Err_check(err)
+    }}
 
     //reply insert
     if len(repmatches) > 0 {

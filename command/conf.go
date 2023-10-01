@@ -15,6 +15,7 @@ var boards []*ini.Key
 var Board_names []string
 var Board_descs []string
 var Board_map map[string]string
+var HBoard_map = make(map[string]bool)
 var Themes []string
 var INV_INST string
 var Word_filter = make(map[*regexp.Regexp]string)
@@ -23,7 +24,9 @@ func Load_conf() {
     homedir, err := os.UserHomeDir()
     Err_check(err)
     
-    cfg, err := ini.Load(homedir +  "/.config/ogai.ini")
+    cfg, err := ini.LoadSources(
+        ini.LoadOptions{AllowBooleanKeys: true,}, 
+        homedir +  "/.config/ogai.ini")
     Err_check(err)
 
     SiteName = cfg.Section("").Key("site name").String()
@@ -37,8 +40,11 @@ func Load_conf() {
     boards = cfg.Section("boards").Keys()
 
     for _, key := range boards {
-        Board_names = append(Board_names, key.Name())
-        Board_descs = append(Board_descs, key.Value())
+        if !cfg.Section("hidden").HasKey(key.Name()) {
+            Board_names = append(Board_names, key.Name())
+            Board_descs = append(Board_descs, key.Value())
+        } else {
+            HBoard_map[key.Name()] = true}
     }
 
     if len(boards) == 0 {

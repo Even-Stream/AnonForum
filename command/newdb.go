@@ -208,7 +208,7 @@ func create_table(db *sql.DB) {
         Err_check(err)
     statement.Exec()
 
-    for _, board := range Board_names {
+    for board := range Board_map {
         statement, err = db.Prepare(strings.Replace(latestseedSQL, "cb", `'` + board + `'`, 1))
             Err_check(err)
         statement.Exec()
