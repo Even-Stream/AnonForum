@@ -19,6 +19,7 @@ var HBoard_map = make(map[string]bool)
 var Themes []string
 var INV_INST string
 var Word_filter = make(map[*regexp.Regexp]string)
+var Forbidden = make(map[string]bool)
 
 func Load_conf() {
     homedir, err := os.UserHomeDir()
@@ -52,6 +53,11 @@ func Load_conf() {
     }
     if len(Board_names) != len(Board_descs) {
         log.Fatal("Configuration error: Not all boards have a description")
+   }
+   
+   fhashes := cfg.Section("forbidden").KeyStrings()
+   for _, h := range fhashes {
+       Forbidden[`d:` + h] = true
    }
 
    Themes = cfg.Section("misc").Key("themes").Strings(" ")

@@ -266,6 +266,11 @@ func New_post(w http.ResponseWriter, req *http.Request) {
                     http.Error(w, `Duplicate image. Original: /` + board + `/` + dupt + `.html#no` + dupid, http.StatusUnauthorized)
                     return
                 }
+                if Forbidden[hash] {
+                    Delete_file(file_path, file_name, file_pre)
+                    http.Redirect(w, req, req.Header.Get("Referer"), 302)
+                    return
+                }
 
                 file_info = image_gen_info(handler.Size, width, height)
                 io.Copy(f, file_buffer)
