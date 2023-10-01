@@ -22,7 +22,7 @@ const (
         "Fileinfo" TEXT,
         "Filemime" TEXT,
         "Imgprev" TEXT,
-        "Phash" TEXT,
+        "Hash" TEXT,
         "Option" TEXT,
         "Calendar" INTEGER NOT NULL,
         "Clock" INTEGER NOT NULL,

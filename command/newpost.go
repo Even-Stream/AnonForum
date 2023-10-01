@@ -235,6 +235,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             file_pre := strconv.FormatInt(time.Now().UnixNano(), 10)
             file_name := file_pre + ext
             file_path := BP + "head/" + board + "/Files/"
+            hash := ""
 
             f, err := os.OpenFile(file_path + file_name, os.O_WRONLY|os.O_CREATE, 0666)
             Err_check(err)
@@ -247,15 +248,26 @@ func New_post(w http.ResponseWriter, req *http.Request) {
                 file_buffer := bytes.NewBuffer(nil)
                 io.Copy(file_buffer, file)
  
-                width, height, cerr := Make_thumb(file_path, file_pre, file_buffer.Bytes(), 200)
+                width, height, ihash, cerr := Make_thumb(file_path, file_pre, file_buffer.Bytes(), 200)
+                hash = ihash
                 if cerr != nil {
                     //delete empty file
+                    Delete_file(file_path, file_name, "")
                     http.Error(w, "Corrupted image.", http.StatusBadRequest)
+                    return
+                }
+                file_pre += "s.webp"
+                
+                var dupt, dupid string
+                dupcheck_stmt := WriteStrings["dupcheck"]
+                err = new_tx.QueryRowContext(ctx, dupcheck_stmt, hash, board).Scan(&dupt, &dupid)
+                if err != sql.ErrNoRows {
+                    Delete_file(file_path, file_name, file_pre)
+                    http.Error(w, `Duplicate image. Original: /` + board + `/` + dupt + `.html#no` + dupid, http.StatusUnauthorized)
                     return
                 }
 
                 file_info = image_gen_info(handler.Size, width, height)
-                file_pre += "s.webp"
                 io.Copy(f, file_buffer)
             } else { 
                 io.Copy(f, file)
@@ -290,7 +302,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
                             err = png.Encode(cover_buffer, frimg.SubImage(frimg.Rect))
                             Err_check(err)
 
-                            _, _, cerr := Make_thumb(file_path, file_pre, cover_buffer.Bytes(), 300)
+                            _, _, _, cerr := Make_thumb(file_path, file_pre, cover_buffer.Bytes(), 300)
                             if cerr != nil {
                                 file_pre = "audio_image.webp"
                             } else {
@@ -314,7 +326,8 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             }
             ffname := string(ofname[rem:])
 
-            _, err = new_tx.ExecContext(ctx, newpst_wfstmt, board, input, post_time, parent, identity, file_name, ffname, file_info, mime_type, file_pre, 
+            _, err = new_tx.ExecContext(ctx, newpst_wfstmt, board, input, post_time, parent, identity, 
+                file_name, ffname, file_info, mime_type, file_pre, hash,
                 option, calendar, clock, post_pass)
             Err_check(err)
 			

@@ -123,6 +123,7 @@ func Entry_check(w http.ResponseWriter, req *http.Request, entry string, value s
 //listened to
 
 func Token_check (w http.ResponseWriter, req *http.Request) {
+    ctx := req.Context()
 
     if Request_filter(w, req, "POST", 1 << 10) == 0 {return}
     if err := req.ParseMultipartForm(1 << 10); err != nil {
@@ -145,24 +146,23 @@ func Token_check (w http.ResponseWriter, req *http.Request) {
     }
 
     //look in database for token, if there, delete token, create account 
-    conn, err := sql.Open("sqlite3", DB_uri)
+    new_conn := WriteConnCheckout()
+    defer WriteConnCheckin(new_conn)
+    new_tx, err := new_conn.Begin()
     Err_check(err)
-    defer conn.Close()
-    search_token_stmt, err := conn.Prepare(search_token_string)
-    Err_check(err)
+    defer new_tx.Rollback()
 
     var acc_type Acc_type
-    err = search_token_stmt.QueryRow(token).Scan(&acc_type)
+    err = new_tx.QueryRowContext(ctx, search_token_string, token).Scan(&acc_type)
     if err == sql.ErrNoRows {
         http.Error(w, "Invalid token.", http.StatusBadRequest)
         return
+    } else {
+        Err_check(err)
     }
 
     //look in database for username
-    search_user_stmt, err := conn.Prepare(search_user_string)
-    Err_check(err)
-
-    err = search_user_stmt.QueryRow(username).Scan()
+    err = new_tx.QueryRowContext(ctx, search_user_string, username).Scan()
     if err != sql.ErrNoRows {
         http.Error(w, "Username already in use.", http.StatusBadRequest)
         return
@@ -176,24 +176,17 @@ func Token_check (w http.ResponseWriter, req *http.Request) {
     }
 
     //deleting token
-    conn2, err := sql.Open("sqlite3", DB_uri)
-    Err_check(err)
-    defer conn2.Close()
-    delete_token_stmt, err := conn2.Prepare(delete_token_string)
-    Err_check(err)
-    delete_token_stmt.Exec(token)
-
-
-    conn3, err := sql.Open("sqlite3", DB_uri)
-    Err_check(err)
-    defer conn3.Close()
-    new_user_stmt, err := conn3.Prepare(new_user_string)
+    _, err = new_tx.ExecContext(ctx, delete_token_string, token)
     Err_check(err)
 
     hash, err := argon2id.CreateHash(password, Argon_params)
     Err_check(err)
-
-    new_user_stmt.Exec(username, hash, acc_type)
+    
+    _, err = new_tx.ExecContext(ctx, new_user_string, username, hash, acc_type)
+    Err_check(err)
+    
+    err = new_tx.Commit()
+    Err_check(err)
 
     w.Write([]byte(html_head + html_tologin_head + `<p>Account created.</p>` + html_foot))
 }

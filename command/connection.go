@@ -43,15 +43,16 @@ const (
     total_countstring = `Select COUNT(*), COUNT(File) FROM posts WHERE Board = ?1 AND Parent = ?2 AND Id <> ?2`
 
     //all inserts(and necessary queries) are preformed in one transaction 
-    newpost_wfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, File, Filename, Fileinfo, Filemime, Imgprev, 
+    newpost_wfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, File, Filename, Fileinfo, Filemime, Imgprev, Hash,
         Option, Calendar, Clock, Password, Pinned, Locked, Anchored) 
-        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, 0, 0, 
+        VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, 0, 0, 
 		COALESCE((SELECT Anchored FROM posts WHERE Id = ?4), 0))`
     newpost_nfstring = `INSERT INTO posts(Board, Id, Content, Time, Parent, Identifier, Option, Calendar, Clock, Password, Pinned, Locked, Anchored)
         VALUES (?1, (SELECT Id FROM latest WHERE Board = ?1), ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, 0, 0, 
 		COALESCE((SELECT Anchored FROM posts WHERE Id = ?4), 0))`
 	user_edit_string = `UPDATE posts SET Content = ? || '<br><br><div class="editmessage">' || ? || '</div>' 
 	    WHERE Calendar >= ? AND Password = ? AND Board = ?`	
+    dupcheck_string = `SELECT Parent, Id FROM posts WHERE Hash = ? AND Board = ?`
 		
     repadd_string = `INSERT INTO replies(Board, Source, Replier, Password) VALUES (?1, ?2, (SELECT Id FROM latest WHERE Board = ?1) - 1, ?3)`
 	repupdate_string = `INSERT INTO replies(Board, Source, Replier, Password) VALUES 
@@ -113,7 +114,7 @@ const (
     unpin_string = `UPDATE posts SET Pinned = 0 WHERE Id = ? AND Board = ?`
 )
 
-var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_nf": newpost_nfstring, "user_edit": user_edit_string,
+var  WriteStrings = map[string]string{"newpost_wf": newpost_wfstring, "newpost_nf": newpost_nfstring, "user_edit": user_edit_string, "dupcheck": dupcheck_string,
         "repadd": repadd_string, "repupdate": repupdate_string, "subadd": subadd_string, 
 		"hpadd": hpadd_string, "htadd": htadd_string, "hpupdate": hpupdate_string,
         "parent_check": parent_checkstring, "threadid" : threadid_string,
