@@ -80,6 +80,8 @@ bold: \*\*example\*\*
 italics: \_\_example\_\_
 
 ## Project status
-12/4/22
+As of 10/1/23, Ogai is considered feature complete. 
+
+Future updates are possible, but no longer a priority for me.
 
 ongoing
