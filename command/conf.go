@@ -57,7 +57,7 @@ func Load_conf() {
    
    fhashes := cfg.Section("forbidden").KeyStrings()
    for _, h := range fhashes {
-       Forbidden[`d:` + h] = true
+       Forbidden[`p:` + h] = true
    }
 
    Themes = cfg.Section("misc").Key("themes").Strings(" ")

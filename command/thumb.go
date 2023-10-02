@@ -30,7 +30,7 @@ func Make_thumb(file_path, file_pre string, file_buffer []byte, max_dim int) (in
     img, _, err := image.Decode(imageReader)
     Err_check(err)
     
-    hash, err := gih.DifferenceHash(img)
+    hash, err := gih.PerceptionHash(img)
     Err_check(err)
 
     bimg.Write(file_path + file_pre + "s.webp", newImage)
