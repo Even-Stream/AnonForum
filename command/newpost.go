@@ -231,6 +231,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
         Err_check(err)
 		
         if supported_file {
+            htadd_cond := false
 
             file_pre := strconv.FormatInt(time.Now().UnixNano(), 10)
             file_name := file_pre + ext
@@ -245,6 +246,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
             var file_info string
 
             if strings.HasPrefix(mime_type, "image") {
+                htadd_cond = true
                 file_buffer := bytes.NewBuffer(nil)
                 io.Copy(file_buffer, file)
  
@@ -313,6 +315,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
                             } else {
                                 file_pre += "s.webp"
                             }
+                            htadd_cond = true
                             break
                         }
                     }
@@ -336,7 +339,7 @@ func New_post(w http.ResponseWriter, req *http.Request) {
                 option, calendar, clock, post_pass)
             Err_check(err)
 			
-            if !HBoard_map[board] {
+            if !HBoard_map[board] && htadd_cond {
                 htadd_stmt := WriteStrings["htadd"]
                 _, err = new_tx.ExecContext(ctx, htadd_stmt, board, parent, file_pre, post_pass)
                 Err_check(err)
