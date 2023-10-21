@@ -70,7 +70,7 @@ func main() {
     go Clean(40 * time.Hour, "get_deleted", "delete_remove")
     go Clean(10 * time.Minute, "get_expired_tokens", "delete_expired_token")
  
-    for _, board := range Board_names{
+    for board, _ := range Board_map{
         Build_home()
         Build_board(board)
         Build_catalog(board)

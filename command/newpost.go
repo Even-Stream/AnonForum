@@ -28,7 +28,7 @@ var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg",
     "video/webm": ".webm", "video/mp4": ".mp4"}
 
 const (
-    max_upload_size = 20 << 20   //20MB
+    max_upload_size = 1024 * 1024 * 15
     max_post_length = 10000
 )
 

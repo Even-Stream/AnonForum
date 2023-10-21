@@ -3,7 +3,6 @@ package main
 //loads configuation information
 import (
     "log"
-    "os"
 	"regexp"
 
     ini "gopkg.in/ini.v1"
@@ -21,13 +20,9 @@ var INV_INST string
 var Word_filter = make(map[*regexp.Regexp]string)
 var Forbidden = make(map[string]bool)
 
-func Load_conf() {
-    homedir, err := os.UserHomeDir()
-    Err_check(err)
-    
+func Load_conf() { 
     cfg, err := ini.LoadSources(
-        ini.LoadOptions{AllowBooleanKeys: true,}, 
-        homedir +  "/.config/ogai.ini")
+        ini.LoadOptions{AllowBooleanKeys: true,}, "ogai.ini")
     Err_check(err)
 
     SiteName = cfg.Section("").Key("site name").String()
