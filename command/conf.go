@@ -10,6 +10,7 @@ import (
 
 var SiteName string
 var BP string
+var Max_request_size int64
 var boards []*ini.Key
 var Board_names []string
 var Board_descs []string
@@ -27,6 +28,9 @@ func Load_conf() {
 
     SiteName = cfg.Section("").Key("site name").String()
     BP = cfg.Section("").Key("base path").String()
+    Max_request_size, err = cfg.Section("").Key("max request size").Int64()
+    Err_check(err)
+    Max_upload_size = 1024 * 1024 * Max_request_size
 
 	for word, replacement := range cfg.Section("filter").KeysHash() {
 	    Word_filter[regexp.MustCompile(`(?i)` + word)] = replacement

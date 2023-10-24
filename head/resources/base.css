@@ -117,6 +117,10 @@ input[type=submit] {
     padding: 3px;
 }
 
+input[type=file]::after {
+    content: ">= 15mb";
+}
+
 .controls {
     background-color: rosybrown;
     padding: 5px;

@@ -20,6 +20,7 @@ import (
 )
 
 var Nip, _ = time.LoadLocation("Asia/Tokyo")
+var Max_upload_size int64
 
 var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg", 
     "image/gif": ".gif", "image/webp": ".webp", "image/avif": ".avif", "image/vnd.mozilla.apng": ".apng",
@@ -28,7 +29,6 @@ var mime_ext = map[string]string{"image/png": ".png", "image/jpeg": ".jpg",
     "video/webm": ".webm", "video/mp4": ".mp4"}
 
 const (
-    max_upload_size = 1024 * 1024 * 15
     max_post_length = 10000
 )
 
@@ -81,9 +81,9 @@ func Ban_check(w http.ResponseWriter, req *http.Request, new_tx *sql.Tx, ctx con
 func New_post(w http.ResponseWriter, req *http.Request) {
     ctx := req.Context()
 
-    if Request_filter(w, req, "POST", max_upload_size) == 0 {return}
-    if err := req.ParseMultipartForm(max_upload_size); err != nil {
-        http.Error(w, "Request size exceeds limit.", http.StatusBadRequest)
+    if Request_filter(w, req, "POST", Max_upload_size) == 0 {return}
+    if err := req.ParseMultipartForm(Max_upload_size); err != nil {
+        http.Error(w, "Request size exceeds limit: " + strconv.FormatInt(Max_request_size - 1, 10) + " MB", http.StatusBadRequest)
         return
     }
     defer req.MultipartForm.RemoveAll()

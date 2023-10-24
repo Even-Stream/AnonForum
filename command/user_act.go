@@ -117,7 +117,7 @@ func User_actions(w http.ResponseWriter, req *http.Request) {
     }}
     
     if option == "Edit" {
-        if Request_filter(w, req, "POST", max_upload_size) == 0 {return}
+        if Request_filter(w, req, "POST", Max_upload_size) == 0 {return}
        
         no_text := (strings.TrimSpace(req.FormValue("newpost")) == "")
         if no_text {
