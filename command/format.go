@@ -36,7 +36,7 @@ const (
     spoilpost = `<spoil>$1</spoil>`
     boldpost = `<b>$1</b>`
     italicpost = `<i>$1</i>`
-    linkpost = `$1<a href="$2://$3" rel="noopener noreferrer nofollow">$2://$3</a>`
+    linkpost = `$1<a href="$2://$3" rel="noopener noreferrer nofollow" target="_blank">$2://$3</a>`
 )
 
 func Rand_gen() string {
