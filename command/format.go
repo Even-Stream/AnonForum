@@ -56,7 +56,7 @@ func Conf_dependent() {
                                 `(youtube.com\/watch\?v=|youtu.be\/|` + INV_INST + `\/watch\?v=)(\S+)`)
 
     vidpost = `<details>
-        <summary>$1$2$3 <a href="$1$2$3" rel="noopener noreferrer nofollow">[link]</a></summary>
+        <summary>$1$2$3 <a href="$1$2$3" rel="noopener noreferrer nofollow" target="_blank">[link]</a></summary>
         <iframe src="/im/vid/?id=$3" allowfullscreen="" loading="lazy" sandbox>
     </iframe></details>` 
 }
