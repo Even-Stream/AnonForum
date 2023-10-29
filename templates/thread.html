@@ -36,7 +36,7 @@
 
                     <label>File <a href="Files/{{.File}}" download="{{.Filename}}">{{.Filename}}</a> - ({{.Fileinfo}})</label>
                     <br>
-                    {{if avcheck .Filemime}}<video controls poster={{if eq .Imgprev "audio_image.webp"}}'/resources/audio_image.webp'{{else}}'/{{$name}}/Files/{{.Imgprev}}'{{end}}><source src='/{{$name}}/Files/{{.File}}' type= '{{.Filemime}}'></video>{{else}}<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
+                    {{if avcheck .Filemime}}<video preload="none" controls poster={{if eq .Imgprev "audio_image.webp"}}'/resources/audio_image.webp'{{else}}'/{{$name}}/Files/{{.Imgprev}}'{{end}}><source src='/{{$name}}/Files/{{.File}}' type= '{{.Filemime}}'></video>{{else}}<input type="checkbox" class="image imspec p{{.Id}}" autocomplete="off"/>{{end}}
                     <label class="{{.Option}}">{{if $sub}}<subject>{{$sub}}</subject>{{end}} <time>{{.Time}}</time> <selfref><a href="#no{{.Id}}">No. </a><a class="plink" href="#newpost">{{.Id}}</a></selfref>{{if .Pinned}}<div class="pin"></div>{{end}}{{if .Locked}}<div class="lock"></div>{{end}}{{if .Anchored}}<div class="anchor"></div>{{end}}</label>
                     <div class="pcontent">{{.Content}}</div>
 
