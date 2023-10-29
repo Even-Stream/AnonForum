@@ -112,6 +112,7 @@ const (
         AFTER UPDATE ON posts
         BEGIN
             DELETE FROM replies WHERE Replier = OLD.Id AND Board = OLD.Board;
+            DELETE FROM homethumb WHERE Imgprev = OLD.Imgprev AND NEW.Imgprev = 'deleted';
         END;
     `
         
