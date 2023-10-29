@@ -1,6 +1,13 @@
 # Ogai
 
-An image board engine written in golang. 
+An image board engine written in golang.
+
+Live instance:
+
+- https://sayachan.pl/ 
+- https://[200:c5b0:cfeb:5db:c054:d66d:eb6f:7412]:4443/ (fastest)
+- https://s4taqq6ysw2wde4rcmq6xk5vvgmab3cuqtykwfq2padiwh2rncjfxcyd.onion:4443/
+- https://mwmrm4yaihoyk7acurfnmfiuucn1ozeyaewo15zdttfeuek5rsto.loki:4443/
 
 ## Advantages
 

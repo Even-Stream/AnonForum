@@ -353,3 +353,7 @@ iframe {
     font-size: 15px;
     content: '\e802';
 }
+
+.bannerimg {
+    height: 100px;
+}
