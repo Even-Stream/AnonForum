@@ -59,7 +59,7 @@ postwrap::before, .prev {
 
 p, label, postwrap, threadwrap, a, postwrap::before, textarea, .ogdc {
     font-family: MPlus, system-ui, Helvetica, Arial, sans-serif;
-    font-size: 15px;
+    font-size: 11pt;
 }
 
 postwrap, threadwrap {
