@@ -117,8 +117,13 @@ input[type=submit] {
     padding: 3px;
 }
 
-input[type=file]::after {
-    content: ">= 15mb";
+input[type=file] {
+    width: 13pc;
+}
+
+.ficon::after {
+    content: " >= 15mb";
+    font-size: small;
 }
 
 .controls {

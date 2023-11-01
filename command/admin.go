@@ -18,7 +18,7 @@ const (
             WHERE Parent <> 0`
     query_cap = ` ORDER BY ROWID DESC`
 
-    ban_log_query_string = `SELECT Identifier, Expiry, Mod, Content, Reason FROM banned`
+    ban_log_query_string = `SELECT Identifier, Expiry, Mod, IIF(Expiry <> '-1', Content, 'something heinous') as Content, Reason FROM banned`
     delete_log_query_string = `SELECT Identifier, Time, Mod, Content, Reason FROM deleted`
 )
 
