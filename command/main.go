@@ -66,6 +66,7 @@ func main() {
         New_db()
         Admin_init()
     }
+    LatestSeed()
     Make_Conns()
     go Clean(40 * time.Hour, "get_deleted", "delete_remove")
     go Clean(10 * time.Minute, "get_expired_tokens", "delete_expired_token")

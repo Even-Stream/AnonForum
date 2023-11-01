@@ -48,7 +48,7 @@ const (
     );`
 
     createLatestIdTableSQL = `CREATE TABLE latest (
-        "Board" TEXT NOT NULL,
+        "Board" TEXT PRIMARY KEY,
         "Id" INTEGER NOT NULL
     );`
 
@@ -143,7 +143,7 @@ const (
         
         
     //how new posts know what their id is 
-    latestseedSQL = `INSERT INTO latest (Board, Id) VALUES (cb, 1);`
+    latestseedSQL = `INSERT OR IGNORE INTO latest (Board, Id) VALUES (cb, 1);`
 )
 
 func create_table(db *sql.DB) {
@@ -209,12 +209,19 @@ func create_table(db *sql.DB) {
         Err_check(err)
     statement.Exec()
 
+}
+
+
+func LatestSeed() {
+    conn, err := sql.Open("sqlite3", DB_path)
+    Err_check(err)
+    defer conn.Close()
+    
     for board := range Board_map {
-        statement, err = db.Prepare(strings.Replace(latestseedSQL, "cb", `'` + board + `'`, 1))
+        statement, err := conn.Prepare(strings.Replace(latestseedSQL, "cb", `'` + board + `'`, 1))
             Err_check(err)
         statement.Exec()
     }
-
 }
 
 func New_db() {
