@@ -47,10 +47,10 @@ func Listen() {
 
     srv := &http.Server {
         Addr: ":1024",
-        IdleTimeout: 5 * time.Second,
-        ReadTimeout: 3 * time.Second,
-        ReadHeaderTimeout: 3 * time.Second,
-        WriteTimeout: 5 * time.Second,
+        IdleTimeout: 10 * time.Second,
+        ReadTimeout: 6 * time.Second,
+        ReadHeaderTimeout: 6 * time.Second,
+        WriteTimeout: 10 * time.Second,
         Handler: hongMeiling(mux),
     }
     srv.ListenAndServe()
