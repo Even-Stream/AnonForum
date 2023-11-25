@@ -481,7 +481,7 @@ func Auto_delete() {
         FROM posts AS outer WHERE Id > (SELECT Id FROM latest AS inner WHERE inner.Board = outer.Board LIMIT 1) - 6 AND
         Content LIKE '%' || ? || '%'`
     
-    for range time.Tick(1 * time.Minute) { //change to five
+    for range time.Tick(5 * time.Minute) { //change to five
         func() {
             update_posts := false
             boards_to_update := make(map[string]bool)
