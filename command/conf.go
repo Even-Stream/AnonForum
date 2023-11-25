@@ -20,6 +20,7 @@ var Themes []string
 var INV_INST string
 var Word_filter = make(map[*regexp.Regexp]string)
 var Forbidden = make(map[string]bool)
+var Auto_phrases []string
 
 func Load_conf() { 
     cfg, err := ini.LoadSources(
@@ -61,5 +62,8 @@ func Load_conf() {
 
    Themes = cfg.Section("misc").Key("themes").Strings(" ")
    INV_INST = cfg.Section("misc").Key("invinst").String()
+
+   Auto_phrases = cfg.Section("auto delete").KeyStrings()
+   
    Conf_dependent()
 }

@@ -7,6 +7,7 @@ import (
     "strconv"
     "database/sql"
     "text/template"
+    "context"
 
     "github.com/google/uuid"
 )
@@ -120,43 +121,11 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
         }
 
         if strings.HasSuffix(actions, "Delete") {
-            get_files_stmt := WriteStrings["get_files"]
-            isparent_stmt := WriteStrings["isparent"]
-
-            //DO FOR ALL FILES
-            file_rows, err := new_tx.QueryContext(ctx, get_files_stmt, id, board)
-            Err_check(err)
-
-            defer file_rows.Close()
-
-            for file_rows.Next() {
-                var file_name string
-                var imgprev string
-
-                err = file_rows.Scan(&file_name, &imgprev)
-                Err_check(err)
-
-                if file_name != "" {
-                    file_path := BP + "head/" + board + "/Files/"
-                    Delete_file(file_path, file_name, imgprev)
-            }}
-
             delete_log_stmt := WriteStrings["delete_log"]
             _, err = new_tx.ExecContext(ctx, delete_log_stmt, id, board, time.Now().In(Nip).Format(time.UnixDate), userSession.username, reason)
 			Err_check(err)
-            
-            var pcheck bool
-            pcheck_row := new_tx.QueryRowContext(ctx, isparent_stmt, id, board)
-            pcheck_row.Scan(&pcheck)
-            
-            if pcheck {
-                file_path := BP + "head/" + board + "/"
-                Delete_file(file_path, id + ".html", "")
-            }
 
-            delete_post_stmt := WriteStrings["delete_post"]
-            _, err = new_tx.ExecContext(ctx, delete_post_stmt, id, board)
-            Err_check(err)
+	    delete_tree(id, board, new_tx, ctx)
 
             update_posts = true
         }
@@ -318,6 +287,43 @@ func Moderation_actions(w http.ResponseWriter, req *http.Request) {
 
 }
 
+
+func delete_tree(id, board string, new_tx *sql.Tx, ctx context.Context) {
+    get_files_stmt := WriteStrings["get_files"]
+    isparent_stmt := WriteStrings["isparent"]
+    
+    //DO FOR ALL FILES
+    file_rows, err := new_tx.QueryContext(ctx, get_files_stmt, id, board)
+    Err_check(err)
+    defer file_rows.Close()
+    
+    for file_rows.Next() {
+        var file_name string
+        var imgprev string
+        err = file_rows.Scan(&file_name, &imgprev)
+        Err_check(err)
+        if file_name != "" {
+            file_path := BP + "head/" + board + "/Files/"
+            Delete_file(file_path, file_name, imgprev)
+    }}
+    
+    var pcheck bool
+    pcheck_row := new_tx.QueryRowContext(ctx, isparent_stmt, id, board)
+    pcheck_row.Scan(&pcheck)
+    if pcheck {
+            file_path := BP + "head/" + board + "/"
+            Delete_file(file_path, id + ".html", "")
+    }
+
+    delete_post_stmt := WriteStrings["delete_post"]
+    _, err = new_tx.ExecContext(ctx, delete_post_stmt, id, board)
+    Err_check(err)
+}
+
+
+
+
+
 func Unban(w http.ResponseWriter, req *http.Request) {
     userSession := Logged_in_check(w, req)
     if userSession == nil {return}
@@ -469,6 +475,58 @@ func Load_console(w http.ResponseWriter, req *http.Request) {
 	Err_check(err)
     }
 }
+
+func Auto_delete() {  
+    auto_delete_stmt := `SELECT Id, Board
+        FROM posts AS outer WHERE Id > (SELECT Id FROM latest AS inner WHERE inner.Board = outer.Board LIMIT 1) - 6 AND
+        Content LIKE '%' || ? || '%'`
+    
+    for range time.Tick(1 * time.Minute) { //change to five
+        func() {
+            update_posts := false
+            boards_to_update := make(map[string]bool)
+            
+            ctx := context.Background()
+            ctx, cancel := context.WithTimeout(ctx, 60 * time.Second)           
+            
+            new_conn := WriteConnCheckout()
+            defer WriteConnCheckin(new_conn)
+            new_tx, err := new_conn.Begin()
+            Err_check(err)
+            defer new_tx.Rollback()
+
+
+            for _, phrase := range Auto_phrases {
+                to_delete, err := new_tx.Query(auto_delete_stmt, phrase)
+                Err_check(err)
+                defer to_delete.Close()
+
+                for to_delete.Next() { 
+                    update_posts = true
+                    var cid string
+                    var cboard string
+                    
+                    err = to_delete.Scan(&cid, &cboard)
+                    Err_check(err)
+
+                    boards_to_update[cboard] = true
+                    
+                    delete_tree(cid, cboard, new_tx, ctx)
+            }}
+
+            err = new_tx.Commit()
+            Err_check(err)
+            cancel()
+
+            if update_posts {
+                for board, _ := range boards_to_update {
+                    go Build_board(board)
+                    go Build_catalog(board)
+                }
+                go Build_home()
+            }
+        }()
+}}
 
 func Clean(expiry time.Duration, get_string, remove_string string) {
     for range time.Tick(expiry) {
