@@ -137,7 +137,7 @@ const (
         AFTER INSERT ON homethumb
         BEGIN
             DELETE FROM homethumb WHERE ROWID =
-                IIF((SELECT COUNT(Id) FROM homethumb) > 6,
+                IIF((SELECT COUNT(Id) FROM homethumb) > 10,
                 (SELECT min(ROWID) from homethumb), NULL);
         END;`
         

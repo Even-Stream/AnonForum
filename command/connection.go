@@ -218,7 +218,7 @@ func Make_Conns() {
         conn10b, err := sql.Open("sqlite3", DB_uri)
         Err_check(err)
 
-        ht_collstmt, err := conn10b.Prepare("SELECT * FROM homethumb ORDER BY ROWID DESC")
+        ht_collstmt, err := conn10b.Prepare("SELECT * FROM homethumb ORDER BY ROWID DESC LIMIT 6")
         Err_check(err)
 
         conn12, err := sql.Open("sqlite3", DB_uri)
