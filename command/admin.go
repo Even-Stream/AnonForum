@@ -487,7 +487,7 @@ func Auto_delete() {
             boards_to_update := make(map[string]bool)
             
             ctx := context.Background()
-            ctx, cancel := context.WithTimeout(ctx, 60 * time.Second)           
+            ctx, cancel := context.WithTimeout(ctx, 5 * time.Minute)           
             
             new_conn := WriteConnCheckout()
             defer WriteConnCheckin(new_conn)

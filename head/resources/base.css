@@ -122,7 +122,7 @@ input[type=file] {
 }
 
 .ficon::after {
-    content: " >= 15mb";
+    content: " >= 15MB (1MB on clearnet)";
     font-size: small;
 }
 
