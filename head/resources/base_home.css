@@ -31,8 +31,12 @@ td, iframe {
     border-bottom: thin solid;
 }
 
-.rpost p, .recpost p, .rlast, .blink, .nojsmenu a, pre {
+
+.rpost p, .recpost p, .rlast, .blink, .nojsmenu a, .hop, body {
     font-family: MPlus, system-ui, Helvetica, Arial, sans-serif;
+}
+
+.rpost p, .recpost p, .rlast, .blink, .nojsmenu a, pre {
     font-size: 11pt;
 }
 
@@ -51,7 +55,6 @@ td, iframe {
 }
 
 .hop {
-    font-family: MPlus, Helvetica, Arial, sans-serif;
     font-size: 17px;
     text-align: center;
     text-decoration: none;

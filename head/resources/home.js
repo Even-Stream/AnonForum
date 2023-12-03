@@ -1,14 +1,17 @@
 const selectedcolor = getComputedStyle(document.body).getPropertyValue('--sel-color');
 
 const menubuttons = document.querySelectorAll('td.hop');
-
 const frames = document.querySelectorAll('iframe');
 
+const fontcolor = window.getComputedStyle(document.getElementById('Main')).getPropertyValue('color');
+const parentfont = window.getComputedStyle(document.body).fontFamily;
 
 menubuttons.forEach(menubutton => menubutton.addEventListener('click', SwitchToRow, false));
 
-frames.forEach(frame => frame.addEventListener('load', SizeAdjust));
-
+frames.forEach(frame => {
+        frame.addEventListener('load', ApplyFont);
+            frame.addEventListener('load', SizeAdjust);
+});
 
 function SwitchToRow(e) {
     let visibleid = this.id + 'row';
@@ -24,6 +27,11 @@ function SwitchToRow(e) {
             menurow.style.visibility = 'collapse';
         } else {menurow.style.visibility = 'visible';}
     });
+}
+
+function ApplyFont(e) {
+        this.contentDocument.body.style.color = fontcolor;
+        this.contentDocument.body.style.fontFamily = parentfont;
 }
 
 function SizeAdjust(e) {
