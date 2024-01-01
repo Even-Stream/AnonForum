@@ -24,7 +24,7 @@ var Auto_phrases []string
 
 func Load_conf() { 
     cfg, err := ini.LoadSources(
-        ini.LoadOptions{AllowBooleanKeys: true,}, "ogai.ini")
+        ini.LoadOptions{AllowBooleanKeys: true,}, "af.ini")
     Err_check(err)
 
     SiteName = cfg.Section("").Key("site name").String()
